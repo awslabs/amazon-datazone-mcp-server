@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "datazone-mcp-server"
-version = "0.1.0"
+dynamic = ["version"]
 description = "MCP server for AWS DataZone service"
 authors = [
     {name = "AWS DataZone MCP Community", email = "trwang@amazon.com"}
@@ -102,4 +102,7 @@ markers = [
 "Repository" = "https://github.com/wangtianren/datazone-mcp-server"
 "Issues" = "https://github.com/wangtianren/datazone-mcp-server/issues"
 "Changelog" = "https://github.com/wangtianren/datazone-mcp-server/blob/main/CHANGELOG.md"
+
+[tool.setuptools.dynamic]
+version = {file = "VERSION"}
 
