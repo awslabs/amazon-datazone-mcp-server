@@ -2,9 +2,9 @@
 
 This directory contains comprehensive examples demonstrating how to use the AWS DataZone MCP Server in real-world scenarios. The examples are organized by complexity and use case to help you get started quickly.
 
-## 📋 Example Categories
+## Example Categories
 
-### 🚀 [Basic Examples](./basic/)
+### [Basic Examples](./basic/)
 Simple, focused examples showing individual operations:
 - [Domain Operations](./basic/domain_operations.py) - Get, create, and manage domains
 - [Project Management](./basic/project_management.py) - Create and manage projects
@@ -12,7 +12,7 @@ Simple, focused examples showing individual operations:
 - [Glossary Management](./basic/glossary_management.py) - Create and manage glossaries
 - [Environment Setup](./basic/environment_setup.py) - Environment and connection management
 
-### 🔄 [Workflow Examples](./workflows/)
+### [Workflow Examples](./workflows/)
 Multi-step processes showing complete workflows:
 - [Data Onboarding](./workflows/data_onboarding_workflow.py) - Complete data asset onboarding
 - [Project Setup](./workflows/project_setup_workflow.py) - End-to-end project creation
@@ -20,7 +20,7 @@ Multi-step processes showing complete workflows:
 - [Data Subscription](./workflows/data_subscription_workflow.py) - Request and manage subscriptions
 - [Governance Setup](./workflows/governance_setup_workflow.py) - Set up data governance framework
 
-### 🎯 [Advanced Examples](./advanced/)
+### [Advanced Examples](./advanced/)
 Complex scenarios demonstrating advanced patterns:
 - [Batch Operations](./advanced/batch_operations.py) - Process multiple items efficiently
 - [Error Handling](./advanced/error_handling_patterns.py) - Robust error handling strategies
@@ -28,14 +28,14 @@ Complex scenarios demonstrating advanced patterns:
 - [Performance Optimization](./advanced/performance_optimization.py) - Optimize for scale
 - [Security Patterns](./advanced/security_patterns.py) - Implement security best practices
 
-### 💡 [Best Practices](./best_practices/)
+### [Best Practices](./best_practices/)
 Recommended patterns and practices:
 - [Authentication Setup](./best_practices/authentication_setup.py) - Secure AWS credential management
 - [Configuration Management](./best_practices/configuration_management.py) - Environment and config management
 - [Logging and Monitoring](./best_practices/logging_monitoring.py) - Observability patterns
 - [Testing Strategies](./best_practices/testing_strategies.py) - How to test MCP integrations
 
-## 🏃‍♂️ Quick Start
+## Quick Start
 
 ### Prerequisites
 
@@ -74,7 +74,7 @@ python examples/workflows/data_onboarding_workflow.py
 DATAZONE_DOMAIN_ID=dzd_abc123 python examples/basic/domain_operations.py
 ```
 
-## 📖 Example Structure
+## Example Structure
 
 Each example follows a consistent structure:
 
@@ -111,7 +111,7 @@ if __name__ == "__main__":
     asyncio.run(main())
 ```
 
-## 🔧 Common Patterns
+## Common Patterns
 
 ### Error Handling
 ```python
@@ -143,7 +143,7 @@ for project in projects.get("items", []):
     print(f"Project: {project['name']} (ID: {project['id']})")
 ```
 
-## 🎯 Use Case Index
+## Use Case Index
 
 Find examples by your specific use case:
 
@@ -167,7 +167,7 @@ Find examples by your specific use case:
 - [Asset Discovery](./basic/asset_operations.py)
 - [Search and Browse](./workflows/data_catalog_workflow.py)
 
-## 🆘 Troubleshooting
+## Troubleshooting
 
 ### Common Issues
 
@@ -195,7 +195,7 @@ Error: AccessDeniedException
 2. Review AWS DataZone [permissions requirements](https://docs.aws.amazon.com/datazone/latest/userguide/getting-started-permissions.html)
 3. Examine the [error handling patterns](./advanced/error_handling_patterns.py)
 
-## 🤝 Contributing Examples
+## Contributing Examples
 
 We welcome contributions of new examples! Please:
 

@@ -106,7 +106,7 @@ asyncio.run(test())
 
 The AWS DataZone MCP server provides **25+ tools** organized into 5 categories:
 
-### 🏢 Domain Management Tools
+### Domain Management Tools
 - `get_domain` - Retrieve domain information
 - `create_domain` - Create a new DataZone domain  
 - `list_domain_units` - List organizational units
@@ -119,7 +119,7 @@ The AWS DataZone MCP server provides **25+ tools** organized into 5 categories:
 - `remove_policy_grant` - Remove policy grants
 - `search` - Search across DataZone entities
 
-### 📁 Project Management Tools
+### Project Management Tools
 - `create_project` - Create new projects
 - `get_project` - Get project details
 - `list_projects` - List projects in domain
@@ -127,7 +127,7 @@ The AWS DataZone MCP server provides **25+ tools** organized into 5 categories:
 - `list_project_profiles` - List project profiles
 - `create_project_profile` - Create project profiles
 
-### 📊 Data Management Tools
+### Data Management Tools
 - `get_asset` - Retrieve asset information
 - `create_asset` - Create new data assets
 - `publish_asset` - Publish assets to catalog
@@ -143,13 +143,13 @@ The AWS DataZone MCP server provides **25+ tools** organized into 5 categories:
 - `list_form_types` - List available form types
 - `create_form_type` - Create custom form types
 
-### 📚 Glossary Management Tools
+### Glossary Management Tools
 - `create_glossary` - Create business glossaries
 - `get_glossary` - Get glossary details
 - `create_glossary_term` - Create glossary terms
 - `get_glossary_term` - Get term definitions
 
-### 🌐 Environment Management Tools
+### Environment Management Tools
 - `list_environments` - List project environments
 - `create_connection` - Create external connections
 - `get_connection` - Get connection details
@@ -199,9 +199,9 @@ Save the file and **restart Claude for Desktop completely**.
 
 Look for the "Search and tools" 🔧 icon in Claude for Desktop. After clicking it, you should see the DataZone tools listed:
 
-- ✅ **25+ tools** should be available
-- ✅ Each tool should have clear descriptions
-- ✅ Tools should be organized by category
+- **25+ tools** should be available
+- Each tool should have clear descriptions
+- Tools should be organized by category
 
 ## Usage Examples
 
@@ -277,19 +277,19 @@ Get-Content -Tail 20 -Wait "$env:AppData\Claude\Logs\mcp*.log"
 
 **Server not showing up in Claude**
 
-1. ✅ Check your `claude_desktop_config.json` file syntax
-2. ✅ Verify the Python environment can run the server
-3. ✅ Test the server independently: `python -m datazone_mcp_server.server`
-4. ✅ Restart Claude for Desktop completely
+1. Check your `claude_desktop_config.json` file syntax
+2. Verify the Python environment can run the server
+3. Test the server independently: `python -m datazone_mcp_server.server`
+4. Restart Claude for Desktop completely
 
 **Tool calls failing silently**
 
 If Claude attempts to use tools but they fail:
 
-1. ✅ Check Claude's logs for errors  
-2. ✅ Verify AWS credentials are configured correctly
-3. ✅ Test AWS DataZone access: `aws datazone list-domains`
-4. ✅ Check your IAM permissions for DataZone operations
+1. Check Claude's logs for errors  
+2. Verify AWS credentials are configured correctly
+3. Test AWS DataZone access: `aws datazone list-domains`
+4. Check your IAM permissions for DataZone operations
 
 ### AWS DataZone Issues
 
@@ -309,33 +309,33 @@ aws configure
 
 You don't have sufficient DataZone permissions:
 
-1. ✅ Verify your IAM user/role has DataZone permissions
-2. ✅ Check you're in the correct AWS region
-3. ✅ Ensure the DataZone domain exists and you have access
+1. Verify your IAM user/role has DataZone permissions
+2. Check you're in the correct AWS region
+3. Ensure the DataZone domain exists and you have access
 
 **Error: "ResourceNotFoundException"**  
 
 The specified resource (domain, project, asset) doesn't exist:
 
-1. ✅ Verify your `DATAZONE_DOMAIN_ID` is correct
-2. ✅ Check the resource exists in the AWS Console
-3. ✅ Ensure you're using the correct identifiers
+1. Verify your `DATAZONE_DOMAIN_ID` is correct
+2. Check the resource exists in the AWS Console
+3. Ensure you're using the correct identifiers
 
 **Error: "ValidationException"**
 
 Invalid parameters were provided:
 
-1. ✅ Check parameter formats (domain IDs start with `dzd_`)
-2. ✅ Verify required parameters are provided
-3. ✅ Check string length and character restrictions
+1. Check parameter formats (domain IDs start with `dzd_`)
+2. Verify required parameters are provided
+3. Check string length and character restrictions
 
 **Performance Issues**
 
 If operations are slow:
 
-1. ✅ Check your AWS region latency
-2. ✅ Verify network connectivity to AWS
-3. ✅ Consider using AWS regions closer to your location
+1. Check your AWS region latency
+2. Verify network connectivity to AWS
+3. Consider using AWS regions closer to your location
 
 ### Advanced Debugging
 
@@ -366,20 +366,20 @@ asyncio.run(test_tool())
 ## Best Practices
 
 ### Security
-- ✅ Use IAM roles instead of access keys when possible  
-- ✅ Follow principle of least privilege for DataZone permissions
-- ✅ Don't commit AWS credentials to version control
-- ✅ Rotate access keys regularly
+- Use IAM roles instead of access keys when possible  
+- Follow principle of least privilege for DataZone permissions
+- Don't commit AWS credentials to version control
+- Rotate access keys regularly
 
 ### Performance  
-- ✅ Set `DATAZONE_DOMAIN_ID` to avoid repeated domain lookups
-- ✅ Use specific identifiers rather than searching when possible
-- ✅ Consider AWS region proximity for better latency
+- Set `DATAZONE_DOMAIN_ID` to avoid repeated domain lookups
+- Use specific identifiers rather than searching when possible
+- Consider AWS region proximity for better latency
 
 ### Organization
-- ✅ Use consistent naming conventions for projects and assets
-- ✅ Leverage domain units to organize large DataZone domains
-- ✅ Create glossaries early to establish common terminology
+- Use consistent naming conventions for projects and assets
+- Leverage domain units to organize large DataZone domains
+- Create glossaries early to establish common terminology
 
 ## Next Steps
 

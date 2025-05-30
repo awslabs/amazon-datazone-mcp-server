@@ -38,7 +38,7 @@ class DomainOperationsExample:
             "stdio", 
             ["python", "-m", "datazone_mcp_server.server"]
         )
-        print("✅ Client connection established")
+        print("Client connection established")
     
     async def get_domain_details(self) -> Dict[str, Any]:
         """
@@ -47,7 +47,7 @@ class DomainOperationsExample:
         Returns:
             Dict containing domain details
         """
-        print(f"\n📋 Getting details for domain: {self.domain_id}")
+        print(f"\nGetting details for domain: {self.domain_id}")
         
         try:
             result = await self.client.call_tool("get_domain", {
@@ -56,7 +56,7 @@ class DomainOperationsExample:
             
             domain_data = json.loads(result.content[0].text)
             
-            print("✅ Domain Details:")
+            print("Domain Details:")
             print(f"   Name: {domain_data.get('name', 'N/A')}")
             print(f"   ID: {domain_data.get('id', 'N/A')}")
             print(f"   ARN: {domain_data.get('arn', 'N/A')}")
@@ -73,7 +73,7 @@ class DomainOperationsExample:
             return domain_data
             
         except Exception as e:
-            print(f"❌ Error getting domain details: {e}")
+            print(f"Error getting domain details: {e}")
             return {}
     
     async def list_all_domains(self) -> list:
@@ -83,14 +83,14 @@ class DomainOperationsExample:
         Returns:
             List of domain information
         """
-        print("\n📋 Listing all available domains...")
+        print("\nListing all available domains...")
         
         try:
             result = await self.client.call_tool("list_domains", {})
             domains_data = json.loads(result.content[0].text)
             
             domains = domains_data.get("items", [])
-            print(f"✅ Found {len(domains)} domains:")
+            print(f"Found {len(domains)} domains:")
             
             for i, domain in enumerate(domains, 1):
                 print(f"\n   {i}. {domain.get('name', 'Unnamed')}")
@@ -103,7 +103,7 @@ class DomainOperationsExample:
             return domains
             
         except Exception as e:
-            print(f"❌ Error listing domains: {e}")
+            print(f"Error listing domains: {e}")
             return []
     
     async def check_domain_access(self) -> bool:
@@ -113,7 +113,7 @@ class DomainOperationsExample:
         Returns:
             True if domain is accessible, False otherwise
         """
-        print(f"\n🔍 Checking access to domain: {self.domain_id}")
+        print(f"\nChecking access to domain: {self.domain_id}")
         
         try:
             # Try to get domain details
@@ -122,12 +122,12 @@ class DomainOperationsExample:
             })
             
             domain_data = json.loads(result.content[0].text)
-            print(f"✅ Access confirmed - Domain '{domain_data.get('name')}' is accessible")
+            print(f"Access confirmed - Domain '{domain_data.get('name')}' is accessible")
             return True
             
         except Exception as e:
-            print(f"❌ Access denied or domain not found: {e}")
-            print("💡 Tips:")
+            print(f"Access denied or domain not found: {e}")
+            print("Tips:")
             print("   - Verify your DATAZONE_DOMAIN_ID is correct")
             print("   - Check your AWS credentials and permissions")
             print("   - Ensure the domain exists in your AWS region")
@@ -140,7 +140,7 @@ class DomainOperationsExample:
         Returns:
             List of domain units
         """
-        print(f"\n🏢 Getting organizational units for domain: {self.domain_id}")
+        print(f"\nGetting organizational units for domain: {self.domain_id}")
         
         try:
             result = await self.client.call_tool("list_domain_units", {
@@ -150,7 +150,7 @@ class DomainOperationsExample:
             units_data = json.loads(result.content[0].text)
             units = units_data.get("items", [])
             
-            print(f"✅ Found {len(units)} organizational units:")
+            print(f"Found {len(units)} organizational units:")
             
             for i, unit in enumerate(units, 1):
                 print(f"\n   {i}. {unit.get('name', 'Unnamed')}")
@@ -162,7 +162,7 @@ class DomainOperationsExample:
             return units
             
         except Exception as e:
-            print(f"❌ Error getting domain units: {e}")
+            print(f"Error getting domain units: {e}")
             return []
     
     async def cleanup(self):
@@ -170,23 +170,23 @@ class DomainOperationsExample:
         if self.client:
             print("\n🧹 Cleaning up...")
             # The client will be cleaned up automatically
-            print("✅ Cleanup complete")
+            print("Cleanup complete")
 
 
 async def main():
     """
     Main function demonstrating domain operations.
     """
-    print("🚀 AWS DataZone Domain Operations Example")
+    print("AWS DataZone Domain Operations Example")
     print("=" * 50)
     
     # Configuration
     domain_id = os.getenv("DATAZONE_DOMAIN_ID")
     
     if not domain_id:
-        print("⚠️  No DATAZONE_DOMAIN_ID found in environment variables")
-        print("💡 Set it with: export DATAZONE_DOMAIN_ID=dzd_your_domain_id")
-        print("📋 Proceeding with domain listing only...")
+        print("No DATAZONE_DOMAIN_ID found in environment variables")
+        print("Set it with: export DATAZONE_DOMAIN_ID=dzd_your_domain_id")
+        print("Proceeding with domain listing only...")
     
     # Initialize example
     example = DomainOperationsExample(domain_id)
@@ -201,7 +201,7 @@ async def main():
         # If no specific domain ID, use the first available domain
         if not domain_id and all_domains:
             domain_id = all_domains[0].get("id")
-            print(f"\n💡 Using first available domain: {domain_id}")
+            print(f"\nUsing first available domain: {domain_id}")
             example.domain_id = domain_id
         
         if domain_id:
@@ -217,7 +217,7 @@ async def main():
                 
                 # Summary
                 print("\n" + "=" * 50)
-                print("📊 SUMMARY")
+                print("SUMMARY")
                 print("=" * 50)
                 print(f"Domain Name: {domain_details.get('name', 'N/A')}")
                 print(f"Domain ID: {domain_details.get('id', 'N/A')}")
@@ -226,17 +226,17 @@ async def main():
                 print(f"Organizational Units: {len(domain_units)}")
                 
         else:
-            print("\n⚠️  No domains available or accessible")
-            print("💡 Ensure you have DataZone domains set up in your AWS account")
+            print("\nNo domains available or accessible")
+            print("Ensure you have DataZone domains set up in your AWS account")
     
     except Exception as e:
-        print(f"\n❌ Unexpected error: {e}")
-        print("💡 Check your AWS credentials and DataZone access")
+        print(f"\nUnexpected error: {e}")
+        print("Check your AWS credentials and DataZone access")
     
     finally:
         # Step 6: Cleanup
         await example.cleanup()
-        print("\n✅ Example completed successfully!")
+        print("\nExample completed successfully!")
 
 
 if __name__ == "__main__":
