@@ -6,7 +6,7 @@
 
 A high-performance Model Context Protocol (MCP) server that provides seamless integration with AWS DataZone services. This server enables AI assistants and applications to interact with AWS DataZone APIs through a standardized interface.
 
-## 🚀 Features
+## Features
 
 - **Complete AWS DataZone API Coverage**: Access all major DataZone operations
 - **Modular Architecture**: Well-organized, maintainable code structure
@@ -14,7 +14,7 @@ A high-performance Model Context Protocol (MCP) server that provides seamless in
 - **Comprehensive Error Handling**: Detailed error messages and proper exception handling
 - **Production Ready**: Robust logging, validation, and configuration management
 
-### 🛠️ Supported Operations
+### Supported Operations
 
 | Module | Operations |
 |--------|------------|
@@ -24,7 +24,7 @@ A high-performance Model Context Protocol (MCP) server that provides seamless in
 | **Glossary** | Business glossaries, glossary terms |
 | **Environment** | Environments, connections, blueprints |
 
-## 📦 Installation
+## Installation
 
 ### Prerequisites
 
@@ -89,7 +89,7 @@ async def main():
 asyncio.run(main())
 ```
 
-## 📚 Usage Examples
+## Usage Examples
 
 ### Creating a DataZone Domain
 
@@ -137,7 +137,7 @@ published = await client.call_tool("publish_asset", {
 })
 ```
 
-## 🏗️ Architecture
+## Architecture
 
 ```
 datazone-mcp-server/
@@ -156,7 +156,7 @@ datazone-mcp-server/
 └── docs/                      # Documentation
 ```
 
-## 🧪 Development
+## Development
 
 ### Setup Development Environment
 
@@ -199,7 +199,7 @@ mypy src
 flake8 src tests
 ```
 
-## 📋 Available Tools
+## Available Tools
 
 <details>
 <summary>Click to see all available MCP tools</summary>
@@ -249,7 +249,7 @@ flake8 src tests
 
 </details>
 
-## 🤝 Contributing
+## Contributing
 
 We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
 
@@ -259,11 +259,11 @@ We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) f
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
-## 📄 License
+## License
 
 This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details.
 
-## ⚠️ Disclaimer
+## Disclaimer
 
 **This is an unofficial, community-developed project and is not affiliated with, endorsed by, or supported by Amazon Web Services, Inc.**
 
@@ -275,13 +275,13 @@ This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENS
 
 For official AWS DataZone documentation and support, visit [AWS DataZone Documentation](https://docs.aws.amazon.com/datazone/).
 
-## 🆘 Support
+## Support
 
-- 📖 [Documentation](docs/)
-- 🐛 [Issue Tracker](https://github.com/wangtianren/datazone-mcp-server/issues)
-- 💬 [Discussions](https://github.com/wangtianren/datazone-mcp-server/discussions)
+- [Documentation](docs/)
+- [Issue Tracker](https://github.com/wangtianren/datazone-mcp-server/issues)
+- [Discussions](https://github.com/wangtianren/datazone-mcp-server/discussions)
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 - [Model Context Protocol](https://modelcontextprotocol.io/) for the protocol specification
 - [AWS DataZone](https://aws.amazon.com/datazone/) for the data governance platform
