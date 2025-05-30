@@ -282,6 +282,85 @@ Get-Content -Tail 20 -Wait "$env:AppData\Claude\Logs\mcp*.log"
 3. Test the server independently: `python -m datazone_mcp_server.server`
 4. Restart Claude for Desktop completely
 
+**Common Configuration Issues**
+
+**Issue: "ImportError: attempted relative import with no known parent package"**
+
+This happens when the server is run directly as `server.py` instead of as a module.
+
+**Correct configuration:**
+```json
+{
+    "mcpServers": {
+        "datazone": {
+            "command": "/path/to/uv",
+            "args": [
+                "--directory",
+                "/path/to/datazone-mcp-server",
+                "run",
+                "python",
+                "-m",
+                "datazone_mcp_server.server"
+            ]
+        }
+    }
+}
+```
+
+**Incorrect configuration:**
+```json
+{
+    "mcpServers": {
+        "datazone": {
+            "command": "/path/to/uv",
+            "args": [
+                "--directory",
+                "/path/to/datazone-mcp-server/src/datazone_mcp_server/",
+                "run",
+                "server.py"
+            ]
+        }
+    }
+}
+```
+
+**Issue: Server starts but tools fail silently**
+
+This is often due to missing environment variables or incorrect working directory.
+
+**Add environment variables:**
+```json
+{
+    "mcpServers": {
+        "datazone": {
+            "command": "/path/to/uv",
+            "args": ["--directory", "/path/to/datazone-mcp-server", "run", "python", "-m", "datazone_mcp_server.server"],
+            "env": {
+                "AWS_DEFAULT_REGION": "us-east-1",
+                "AWS_REGION": "us-east-1",
+                "DATAZONE_DOMAIN_ID": "dzd_your_domain_id"
+            }
+        }
+    }
+}
+```
+
+**Issue: "Server not found" with uv installation**
+
+If you have uv installed via different methods, the path may vary:
+
+```bash
+# Check where uv is installed
+which uv
+
+# Common locations:
+# Homebrew: /opt/homebrew/bin/uv
+# User install: /Users/username/.local/bin/uv
+# System install: /usr/local/bin/uv
+```
+
+Use the actual path returned by `which uv` in your configuration.
+
 **Tool calls failing silently**
 
 If Claude attempts to use tools but they fail:

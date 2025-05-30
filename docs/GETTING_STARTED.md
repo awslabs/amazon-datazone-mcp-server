@@ -81,6 +81,53 @@ export AWS_SECRET_ACCESS_KEY="your_secret_key_here"
 export AWS_DEFAULT_REGION="us-east-1"
 ```
 
+**If you have a specific DataZone domain ID:**
+```json
+{
+    "mcpServers": {
+        "aws-datazone": {
+            "command": "python",
+            "args": [
+                "-m", 
+                "datazone_mcp_server.server"
+            ],
+            "env": {
+                "AWS_DEFAULT_REGION": "us-east-1",
+                "DATAZONE_DOMAIN_ID": "dzd_your_domain_id_here"
+            }
+        }
+    }
+}
+```
+
+**If you're using uv (installed from source):**
+
+For users who cloned the repository and are using uv:
+
+```json
+{
+    "mcpServers": {
+        "aws-datazone": {
+            "command": "/Users/username/.local/bin/uv",
+            "args": [
+                "--directory",
+                "/path/to/datazone-mcp-server",
+                "run",
+                "python",
+                "-m",
+                "datazone_mcp_server.server"
+            ],
+            "env": {
+                "AWS_DEFAULT_REGION": "us-east-1",
+                "DATAZONE_DOMAIN_ID": "dzd_your_domain_id_here"
+            }
+        }
+    }
+}
+```
+
+**Note**: Replace `/Users/username/.local/bin/uv` with the path from `which uv` and `/path/to/datazone-mcp-server` with your actual project path.
+
 ### Step 3: Test Your Setup
 
 ```bash

@@ -189,6 +189,52 @@ Error: AccessDeniedException
 ```
 **Solution**: Check your AWS IAM permissions for DataZone operations.
 
+**macOS Apple Silicon (M1/M2/M3) Configuration Issues**:
+
+**Issue: "ImportError: attempted relative import with no known parent package"**
+This commonly occurs when using uv with incorrect Claude Desktop configuration.
+
+ **Correct uv configuration:**
+```json
+{
+    "mcpServers": {
+        "datazone": {
+            "command": "/Users/username/.local/bin/uv",
+            "args": [
+                "--directory",
+                "/path/to/datazone-mcp-server",
+                "run",
+                "python",
+                "-m",
+                "datazone_mcp_server.server"
+            ],
+            "env": {
+                "AWS_DEFAULT_REGION": "us-east-1",
+                "DATAZONE_DOMAIN_ID": "dzd_your_domain_id"
+            }
+        }
+    }
+}
+```
+
+**Issue: uv path varies by installation method**
+Check your uv installation path:
+```bash
+which uv
+# Common paths:
+# Homebrew: /opt/homebrew/bin/uv
+# uv installer: /Users/username/.local/bin/uv
+```
+
+**Issue: AWS credentials invalid on macOS**
+```bash
+# Check current credentials
+aws sts get-caller-identity
+
+# If invalid, reconfigure
+aws configure
+```
+
 ### Getting Help
 
 1. Check the [troubleshooting guide](./best_practices/troubleshooting.md)
