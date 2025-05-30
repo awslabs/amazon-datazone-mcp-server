@@ -1,6 +1,7 @@
 # AWS DataZone MCP Server
 
 [![Python](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
+[![Version](https://img.shields.io/badge/version-0.1.0-green.svg)](https://github.com/wangtianren/datazone-mcp-server/releases)
 [![License](https://img.shields.io/badge/license-Apache%202.0-green.svg)](LICENSE)
 [![MCP](https://img.shields.io/badge/MCP-compatible-purple.svg)](https://modelcontextprotocol.io/)
 
@@ -46,7 +47,7 @@ cd datazone-mcp-server
 pip install -e .
 ```
 
-## ⚡ Quick Start
+## Quick Start
 
 ### 1. Configure AWS Credentials
 
@@ -201,8 +202,7 @@ flake8 src tests
 
 ## Available Tools
 
-<details>
-<summary>Click to see all available MCP tools</summary>
+The AWS DataZone MCP server provides **38 tools** organized into 5 categories:
 
 ### Domain Management
 - `get_domain` - Retrieve domain information
@@ -247,7 +247,7 @@ flake8 src tests
 - `list_connections` - List all connections
 - `list_environment_blueprints` - List available blueprints
 
-</details>
+> **For detailed documentation** of each tool with parameters and examples, see our [Tool Reference](docs/TOOL_REFERENCE.md).
 
 ## Contributing
 
