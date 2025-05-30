@@ -16,7 +16,7 @@ Complete reference for all tools provided by the AWS DataZone MCP server. Each t
 
 ---
 
-## 🏢 Domain Management
+## Domain Management
 
 Manage AWS DataZone domains, organizational units, and access permissions.
 
@@ -198,7 +198,7 @@ Search results with matching entities and metadata.
 
 ---
 
-## 📁 Project Management
+## Project Management
 
 Manage DataZone projects, memberships, and project profiles.
 
@@ -299,7 +299,7 @@ Created project profile details including ID, name, and configurations.
 
 ---
 
-## 📊 Data Management
+## Data Management
 
 Manage data assets, listings, subscriptions, and data sources.
 
@@ -506,7 +506,7 @@ Created form type details including ID and model definition.
 
 ---
 
-## 📚 Glossary Management
+## Glossary Management
 
 Manage business glossaries and terminology definitions.
 
@@ -576,7 +576,7 @@ Glossary term details including definitions, status, relationships, and usage in
 
 ---
 
-## 🌐 Environment Management
+## Environment Management
 
 Manage project environments and external connections.
 

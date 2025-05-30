@@ -2,7 +2,7 @@
 
 Thank you for your interest in contributing to the AWS DataZone MCP Server! We welcome contributions from the community and are pleased to have you help make this project better.
 
-## 📋 Table of Contents
+## ## Table of Contents
 
 - [Code of Conduct](#code-of-conduct)
 - [Getting Started](#getting-started)
@@ -14,11 +14,11 @@ Thank you for your interest in contributing to the AWS DataZone MCP Server! We w
 - [Reporting Issues](#reporting-issues)
 - [Feature Requests](#feature-requests)
 
-## 📜 Code of Conduct
+## ## Code of Conduct
 
 This project adheres to a code of conduct. By participating, you are expected to uphold this code. Please be respectful and constructive in all interactions.
 
-## 🚀 Getting Started
+## ## Getting Started
 
 ### Prerequisites
 
@@ -65,7 +65,7 @@ This project adheres to a code of conduct. By participating, you are expected to
    python -c "import datazone_mcp_server; print('Setup successful!')"
    ```
 
-## 🔧 Making Changes
+## ## Making Changes
 
 ### Branch Naming Convention
 
@@ -91,7 +91,7 @@ Examples:
 - `fix(project): handle missing project identifier`
 - `docs(readme): add installation instructions`
 
-## 🛠️ Development Guidelines
+## ### Development Guidelines
 
 ### Adding New Tools
 
@@ -171,7 +171,7 @@ When adding new DataZone API operations:
 - Provide usage examples in docstrings
 - Update README.md if adding major features
 
-## 🧪 Testing
+## ## Testing
 
 ### Running Tests
 
@@ -234,7 +234,7 @@ pytest tests/test_domain_management.py::test_create_domain
 - Test both success and error scenarios
 - Include edge cases and validation tests
 
-## 🎨 Code Style
+## Code Style
 
 ### Python Style Guide
 
@@ -269,7 +269,7 @@ The project uses:
 - Use `Any` for complex AWS API responses
 - Be consistent with `List`, `Dict`, etc. (not `list`, `dict`)
 
-## 📤 Submitting Changes
+## ## Submitting Changes
 
 ### Pull Request Process
 
@@ -335,7 +335,7 @@ Brief description of the changes
 - [ ] Documentation updated
 ```
 
-## 🐛 Reporting Issues
+## ## Reporting Issues
 
 ### Bug Reports
 
@@ -350,7 +350,7 @@ Use the issue template and include:
 
 For security vulnerabilities, please email [security@yourproject.com] instead of creating a public issue.
 
-## 💡 Feature Requests
+## ## Feature Requests
 
 We welcome feature requests! Please:
 - Check existing issues first
@@ -358,18 +358,18 @@ We welcome feature requests! Please:
 - Explain why the feature would benefit users
 - Consider implementation complexity
 
-## 📞 Getting Help
+## ## Getting Help
 
-- 📖 Check the [documentation](docs/)
-- 💬 Join [discussions](https://github.com/wangtianren/datazone-mcp-server/discussions)
-- 🐛 Browse [existing issues](https://github.com/wangtianren/datazone-mcp-server/issues)
+- - Check the [documentation](docs/)
+- - Join [discussions](https://github.com/wangtianren/datazone-mcp-server/discussions)
+- ## Browse [existing issues](https://github.com/wangtianren/datazone-mcp-server/issues)
 - 📧 Contact maintainers
 
-## 🎉 Recognition
+## ## Recognition
 
 Contributors will be recognized in:
 - README.md acknowledgments
 - CHANGELOG.md release notes
 - GitHub contributors list
 
-Thank you for contributing to AWS DataZone MCP Server! 🚀 
+Thank you for contributing to AWS DataZone MCP Server! ## 

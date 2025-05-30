@@ -33,7 +33,7 @@ class DomainOperationsExample:
     
     async def setup_client(self):
         """Initialize the MCP client connection."""
-        print("🔌 Setting up MCP client connection...")
+        print("Setting up MCP client connection...")
         self.client = await create_client(
             "stdio", 
             ["python", "-m", "datazone_mcp_server.server"]

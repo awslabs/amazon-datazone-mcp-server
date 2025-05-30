@@ -2,29 +2,29 @@
 
 Welcome! This guide will walk you through setting up and using the AWS DataZone MCP server step-by-step. In 30 minutes, you'll have a working setup and understand how to manage AWS DataZone resources through natural language.
 
-## 🎯 What You'll Learn
+## What You'll Learn
 
 By the end of this guide, you'll be able to:
-- ✅ Set up the AWS DataZone MCP server
-- ✅ Connect it to Claude for Desktop
-- ✅ Manage DataZone domains, projects, and assets through conversation
-- ✅ Troubleshoot common issues
-- ✅ Use the server for real data governance workflows
+- Set up the AWS DataZone MCP server
+- Connect it to Claude for Desktop
+- Manage DataZone domains, projects, and assets through conversation
+- Troubleshoot common issues
+- Use the server for real data governance workflows
 
-## ⏱️ Quick Overview
+## Quick Overview
 
 | Tutorial | Time | Difficulty | What You'll Do |
 |----------|------|------------|----------------|
-| [Quick Start](#-tutorial-1-quick-start-5-minutes) | 5 min | Easy | Install and verify the server |
-| [Claude Integration](#-tutorial-2-claude-desktop-integration-10-minutes) | 10 min | Easy | Connect to Claude for Desktop |
-| [First Operations](#-tutorial-3-your-first-datazone-operations-10-minutes) | 10 min | Medium | Explore domains and projects |
-| [Real Workflow](#-tutorial-4-complete-data-governance-workflow-15-minutes) | 15 min | Medium | End-to-end data management |
+| [Quick Start](#tutorial-1-quick-start-5-minutes) | 5 min | Easy | Install and verify the server |
+| [Claude Integration](#tutorial-2-claude-desktop-integration-10-minutes) | 10 min | Easy | Connect to Claude for Desktop |
+| [First Operations](#tutorial-3-your-first-datazone-operations-10-minutes) | 10 min | Medium | Explore domains and projects |
+| [Real Workflow](#tutorial-4-complete-data-governance-workflow-15-minutes) | 15 min | Medium | End-to-end data management |
 
 **Total Time: ~40 minutes**
 
 ---
 
-## 🚀 Tutorial 1: Quick Start (5 minutes)
+## Tutorial 1: Quick Start (5 minutes)
 
 Let's get the server installed and running quickly.
 
@@ -95,22 +95,22 @@ from mcp import create_client
 async def test():
     client = await create_client('stdio', ['python', '-m', 'datazone_mcp_server.server'])
     tools = await client.list_tools()
-    print(f'✅ Server running with {len(tools.tools)} tools')
+    print(f'Server running with {len(tools.tools)} tools')
 
 asyncio.run(test())
 "
 ```
 
-**✅ Success!** If you see "Server running with 38 tools", you're ready for the next tutorial.
+**Success!** If you see "Server running with 38 tools", you're ready for the next tutorial.
 
-**❌ Troubleshooting:**
+**Troubleshooting:**
 - **"ModuleNotFoundError"**: Run `pip install datazone-mcp-server` again
 - **"NoCredentialsError"**: Double-check your AWS credentials setup
 - **"ImportError: mcp"**: Run `pip install mcp`
 
 ---
 
-## 🔗 Tutorial 2: Claude Desktop Integration (10 minutes)
+## Tutorial 2: Claude Desktop Integration (10 minutes)
 
 Now let's connect your server to Claude for Desktop for natural language interaction.
 
@@ -193,7 +193,7 @@ Add this configuration to your `claude_desktop_config.json`:
 
 1. **Quit** Claude for Desktop completely
 2. **Restart** the application
-3. **Look** for the tools icon 🔧 in the interface
+3. **Look** for the tools icon  in the interface
 
 ### Step 5: Verify Integration
 
@@ -203,17 +203,17 @@ In Claude for Desktop, try this message:
 Hi! I'd like to explore my AWS DataZone environment. Can you show me what tools are available?
 ```
 
-**✅ Expected Response:**
+**Expected Response:**
 Claude should respond with information about the 38 available DataZone tools, organized into categories like Domain Management, Project Management, etc.
 
-**❌ Troubleshooting:**
+**Troubleshooting:**
 - **No tools showing**: Check your configuration file syntax
 - **Server not starting**: Verify Python can run the server independently
 - **Connection errors**: Check AWS credentials are properly configured
 
 ---
 
-## 🏢 Tutorial 3: Your First DataZone Operations (10 minutes)
+## Tutorial 3: Your First DataZone Operations (10 minutes)
 
 Let's explore your DataZone environment and perform basic operations.
 
@@ -293,7 +293,7 @@ Search for any assets related to "customer" in domain dzd_abc123
 - Published data catalog items
 - Search capabilities across the domain
 
-### ✅ Tutorial 3 Complete!
+### Tutorial 3 Complete!
 
 You've now explored your DataZone environment using natural language. You should understand:
 - How to discover domains and projects
@@ -302,7 +302,7 @@ You've now explored your DataZone environment using natural language. You should
 
 ---
 
-## 📊 Tutorial 4: Complete Data Governance Workflow (15 minutes)
+## Tutorial 4: Complete Data Governance Workflow (15 minutes)
 
 Let's walk through a real-world scenario: setting up a new analytics project with proper data governance.
 
@@ -326,7 +326,7 @@ I need to create a new project called "Customer Analytics" in domain dzd_abc123.
 
 **Expected result:**
 ```
-✅ Successfully created project "Customer Analytics"
+Successfully created project "Customer Analytics"
 
 Project Details:
 - Project ID: prj_new123
@@ -414,19 +414,19 @@ Give me a summary of everything we've set up for the Customer Analytics project
 - Assets created and published
 - Overall project structure
 
-### ✅ Tutorial 4 Complete!
+### Tutorial 4 Complete!
 
-🎉 **Congratulations!** You've completed a full data governance workflow:
+ **Congratulations!** You've completed a full data governance workflow:
 
-- ✅ Created a project with proper organization
-- ✅ Established business terminology through glossaries
-- ✅ Created and published data assets
-- ✅ Made data discoverable through the catalog
-- ✅ Used natural language for all operations
+- Created a project with proper organization
+- Established business terminology through glossaries
+- Created and published data assets
+- Made data discoverable through the catalog
+- Used natural language for all operations
 
 ---
 
-## 🛠️ Troubleshooting Guide
+## Troubleshooting Guide
 
 ### Common Issues and Solutions
 
@@ -525,7 +525,7 @@ export DATAZONE_MCP_DEBUG=true
 
 ---
 
-## 🎓 Next Steps
+## Next Steps
 
 ### Explore Advanced Features
 
@@ -599,7 +599,7 @@ Build your own MCP client for specific use cases:
 
 ---
 
-## 📋 Quick Reference
+## Quick Reference
 
 ### Essential Commands
 
@@ -653,8 +653,8 @@ export DATAZONE_MCP_DEBUG="true"  # For debugging
 
 ---
 
-🎉 **You're now ready to use AWS DataZone MCP Server productively!**
+ **You're now ready to use AWS DataZone MCP Server productively!**
 
 This getting started guide has taken you from installation to real-world usage. You now have the foundation to manage AWS DataZone resources through natural language conversation.
 
-**Happy data governing!** 🚀 
+**Happy data governing!** 

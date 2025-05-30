@@ -2,7 +2,7 @@
 
 This directory contains comprehensive tests for the AWS DataZone MCP Server. The testing infrastructure is designed to provide reliable, fast, and maintainable tests for all components.
 
-## 📋 Test Structure
+## Test Structure
 
 ```
 tests/
@@ -17,7 +17,7 @@ tests/
 └── README.md                     # This file
 ```
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Running All Tests
 
@@ -50,17 +50,17 @@ pytest tests/test_integration.py -m integration
 SKIP_AWS_TESTS=true pytest
 ```
 
-## 🧪 Test Types
+## Test Types
 
 ### 1. Unit Tests
 **Files**: `test_domain_management.py`, `test_project_management.py`, etc.
 
 Fast, isolated tests that mock AWS API calls:
-- ✅ Test success scenarios
-- ✅ Test error handling 
-- ✅ Test parameter validation
-- ✅ Test tool registration
-- ✅ Mock all external dependencies
+- Test success scenarios
+- Test error handling 
+- Test parameter validation
+- Test tool registration
+- Mock all external dependencies
 
 ```python
 @patch('datazone_mcp_server.tools.domain_management.datazone_client')
@@ -80,21 +80,21 @@ async def test_get_domain_success(self, mock_client, test_data_helper):
 **File**: `test_integration.py`
 
 Tests with real AWS services (marked with `@pytest.mark.integration`):
-- ✅ Real AWS API calls
-- ✅ Error handling with actual AWS errors
-- ✅ Performance testing
-- ✅ End-to-end workflows
+- Real AWS API calls
+- Error handling with actual AWS errors
+- Performance testing
+- End-to-end workflows
 
 ### 3. Server Tests
 **File**: `test_server.py`
 
 Tests for the main MCP server functionality:
-- ✅ Server initialization
-- ✅ Tool registration
-- ✅ Error handling
-- ✅ CLI functionality
+- Server initialization
+- Tool registration
+- Error handling
+- CLI functionality
 
-## 🔧 Test Configuration
+## Test Configuration
 
 ### Fixtures (`conftest.py`)
 
@@ -140,7 +140,7 @@ pytest -m "not slow"
 pytest -m "not integration"
 ```
 
-## 📊 Coverage Requirements
+## Coverage Requirements
 
 **Target Coverage: >80%**
 
@@ -153,13 +153,13 @@ open htmlcov/index.html
 ```
 
 **Coverage Areas:**
-- ✅ All tool functions
-- ✅ Error handling paths
-- ✅ Parameter validation
-- ✅ Server initialization
-- ⚠️ Integration scenarios (when AWS tests run)
+- All tool functions
+- Error handling paths
+- Parameter validation
+- Server initialization
+- Integration scenarios (when AWS tests run)
 
-## 🎯 Testing Patterns
+## Testing Patterns
 
 ### 1. AAA Pattern (Arrange-Act-Assert)
 
@@ -232,7 +232,7 @@ async def test_create_domain_with_all_optional_params(self, mock_client):
     )
 ```
 
-## 🔍 Debugging Tests
+## Debugging Tests
 
 ### Running Single Tests
 
@@ -269,7 +269,7 @@ export AWS_SECRET_ACCESS_KEY=your_secret
 - Check mock call assertions
 - Verify return values match expected format
 
-## 🚀 Adding New Tests
+## Adding New Tests
 
 ### 1. Unit Test Template
 
@@ -328,7 +328,7 @@ async def test_new_function_integration(self, real_datazone_client, test_domain_
         nm.datazone_client = original_client
 ```
 
-## 📈 Performance Testing
+## Performance Testing
 
 ### Benchmarking
 
@@ -345,14 +345,14 @@ pytest --memray tests/test_server.py::TestServerIntegration::test_memory_usage_r
 
 ### Performance Targets
 
-- ✅ Unit tests: <1ms per test
-- ✅ Server initialization: <1 second
-- ✅ Integration tests: <5 seconds per test
-- ✅ Memory usage: <1000 new objects per module load
+- Unit tests: <1ms per test
+- Server initialization: <1 second
+- Integration tests: <5 seconds per test
+- Memory usage: <1000 new objects per module load
 
-## 🎉 Best Practices
+## Best Practices
 
-### ✅ Do's
+### Do's
 
 - Use descriptive test names
 - Follow AAA pattern (Arrange-Act-Assert)
@@ -362,7 +362,7 @@ pytest --memray tests/test_server.py::TestServerIntegration::test_memory_usage_r
 - Write integration tests for critical paths
 - Maintain >80% code coverage
 
-### ❌ Don'ts
+### Don'ts
 
 - Don't test implementation details
 - Don't write overly complex tests
@@ -371,7 +371,7 @@ pytest --memray tests/test_server.py::TestServerIntegration::test_memory_usage_r
 - Don't hardcode credentials
 - Don't make tests dependent on each other
 
-## 📞 Getting Help
+## Getting Help
 
 **Common Commands:**
 ```bash

@@ -197,7 +197,7 @@ Save the file and **restart Claude for Desktop completely**.
 
 ### Verify Integration
 
-Look for the "Search and tools" 🔧 icon in Claude for Desktop. After clicking it, you should see the DataZone tools listed:
+Look for the "Search and tools"  icon in Claude for Desktop. After clicking it, you should see the DataZone tools listed:
 
 - **25+ tools** should be available
 - Each tool should have clear descriptions

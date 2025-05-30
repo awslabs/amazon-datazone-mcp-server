@@ -34,10 +34,10 @@ def update_readme_version():
     
     if updated_content != content:
         readme_file.write_text(updated_content)
-        print(f"✅ Updated README.md version badge to {version}")
+        print(f"Updated README.md version badge to {version}")
         return True
     else:
-        print(f"ℹ️  README.md already has correct version {version}")
+        print(f"README.md already has correct version {version}")
         return False
 
 if __name__ == "__main__":
