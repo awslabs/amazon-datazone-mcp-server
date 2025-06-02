@@ -517,324 +517,324 @@ def register_tools(mcp: FastMCP):
         except Exception as e:
             raise Exception(f"Unexpected error starting data source run for {data_source_identifier} in domain {domain_identifier}: {str(e)}")
 
-    # @mcp.tool()
-    # async def create_subscription_request(
-    #     domain_identifier: str,
-    #     request_reason: str,
-    #     subscribed_listings: List[Dict[str, str]],
-    #     subscribed_principals: List[Dict[str, Any]],
-    #     metadata_forms: List[Dict[str, str]] = None,
-    #     client_token: str = None
-    # ) -> Any:
-    #     """
-    #     Creates a subscription request in Amazon DataZone.
+    @mcp.tool()
+    async def create_subscription_request(
+        domain_identifier: str,
+        request_reason: str,
+        subscribed_listings: List[Dict[str, str]],
+        subscribed_principals: List[Dict[str, Any]],
+        metadata_forms: List[Dict[str, str]] = None,
+        client_token: str = None
+    ) -> Any:
+        """
+        Creates a subscription request in Amazon DataZone.
         
-    #     Args:
-    #         domain_identifier (str): The ID of the domain where the subscription request is created
-    #         request_reason (str): The reason for the subscription request (1-4096 characters)
-    #         subscribed_listings (List[Dict[str, str]]): The published assets to subscribe to
-    #             Example: [{"identifier": "listing-id"}]
-    #         subscribed_principals (List[Dict[str, Any]]): The principals to subscribe using tagged union format
-    #             Example for project: [{"project": {"identifier": "project-id"}}]
-    #             Example for user: [{"user": {"userId": "user-id"}}]
-    #         metadata_forms (List[Dict[str, str]], optional): Additional metadata forms
-    #             Example: [{
-    #                 "content": "form-content",
-    #                 "formName": "form-name",
-    #                 "typeIdentifier": "type-id",
-    #                 "typeRevision": "type-rev"
-    #             }]
-    #         client_token (str, optional): A unique token to ensure idempotency
+        Args:
+            domain_identifier (str): The ID of the domain where the subscription request is created
+            request_reason (str): The reason for the subscription request (1-4096 characters)
+            subscribed_listings (List[Dict[str, str]]): The published assets to subscribe to
+                Example: [{"identifier": "listing-id"}]
+            subscribed_principals (List[Dict[str, Any]]): The principals to subscribe using tagged union format
+                Example for project: [{"project": {"identifier": "project-id"}}]
+                Example for user: [{"user": {"userId": "user-id"}}]
+            metadata_forms (List[Dict[str, str]], optional): Additional metadata forms
+                Example: [{
+                    "content": "form-content",
+                    "formName": "form-name",
+                    "typeIdentifier": "type-id",
+                    "typeRevision": "type-rev"
+                }]
+            client_token (str, optional): A unique token to ensure idempotency
         
-    #     Returns:
-    #         Any: The API response containing:
-    #             - Subscription request ID and status
-    #             - Creation and update timestamps
-    #             - Domain ID
-    #             - Request reason and decision comment
-    #             - Subscribed listings and principals
-    #             - Metadata forms
-    #             - Reviewer information
-    #     """
-    #     try:
-    #         # Prepare the request parameters
-    #         params = {
-    #             "domainIdentifier": domain_identifier,
-    #             "requestReason": request_reason,
-    #             "subscribedListings": subscribed_listings,
-    #             "subscribedPrincipals": subscribed_principals
-    #         }
+        Returns:
+            Any: The API response containing:
+                - Subscription request ID and status
+                - Creation and update timestamps
+                - Domain ID
+                - Request reason and decision comment
+                - Subscribed listings and principals
+                - Metadata forms
+                - Reviewer information
+        """
+        try:
+            # Prepare the request parameters
+            params = {
+                "domainIdentifier": domain_identifier,
+                "requestReason": request_reason,
+                "subscribedListings": subscribed_listings,
+                "subscribedPrincipals": subscribed_principals
+            }
             
-    #         # Add optional parameters if provided
-    #         if metadata_forms:
-    #             params["metadataForms"] = metadata_forms
-    #         if client_token:
-    #             params["clientToken"] = client_token
+            # Add optional parameters if provided
+            if metadata_forms:
+                params["metadataForms"] = metadata_forms
+            if client_token:
+                params["clientToken"] = client_token
 
-    #         response = datazone_client.create_subscription_request(**params)
-    #         return response
-    #     except ClientError as e:
-    #         raise Exception(f"Error creating subscription request in domain {domain_identifier}: {e}")
+            response = datazone_client.create_subscription_request(**params)
+            return response
+        except ClientError as e:
+            raise Exception(f"Error creating subscription request in domain {domain_identifier}: {e}")
 
-    # @mcp.tool()
-    # async def accept_subscription_request(
-    #     domain_identifier: str,
-    #     identifier: str,
-    #     asset_scopes: List[Dict[str, Any]] = None,
-    #     decision_comment: str = None
-    # ) -> Any:
-    #     """
-    #     Accepts a subscription request to a specific asset in Amazon DataZone.
+    @mcp.tool()
+    async def accept_subscription_request(
+        domain_identifier: str,
+        identifier: str,
+        asset_scopes: List[Dict[str, Any]] = None,
+        decision_comment: str = None
+    ) -> Any:
+        """
+        Accepts a subscription request to a specific asset in Amazon DataZone.
         
-    #     Args:
-    #         domain_identifier (str): The ID of the domain where the subscription request exists
-    #         identifier (str): The unique identifier of the subscription request to accept
-    #         asset_scopes (List[Dict[str, Any]], optional): The asset scopes of the accept subscription request
-    #             Example: [{"assetId": "asset-id", "filterIds": ["filter-id"]}]
-    #         decision_comment (str, optional): A description that specifies the reason for accepting the request
-    #             Length: 1-4096 characters
+        Args:
+            domain_identifier (str): The ID of the domain where the subscription request exists
+            identifier (str): The unique identifier of the subscription request to accept
+            asset_scopes (List[Dict[str, Any]], optional): The asset scopes of the accept subscription request
+                Example: [{"assetId": "asset-id", "filterIds": ["filter-id"]}]
+            decision_comment (str, optional): A description that specifies the reason for accepting the request
+                Length: 1-4096 characters
         
-    #     Returns:
-    #         Any: The API response containing:
-    #             - Subscription request ID and status
-    #             - Creation and update timestamps
-    #             - Domain ID
-    #             - Decision comment
-    #             - Subscribed listings and principals
-    #             - Metadata forms
-    #             - Reviewer information
-    #     """
-    #     try:
-    #         # Prepare the request parameters
-    #         params = {
-    #             "domainIdentifier": domain_identifier,
-    #             "identifier": identifier
-    #         }
+        Returns:
+            Any: The API response containing:
+                - Subscription request ID and status
+                - Creation and update timestamps
+                - Domain ID
+                - Decision comment
+                - Subscribed listings and principals
+                - Metadata forms
+                - Reviewer information
+        """
+        try:
+            # Prepare the request parameters
+            params = {
+                "domainIdentifier": domain_identifier,
+                "identifier": identifier
+            }
             
-    #         # Add optional parameters if provided
-    #         if asset_scopes:
-    #             params["assetScopes"] = asset_scopes
-    #         if decision_comment:
-    #             params["decisionComment"] = decision_comment
+            # Add optional parameters if provided
+            if asset_scopes:
+                params["assetScopes"] = asset_scopes
+            if decision_comment:
+                params["decisionComment"] = decision_comment
 
-    #         response = datazone_client.accept_subscription_request(**params)
-    #         return response
-    #     except ClientError as e:
-    #         raise Exception(f"Error accepting subscription request {identifier} in domain {domain_identifier}: {e}")
+            response = datazone_client.accept_subscription_request(**params)
+            return response
+        except ClientError as e:
+            raise Exception(f"Error accepting subscription request {identifier} in domain {domain_identifier}: {e}")
 
-    # @mcp.tool()
-    # async def get_subscription(
-    #     domain_identifier: str,
-    #     identifier: str
-    # ) -> Any:
-    #     """
-    #     Gets a subscription in Amazon DataZone.
+    @mcp.tool()
+    async def get_subscription(
+        domain_identifier: str,
+        identifier: str
+    ) -> Any:
+        """
+        Gets a subscription in Amazon DataZone.
         
-    #     Args:
-    #         domain_identifier (str): The ID of the Amazon DataZone domain in which the subscription exists
-    #             Pattern: ^dzd[-_][a-zA-Z0-9_-]{1,36}$
-    #         identifier (str): The ID of the subscription
-    #             Pattern: ^[a-zA-Z0-9_-]{1,36}$
+        Args:
+            domain_identifier (str): The ID of the Amazon DataZone domain in which the subscription exists
+                Pattern: ^dzd[-_][a-zA-Z0-9_-]{1,36}$
+            identifier (str): The ID of the subscription
+                Pattern: ^[a-zA-Z0-9_-]{1,36}$
         
-    #     Returns:
-    #         Any: The API response containing:
-    #             - Subscription ID and status (APPROVED | REVOKED | CANCELLED)
-    #             - Creation and update timestamps
-    #             - Domain ID
-    #             - Retain permissions flag
-    #             - Subscribed listing details
-    #             - Subscribed principal information
-    #             - Subscription request ID
-    #             - Creator and updater information
-    #     """
-    #     try:
-    #         response = datazone_client.get_subscription(
-    #             domainIdentifier=domain_identifier,
-    #             identifier=identifier
-    #         )
-    #         return response
-    #     except ClientError as e:
-    #         raise Exception(f"Error getting subscription {identifier} in domain {domain_identifier}: {e}")
+        Returns:
+            Any: The API response containing:
+                - Subscription ID and status (APPROVED | REVOKED | CANCELLED)
+                - Creation and update timestamps
+                - Domain ID
+                - Retain permissions flag
+                - Subscribed listing details
+                - Subscribed principal information
+                - Subscription request ID
+                - Creator and updater information
+        """
+        try:
+            response = datazone_client.get_subscription(
+                domainIdentifier=domain_identifier,
+                identifier=identifier
+            )
+            return response
+        except ClientError as e:
+            raise Exception(f"Error getting subscription {identifier} in domain {domain_identifier}: {e}")
 
-    # @mcp.tool()
-    # async def get_form_type(
-    #     domain_identifier: str,
-    #     form_type_identifier: str,
-    #     revision: str = None
-    # ) -> Any:
-    #     """
-    #     Retrieves detailed information about a specific metadata form type in Amazon DataZone.
+    @mcp.tool()
+    async def get_form_type(
+        domain_identifier: str,
+        form_type_identifier: str,
+        revision: str = None
+    ) -> Any:
+        """
+        Retrieves detailed information about a specific metadata form type in Amazon DataZone.
         
-    #     Args:
-    #         domain_identifier (str): The ID of the domain where the form type exists
-    #             Pattern: ^dzd[-_][a-zA-Z0-9_-]{1,36}$
-    #         form_type_identifier (str): The ID of the form type to retrieve
-    #             Length: 1-385 characters
-    #         revision (str, optional): The revision of the form type to retrieve
-    #             Length: 1-64 characters
+        Args:
+            domain_identifier (str): The ID of the domain where the form type exists
+                Pattern: ^dzd[-_][a-zA-Z0-9_-]{1,36}$
+            form_type_identifier (str): The ID of the form type to retrieve
+                Length: 1-385 characters
+            revision (str, optional): The revision of the form type to retrieve
+                Length: 1-64 characters
         
-    #     Returns:
-    #         Any: The API response containing form type details including:
-    #             - createdAt (number): Timestamp of when the form type was created
-    #             - createdBy (str): The user who created the form type
-    #             - description (str): The description of the form type (0-2048 characters)
-    #             - domainId (str): The ID of the domain
-    #             - imports (list): The imports of the form type (1-10 items)
-    #                 Each import contains:
-    #                     - name (str): The name of the import
-    #                     - revision (str): The revision of the import
-    #             - model (dict): The model of the form type (Union type)
-    #             - name (str): The name of the form type (1-128 characters)
-    #             - originDomainId (str): The ID of the domain where the form type was originally created
-    #             - originProjectId (str): The ID of the project where the form type was originally created
-    #             - owningProjectId (str): The ID of the project that owns the form type
-    #             - revision (str): The revision of the form type (1-64 characters)
-    #             - status (str): The status of the form type (ENABLED or DISABLED)
+        Returns:
+            Any: The API response containing form type details including:
+                - createdAt (number): Timestamp of when the form type was created
+                - createdBy (str): The user who created the form type
+                - description (str): The description of the form type (0-2048 characters)
+                - domainId (str): The ID of the domain
+                - imports (list): The imports of the form type (1-10 items)
+                    Each import contains:
+                        - name (str): The name of the import
+                        - revision (str): The revision of the import
+                - model (dict): The model of the form type (Union type)
+                - name (str): The name of the form type (1-128 characters)
+                - originDomainId (str): The ID of the domain where the form type was originally created
+                - originProjectId (str): The ID of the project where the form type was originally created
+                - owningProjectId (str): The ID of the project that owns the form type
+                - revision (str): The revision of the form type (1-64 characters)
+                - status (str): The status of the form type (ENABLED or DISABLED)
             
-    #     Example:
-    #         ```python
-    #         response = await get_form_type(
-    #             domain_identifier="dzd_123456789",
-    #             form_type_identifier="amazon.datazone.customer_profile",
-    #             revision="1.0.0"
-    #         )
-    #         ```
-    #     """
-    #     try:
-    #         # Prepare the request parameters
-    #         params = {
-    #             "domainIdentifier": domain_identifier,
-    #             "formTypeIdentifier": form_type_identifier
-    #         }
+        Example:
+            ```python
+            response = await get_form_type(
+                domain_identifier="dzd_123456789",
+                form_type_identifier="amazon.datazone.customer_profile",
+                revision="1.0.0"
+            )
+            ```
+        """
+        try:
+            # Prepare the request parameters
+            params = {
+                "domainIdentifier": domain_identifier,
+                "formTypeIdentifier": form_type_identifier
+            }
             
-    #         # Add optional revision if provided
-    #         if revision:
-    #             params["revision"] = revision
+            # Add optional revision if provided
+            if revision:
+                params["revision"] = revision
 
-    #         response = datazone_client.get_form_type(**params)
-    #         return response
-    #     except ClientError as e:
-    #         raise Exception(f"Error getting form type {form_type_identifier} in domain {domain_identifier}: {e}")
+            response = datazone_client.get_form_type(**params)
+            return response
+        except ClientError as e:
+            raise Exception(f"Error getting form type {form_type_identifier} in domain {domain_identifier}: {e}")
 
-    # @mcp.tool()
-    # async def list_form_types(
-    #     domain_identifier: str,
-    #     max_results: int = 50,
-    #     next_token: str = None,
-    #     status: str = None
-    # ) -> Any:
-    #     """
-    #     Lists all form types available in an Amazon DataZone domain.
+    @mcp.tool()
+    async def list_form_types(
+        domain_identifier: str,
+        max_results: int = 50,
+        next_token: str = None,
+        status: str = None
+    ) -> Any:
+        """
+        Lists all form types available in an Amazon DataZone domain.
         
-    #     Args:
-    #         domain_identifier (str): The ID of the domain
-    #         max_results (int, optional): Maximum number of form types to return (1-50, default: 50)
-    #         next_token (str, optional): Token for pagination
-    #         status (str, optional): Filter form types by status (ENABLED/DISABLED)
+        Args:
+            domain_identifier (str): The ID of the domain
+            max_results (int, optional): Maximum number of form types to return (1-50, default: 50)
+            next_token (str, optional): Token for pagination
+            status (str, optional): Filter form types by status (ENABLED/DISABLED)
         
-    #     Returns:
-    #         Any: The API response containing:
-    #             - List of form types with their details
-    #             - Pagination token if more results are available
-    #             - Total count of form types
-    #     """
-    #     try:
-    #         # Prepare the request parameters
-    #         params = {
-    #             "domainIdentifier": domain_identifier,
-    #             "maxResults": min(max_results, 50)  # Ensure maxResults is within valid range
-    #         }
+        Returns:
+            Any: The API response containing:
+                - List of form types with their details
+                - Pagination token if more results are available
+                - Total count of form types
+        """
+        try:
+            # Prepare the request parameters
+            params = {
+                "domainIdentifier": domain_identifier,
+                "maxResults": min(max_results, 50)  # Ensure maxResults is within valid range
+            }
             
-    #         # Add optional parameters if provided
-    #         if next_token:
-    #             params["nextToken"] = next_token
-    #         if status:
-    #             params["status"] = status
+            # Add optional parameters if provided
+            if next_token:
+                params["nextToken"] = next_token
+            if status:
+                params["status"] = status
 
-    #         response = datazone_client.list_form_types(**params)
-    #         return response
-    #     except ClientError as e:
-    #         raise Exception(f"Error listing form types in domain {domain_identifier}: {e}")
+            response = datazone_client.list_form_types(**params)
+            return response
+        except ClientError as e:
+            raise Exception(f"Error listing form types in domain {domain_identifier}: {e}")
 
-    # @mcp.tool()
-    # async def create_form_type(
-    #     domain_identifier: str,
-    #     name: str,
-    #     model: Dict[str, Any],
-    #     owning_project_identifier: str,
-    #     description: str = None,
-    #     status: str = "ENABLED"
-    # ) -> Any:
-    #     """
-    #     Creates a new metadata form type in Amazon DataZone.
+    @mcp.tool()
+    async def create_form_type(
+        domain_identifier: str,
+        name: str,
+        model: Dict[str, Any],
+        owning_project_identifier: str,
+        description: str = None,
+        status: str = "ENABLED"
+    ) -> Any:
+        """
+        Creates a new metadata form type in Amazon DataZone.
         
-    #     Args:
-    #         domain_identifier (str): The ID of the domain where the form type will be created
-    #             Pattern: ^dzd[-_][a-zA-Z0-9_-]{1,36}$
-    #         name (str): The name of the form type (1-128 characters)
-    #         model (Dict[str, Any]): The model of the form type
-    #             Note: This is a Union type object where only one member can be specified
-    #         owning_project_identifier (str): The ID of the project that owns the form type
-    #             Pattern: ^[a-zA-Z0-9_-]{1,36}$
-    #         description (str, optional): The description of the form type (0-2048 characters)
-    #         status (str, optional): The status of the form type (ENABLED or DISABLED, default: ENABLED)
+        Args:
+            domain_identifier (str): The ID of the domain where the form type will be created
+                Pattern: ^dzd[-_][a-zA-Z0-9_-]{1,36}$
+            name (str): The name of the form type (1-128 characters)
+            model (Dict[str, Any]): The model of the form type
+                Note: This is a Union type object where only one member can be specified
+            owning_project_identifier (str): The ID of the project that owns the form type
+                Pattern: ^[a-zA-Z0-9_-]{1,36}$
+            description (str, optional): The description of the form type (0-2048 characters)
+            status (str, optional): The status of the form type (ENABLED or DISABLED, default: ENABLED)
         
-    #     Returns:
-    #         Any: The API response containing:
-    #             - description (str): The description of the form type
-    #             - domainId (str): The ID of the domain
-    #             - name (str): The name of the form type
-    #             - originDomainId (str): The ID of the domain where the form type was originally created
-    #             - originProjectId (str): The ID of the project where the form type was originally created
-    #             - owningProjectId (str): The ID of the project that owns the form type
-    #             - revision (str): The revision of the form type (1-64 characters)
+        Returns:
+            Any: The API response containing:
+                - description (str): The description of the form type
+                - domainId (str): The ID of the domain
+                - name (str): The name of the form type
+                - originDomainId (str): The ID of the domain where the form type was originally created
+                - originProjectId (str): The ID of the project where the form type was originally created
+                - owningProjectId (str): The ID of the project that owns the form type
+                - revision (str): The revision of the form type (1-64 characters)
             
-    #     Example:
-    #         ```python
-    #         response = await create_form_type(
-    #             domain_identifier="dzd_123456789",
-    #             name="amazon.datazone.customer_profile",
-    #             model={
-    #                 "schema": {
-    #                     "type": "object",
-    #                     "properties": {
-    #                         "customer_id": {"type": "string"},
-    #                         "customer_name": {"type": "string"},
-    #                         "email": {"type": "string", "format": "email"}
-    #                     },
-    #                     "required": ["customer_id", "customer_name"]
-    #                 }
-    #             },
-    #             owning_project_identifier="prj_987654321",
-    #             description="Form type for customer profile information",
-    #             status="ENABLED"
-    #         )
-    #         ```
-    #     """
-    #     try:
-    #         # Validate status
-    #         if status not in ["ENABLED", "DISABLED"]:
-    #             raise ValueError("status must be either 'ENABLED' or 'DISABLED'")
+        Example:
+            ```python
+            response = await create_form_type(
+                domain_identifier="dzd_123456789",
+                name="amazon.datazone.customer_profile",
+                model={
+                    "schema": {
+                        "type": "object",
+                        "properties": {
+                            "customer_id": {"type": "string"},
+                            "customer_name": {"type": "string"},
+                            "email": {"type": "string", "format": "email"}
+                        },
+                        "required": ["customer_id", "customer_name"]
+                    }
+                },
+                owning_project_identifier="prj_987654321",
+                description="Form type for customer profile information",
+                status="ENABLED"
+            )
+            ```
+        """
+        try:
+            # Validate status
+            if status not in ["ENABLED", "DISABLED"]:
+                raise ValueError("status must be either 'ENABLED' or 'DISABLED'")
             
-    #         # Prepare the request parameters
-    #         params = {
-    #             "name": name,
-    #             "model": model,
-    #             "owningProjectIdentifier": owning_project_identifier,
-    #             "status": status
-    #         }
+            # Prepare the request parameters
+            params = {
+                "name": name,
+                "model": model,
+                "owningProjectIdentifier": owning_project_identifier,
+                "status": status
+            }
             
-    #         # Add optional parameters if provided
-    #         if description:
-    #             params["description"] = description
+            # Add optional parameters if provided
+            if description:
+                params["description"] = description
 
-    #         response = datazone_client.create_form_type(
-    #             domainIdentifier=domain_identifier,
-    #             **params
-    #         )
-    #         return response
-    #     except ClientError as e:
-    #         raise Exception(f"Error creating form type in domain {domain_identifier}: {e}")
+            response = datazone_client.create_form_type(
+                domainIdentifier=domain_identifier,
+                **params
+            )
+            return response
+        except ClientError as e:
+            raise Exception(f"Error creating form type in domain {domain_identifier}: {e}")
 
     # Return the decorated functions for testing purposes
     return {
@@ -846,8 +846,8 @@ def register_tools(mcp: FastMCP):
         "create_data_source": create_data_source,
         "get_data_source": get_data_source,
         "start_data_source_run": start_data_source_run,
-        # "create_subscription_request": create_subscription_request,
-        # "accept_subscription_request": accept_subscription_request,
+        "create_subscription_request": create_subscription_request,
+        "accept_subscription_request": accept_subscription_request,
         # "get_subscription": get_subscription,
         # "get_form_type": get_form_type,
         # "list_form_types": list_form_types,

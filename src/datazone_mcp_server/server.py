@@ -58,7 +58,7 @@ logger.setLevel(logging.INFO)
 domain_management.register_tools(mcp)
 project_management.register_tools(mcp)
 data_management.register_tools(mcp)
-# glossary.register_tools(mcp)
+glossary.register_tools(mcp)
 environment.register_tools(mcp)
 
 if __name__ == "__main__":
