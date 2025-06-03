@@ -68,85 +68,85 @@ def register_tools(mcp: FastMCP):
         except ClientError as e:
             raise Exception(f"Error creating glossary in domain {domain_identifier}: {e}")
 
-    @mcp.tool()
-    async def create_glossary_term(
-        domain_identifier: str,
-        glossary_identifier: str,
-        name: str,
-        short_description: str = None,
-        long_description: str = None,
-        status: str = "ENABLED",
-        term_relations: Dict[str, List[str]] = None,
-        client_token: str = None
-    ) -> Any:
-        """
-        Creates a new business glossary term in Amazon DataZone.
+    # @mcp.tool()
+    # async def create_glossary_term(
+    #     domain_identifier: str,
+    #     glossary_identifier: str,
+    #     name: str,
+    #     short_description: str = None,
+    #     long_description: str = None,
+    #     status: str = "ENABLED",
+    #     term_relations: Dict[str, List[str]] = None,
+    #     client_token: str = None
+    # ) -> Any:
+    #     """
+    #     Creates a new business glossary term in Amazon DataZone.
         
-        Args:
-            domain_identifier (str): The ID of the domain where the glossary term will be created
-                Pattern: ^dzd[-_][a-zA-Z0-9_-]{1,36}$
-            glossary_identifier (str): The ID of the glossary where the term will be created
-                Pattern: ^[a-zA-Z0-9_-]{1,36}$
-            name (str): The name of the glossary term (1-256 characters)
-            short_description (str, optional): A short description of the term (0-1024 characters)
-            long_description (str, optional): A detailed description of the term (0-4096 characters)
-            status (str, optional): The status of the term (ENABLED or DISABLED, default: ENABLED)
-            term_relations (Dict[str, List[str]], optional): The term relations
-                Example: {
-                    "classifies": ["term-id-1", "term-id-2"],
-                    "isA": ["term-id-3"]
-                }
-            client_token (str, optional): A unique token to ensure idempotency (1-128 characters)
-                Pattern: ^[\x21-\x7E]+$
+    #     Args:
+    #         domain_identifier (str): The ID of the domain where the glossary term will be created
+    #             Pattern: ^dzd[-_][a-zA-Z0-9_-]{1,36}$
+    #         glossary_identifier (str): The ID of the glossary where the term will be created
+    #             Pattern: ^[a-zA-Z0-9_-]{1,36}$
+    #         name (str): The name of the glossary term (1-256 characters)
+    #         short_description (str, optional): A short description of the term (0-1024 characters)
+    #         long_description (str, optional): A detailed description of the term (0-4096 characters)
+    #         status (str, optional): The status of the term (ENABLED or DISABLED, default: ENABLED)
+    #         term_relations (Dict[str, List[str]], optional): The term relations
+    #             Example: {
+    #                 "classifies": ["term-id-1", "term-id-2"],
+    #                 "isA": ["term-id-3"]
+    #             }
+    #         client_token (str, optional): A unique token to ensure idempotency (1-128 characters)
+    #             Pattern: ^[\x21-\x7E]+$
         
-        Returns:
-            Any: The API response containing the created glossary term details
+    #     Returns:
+    #         Any: The API response containing the created glossary term details
             
-        Example:
-            ```python
-            response = await create_glossary_term(
-                domain_identifier="dzd_123456789",
-                glossary_identifier="gloss_987654321",
-                name="Customer",
-                short_description="A person or organization that purchases goods or services",
-                long_description="In business, a customer is an individual or organization that purchases goods or services from a company. Customers are vital to the success of any business as they provide revenue and feedback.",
-                status="ENABLED",
-                term_relations={
-                    "classifies": ["term_123", "term_456"],
-                    "isA": ["term_789"]
-                }
-            )
-            ```
-        """
-        try:
-            # Validate status
-            if status not in ["ENABLED", "DISABLED"]:
-                raise ValueError("status must be either 'ENABLED' or 'DISABLED'")
+    #     Example:
+    #         ```python
+    #         response = await create_glossary_term(
+    #             domain_identifier="dzd_123456789",
+    #             glossary_identifier="gloss_987654321",
+    #             name="Customer",
+    #             short_description="A person or organization that purchases goods or services",
+    #             long_description="In business, a customer is an individual or organization that purchases goods or services from a company. Customers are vital to the success of any business as they provide revenue and feedback.",
+    #             status="ENABLED",
+    #             term_relations={
+    #                 "classifies": ["term_123", "term_456"],
+    #                 "isA": ["term_789"]
+    #             }
+    #         )
+    #         ```
+    #     """
+    #     try:
+    #         # Validate status
+    #         if status not in ["ENABLED", "DISABLED"]:
+    #             raise ValueError("status must be either 'ENABLED' or 'DISABLED'")
             
-            # Prepare the request parameters
-            params = {
-                "glossaryIdentifier": glossary_identifier,
-                "name": name,
-                "status": status
-            }
+    #         # Prepare the request parameters
+    #         params = {
+    #             "glossaryIdentifier": glossary_identifier,
+    #             "name": name,
+    #             "status": status
+    #         }
             
-            # Add optional parameters if provided
-            if short_description:
-                params["shortDescription"] = short_description
-            if long_description:
-                params["longDescription"] = long_description
-            if term_relations:
-                params["termRelations"] = term_relations
-            if client_token:
-                params["clientToken"] = client_token
+    #         # Add optional parameters if provided
+    #         if short_description:
+    #             params["shortDescription"] = short_description
+    #         if long_description:
+    #             params["longDescription"] = long_description
+    #         if term_relations:
+    #             params["termRelations"] = term_relations
+    #         if client_token:
+    #             params["clientToken"] = client_token
 
-            response = datazone_client.create_glossary_term(
-                domainIdentifier=domain_identifier,
-                **params
-            )
-            return response
-        except ClientError as e:
-            raise Exception(f"Error creating glossary term in domain {domain_identifier}: {e}")
+    #         response = datazone_client.create_glossary_term(
+    #             domainIdentifier=domain_identifier,
+    #             **params
+    #         )
+    #         return response
+    #     except ClientError as e:
+    #         raise Exception(f"Error creating glossary term in domain {domain_identifier}: {e}")
 
     @mcp.tool()
     async def get_glossary(
@@ -192,60 +192,60 @@ def register_tools(mcp: FastMCP):
         except ClientError as e:
             raise Exception(f"Error getting glossary {identifier} in domain {domain_identifier}: {e}")
 
-    @mcp.tool()
-    async def get_glossary_term(
-        domain_identifier: str,
-        identifier: str
-    ) -> Any:
-        """
-        Retrieves detailed information about a specific business glossary term in Amazon DataZone.
+    # @mcp.tool()
+    # async def get_glossary_term(
+    #     domain_identifier: str,
+    #     identifier: str
+    # ) -> Any:
+    #     """
+    #     Retrieves detailed information about a specific business glossary term in Amazon DataZone.
         
-        Args:
-            domain_identifier (str): The ID of the domain where the glossary term exists
-                Pattern: ^dzd[-_][a-zA-Z0-9_-]{1,36}$
-            identifier (str): The ID of the glossary term to retrieve
-                Pattern: ^[a-zA-Z0-9_-]{1,36}$
+    #     Args:
+    #         domain_identifier (str): The ID of the domain where the glossary term exists
+    #             Pattern: ^dzd[-_][a-zA-Z0-9_-]{1,36}$
+    #         identifier (str): The ID of the glossary term to retrieve
+    #             Pattern: ^[a-zA-Z0-9_-]{1,36}$
         
-        Returns:
-            Any: The API response containing glossary term details including:
-                - createdAt (number): Timestamp of when the term was created
-                - createdBy (str): The user who created the term
-                - domainId (str): The ID of the domain
-                - glossaryId (str): The ID of the glossary containing the term
-                - id (str): The ID of the glossary term
-                - longDescription (str): The long description of the term (0-4096 characters)
-                - name (str): The name of the term (1-256 characters)
-                - shortDescription (str): The short description of the term (0-1024 characters)
-                - status (str): The status of the term (ENABLED or DISABLED)
-                - termRelations (dict): The relations of the term
-                    Example: {
-                        "classifies": ["term-id-1", "term-id-2"],
-                        "isA": ["term-id-3"]
-                    }
-                - updatedAt (number): Timestamp of when the term was updated
-                - updatedBy (str): The user who updated the term
+    #     Returns:
+    #         Any: The API response containing glossary term details including:
+    #             - createdAt (number): Timestamp of when the term was created
+    #             - createdBy (str): The user who created the term
+    #             - domainId (str): The ID of the domain
+    #             - glossaryId (str): The ID of the glossary containing the term
+    #             - id (str): The ID of the glossary term
+    #             - longDescription (str): The long description of the term (0-4096 characters)
+    #             - name (str): The name of the term (1-256 characters)
+    #             - shortDescription (str): The short description of the term (0-1024 characters)
+    #             - status (str): The status of the term (ENABLED or DISABLED)
+    #             - termRelations (dict): The relations of the term
+    #                 Example: {
+    #                     "classifies": ["term-id-1", "term-id-2"],
+    #                     "isA": ["term-id-3"]
+    #                 }
+    #             - updatedAt (number): Timestamp of when the term was updated
+    #             - updatedBy (str): The user who updated the term
             
-        Example:
-            ```python
-            response = await get_glossary_term(
-                domain_identifier="dzd_123456789",
-                identifier="term_987654321"
-            )
-            ```
-        """
-        try:
-            response = datazone_client.get_glossary_term(
-                domainIdentifier=domain_identifier,
-                identifier=identifier
-            )
-            return response
-        except ClientError as e:
-            raise Exception(f"Error getting glossary term {identifier} in domain {domain_identifier}: {e}")
+    #     Example:
+    #         ```python
+    #         response = await get_glossary_term(
+    #             domain_identifier="dzd_123456789",
+    #             identifier="term_987654321"
+    #         )
+    #         ```
+    #     """
+    #     try:
+    #         response = datazone_client.get_glossary_term(
+    #             domainIdentifier=domain_identifier,
+    #             identifier=identifier
+    #         )
+    #         return response
+    #     except ClientError as e:
+    #         raise Exception(f"Error getting glossary term {identifier} in domain {domain_identifier}: {e}")
 
     # Return the decorated functions for testing purposes
     return {
         "create_glossary": create_glossary,
-        "create_glossary_term": create_glossary_term,
+        # "create_glossary_term": create_glossary_term,
         "get_glossary": get_glossary,
-        "get_glossary_term": get_glossary_term
+        # "get_glossary_term": get_glossary_term
     } 

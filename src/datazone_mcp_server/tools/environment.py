@@ -256,6 +256,163 @@ def register_tools(mcp: FastMCP):
                 raise Exception(f"Error getting connection {identifier} in domain {domain_identifier}: {error_message}")
 
     @mcp.tool()
+    async def get_environment(
+        domain_identifier: str,
+        identifier: str
+    ) -> Any:
+        """
+        Gets an Amazon DataZone environment.
+                
+        Args:
+            domain_identifier (str): The ID of the domain where the environment exists.
+                Pattern: ^dzd[-_][a-zA-Z0-9_-]{1,36}$
+            identifier (str): The ID of the environment to retrieve.
+                Length Constraints: Minimum length of 0. Maximum length of 128.
+        
+        Returns:
+            Any: The API response containing:
+                - awsAccountId (str): The AWS account ID associated with the environment.
+                - awsAccountRegion (str): The AWS region where the environment is located.
+                - createdAt (str): Timestamp when the environment was created.
+                - createdBy (str): The identifier of the user who created the environment.
+                - deploymentProperties (dict): Properties related to deployment, including:
+                    - endTimeoutMinutes (int): Timeout in minutes for ending the deployment.
+                    - startTimeoutMinutes (int): Timeout in minutes for starting the deployment.
+                - description (str): Description of the environment.
+                - domainId (str): The domain ID associated with the environment.
+                - environmentActions (list): A list of actions for the environment, each containing:
+                    - auth (str): Authorization type for the action.
+                    - parameters (list): Parameters for the action, each including:
+                        - key (str): Parameter key.
+                        - value (str): Parameter value.
+                    - type (str): The type of environment action.
+                - environmentBlueprintId (str): ID of the blueprint used for the environment.
+                - environmentConfigurationId (str): ID of the environment configuration.
+                - environmentProfileId (str): ID of the environment profile.
+                - glossaryTerms (list): List of glossary term strings associated with the environment.
+                - id (str): The unique ID of the environment.
+                - lastDeployment (dict): Information about the last deployment, including:
+                    - deploymentId (str): ID of the last deployment.
+                    - deploymentStatus (str): Status of the deployment.
+                    - deploymentType (str): Type of deployment.
+                    - failureReason (dict): Details of any failure, including:
+                        - code (str): Error code for the failure.
+                        - message (str): Human-readable error message.
+                    - isDeploymentComplete (bool): Whether the deployment is complete.
+                    - messages (list): List of messages related to the deployment.
+                - name (str): Name of the environment.
+                - projectId (str): The project ID associated with the environment.
+                - provider (str): Provider responsible for provisioning the environment.
+                - provisionedResources (list): List of provisioned resources, each including:
+                    - name (str): Name of the resource.
+                    - provider (str): Resource provider.
+                    - type (str): Type of the resource.
+                    - value (str): Value associated with the resource.
+                - provisioningProperties (dict): Additional properties used during provisioning.
+                - status (str): Current status of the environment.
+                - updatedAt (str): Timestamp when the environment was last updated.
+                - userParameters (list): Parameters provided by the user, each including:
+                    - defaultValue (str): Default value of the parameter.
+                    - description (str): Description of the parameter.
+                    - fieldType (str): Type of input field.
+                    - isEditable (bool): Whether the parameter is editable.
+                    - isOptional (bool): Whether the parameter is optional.
+                    - keyName (str): Key name for the parameter.
+        
+        Example:
+            >>> get_environment(
+            ...     domain_identifier="dzd_4p9n6sw4qt9xgn",
+            ...     identifier="conn_123456789"
+            ... )
+        """
+        try:
+            # Prepare the request parameters
+            params = {
+                "domainIdentifier": domain_identifier,
+                "identifier": identifier
+            }
+            
+            response = datazone_client.get_environment(**params)
+            return response
+        except ClientError as e:
+            error_code = e.response.get("Error", {}).get("Code", "")
+            error_message = e.response.get("Error", {}).get("Message", str(e))
+            
+            if error_code == "AccessDeniedException":
+                raise Exception(f"Access denied while getting environment {identifier} in domain {domain_identifier}: {error_message}")
+            elif error_code == "ResourceNotFoundException":
+                raise Exception(f"Environment {identifier} not found in domain {domain_identifier}: {error_message}")
+            elif error_code == "ValidationException":
+                raise Exception(f"Invalid parameters while getting environment {identifier} in domain {domain_identifier}: {error_message}")
+            else:
+                raise Exception(f"Error getting environment {identifier} in domain {domain_identifier}: {error_message}")
+
+    @mcp.tool()
+    async def get_environment_blueprint(
+        domain_identifier: str,
+        identifier: str
+    ) -> Any:
+        """
+        Gets an Amazon DataZone environment blueprint.
+                
+        Args:
+            domain_identifier (str): The ID of the domain where the environment exists.
+                Pattern: ^dzd[-_][a-zA-Z0-9_-]{1,36}$
+            identifier (str): The ID of the environment to retrieve.
+                Length Constraints: Minimum length of 0. Maximum length of 128.
+        
+        Returns:
+            Any: The API response containing the Amazon DataZone blueprint metadata:
+
+                - createdAt (str): Timestamp indicating when the blueprint was created.
+                - deploymentProperties (dict): Deployment-related configuration, including:
+                    - endTimeoutMinutes (int): Timeout in minutes for ending deployment.
+                    - startTimeoutMinutes (int): Timeout in minutes for starting deployment.
+                - description (str): A description of the blueprint.
+                    - Constraints: 0–2048 characters.
+                - glossaryTerms (list of str): Glossary terms associated with the blueprint.
+                    - Constraints: 1–20 items.
+                    - Pattern: ^[a-zA-Z0-9_-]{1,36}$
+                - id (str): Unique ID of the blueprint.
+                    - Pattern: ^[a-zA-Z0-9_-]{1,36}$
+                - name (str): Name of the blueprint.
+                    - Constraints: 1–64 characters.
+                    - Pattern: ^[\w -]+$
+                - provider (str): The provider of the blueprint.
+                - provisioningProperties (dict): Provisioning configuration for the blueprint.
+                    - Note: This is a union object—only one configuration type may be present.
+                - updatedAt (str): Timestamp indicating when the blueprint was last updated.
+                - userParameters (list of dict): Custom parameters defined by the user, each including:
+                    - defaultValue (str): Default value for the parameter.
+                    - description (str): Description of the parameter.
+                    - fieldType (str): Type of input field (e.g., string, boolean).
+                    - isEditable (bool): Whether the parameter is user-editable.
+                    - isOptional (bool): Whether the parameter is optional.
+                    - keyName (str): Key name for the parameter.
+        """
+        try:
+            # Prepare the request parameters
+            params = {
+                "domainIdentifier": domain_identifier,
+                "identifier": identifier
+            }
+            
+            response = datazone_client.get_environment_blueprint(**params)
+            return response
+        except ClientError as e:
+            error_code = e.response.get("Error", {}).get("Code", "")
+            error_message = e.response.get("Error", {}).get("Message", str(e))
+            
+            if error_code == "AccessDeniedException":
+                raise Exception(f"Access denied while getting environment {identifier} blueprint in domain {domain_identifier}: {error_message}")
+            elif error_code == "ResourceNotFoundException":
+                raise Exception(f"Environment {identifier} not found in domain {domain_identifier}: {error_message}")
+            elif error_code == "ValidationException":
+                raise Exception(f"Invalid parameters while getting environment {identifier} blueprint in domain {domain_identifier}: {error_message}")
+            else:
+                raise Exception(f"Error getting environment {identifier} blueprint in domain {domain_identifier}: {error_message}")
+
+    @mcp.tool()
     async def list_connections(
         domain_identifier: str,
         project_identifier: str,
@@ -420,6 +577,8 @@ def register_tools(mcp: FastMCP):
         "list_environments": list_environments,
         "create_connection": create_connection,
         "get_connection": get_connection,
+        "get_environment": get_environment,
+        "get_environment_blueprint": get_environment_blueprint,
         "list_connections": list_connections,
         # "list_environment_blueprints": list_environment_blueprints
     } 
