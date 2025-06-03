@@ -352,166 +352,166 @@ def register_tools(mcp: FastMCP):
             logger.error(f"Unexpected error getting domain unit {identifier} in domain {domain_identifier}: {str(e)}")
             raise Exception(f"Unexpected error getting domain unit {identifier} in domain {domain_identifier}: {str(e)}")
 
-    # @mcp.tool()
-    # async def list_domain_units_for_parent(
-    #     domain_identifier: str,
-    #     parent_domain_unit_identifier: str,
-    #     max_results: int = 50,
-    #     next_token: str = None
-    # ) -> Dict[str, Any]:
-    #     """
-    #     Lists child domain units for a specific parent domain unit in Amazon DataZone.
+    @mcp.tool()
+    async def list_domain_units_for_parent(
+        domain_identifier: str,
+        parent_domain_unit_identifier: str,
+        max_results: int = 50,
+        next_token: str = None
+    ) -> Dict[str, Any]:
+        """
+        Lists child domain units for a specific parent domain unit in Amazon DataZone.
         
-    #     Args:
-    #         domain_identifier (str): The ID of the domain where the domain units exist
-    #             Pattern: ^dzd[-_][a-zA-Z0-9_-]{1,36}$
-    #         parent_domain_unit_identifier (str): The ID of the parent domain unit
-    #             Pattern: ^[a-z0-9_-]+$
-    #         max_results (int, optional): Maximum number of domain units to return (1-50, default: 50)
-    #         next_token (str, optional): Token for pagination (1-8192 characters)
+        Args:
+            domain_identifier (str): The ID of the domain where the domain units exist
+                Pattern: ^dzd[-_][a-zA-Z0-9_-]{1,36}$
+            parent_domain_unit_identifier (str): The ID of the parent domain unit
+                Pattern: ^[a-z0-9_-]+$
+            max_results (int, optional): Maximum number of domain units to return (1-50, default: 50)
+            next_token (str, optional): Token for pagination (1-8192 characters)
         
-    #     Returns:
-    #         Dict containing:
-    #             - items: List of domain units, each containing:
-    #                 - id: Domain unit identifier
-    #                 - name: Domain unit name
-    #             - next_token: Token for pagination if more results are available
-    #     """
-    #     try:
-    #         logger.info(f"Listing domain units for parent {parent_domain_unit_identifier} in domain {domain_identifier}")
+        Returns:
+            Dict containing:
+                - items: List of domain units, each containing:
+                    - id: Domain unit identifier
+                    - name: Domain unit name
+                - next_token: Token for pagination if more results are available
+        """
+        try:
+            logger.info(f"Listing domain units for parent {parent_domain_unit_identifier} in domain {domain_identifier}")
             
-    #         # Prepare request parameters
-    #         params = {
-    #             'domainIdentifier': domain_identifier,
-    #             'parentDomainUnitIdentifier': parent_domain_unit_identifier,
-    #             'maxResults': min(max_results, 50)  # Ensure maxResults is within valid range
-    #         }
+            # Prepare request parameters
+            params = {
+                'domainIdentifier': domain_identifier,
+                'parentDomainUnitIdentifier': parent_domain_unit_identifier,
+                'maxResults': min(max_results, 50)  # Ensure maxResults is within valid range
+            }
             
-    #         # Add optional next token if provided
-    #         if next_token:
-    #             params['nextToken'] = next_token
+            # Add optional next token if provided
+            if next_token:
+                params['nextToken'] = next_token
             
-    #         # List the domain units
-    #         response = datazone_client.list_domain_units_for_parent(**params)
+            # List the domain units
+            response = datazone_client.list_domain_units_for_parent(**params)
             
-    #         # Format the response
-    #         result = {
-    #             'items': [],
-    #             'next_token': response.get('nextToken')
-    #         }
+            # Format the response
+            result = {
+                'items': [],
+                'next_token': response.get('nextToken')
+            }
             
-    #         # Format each domain unit
-    #         for domain_unit in response.get('items', []):
-    #             formatted_domain_unit = {
-    #                 'id': domain_unit.get('id'),
-    #                 'name': domain_unit.get('name')
-    #             }
-    #             result['items'].append(formatted_domain_unit)
+            # Format each domain unit
+            for domain_unit in response.get('items', []):
+                formatted_domain_unit = {
+                    'id': domain_unit.get('id'),
+                    'name': domain_unit.get('name')
+                }
+                result['items'].append(formatted_domain_unit)
             
-    #         logger.info(f"Successfully listed {len(result['items'])} domain units for parent {parent_domain_unit_identifier} in domain {domain_identifier}")
-    #         return result
+            logger.info(f"Successfully listed {len(result['items'])} domain units for parent {parent_domain_unit_identifier} in domain {domain_identifier}")
+            return result
             
-    #     except ClientError as e:
-    #         error_code = e.response['Error']['Code']
-    #         if error_code == 'AccessDeniedException':
-    #             logger.error(f"Access denied while listing domain units for parent {parent_domain_unit_identifier} in domain {domain_identifier}")
-    #             raise Exception(f"Access denied while listing domain units for parent {parent_domain_unit_identifier} in domain {domain_identifier}")
-    #         elif error_code == 'ResourceNotFoundException':
-    #             logger.error(f"Parent domain unit {parent_domain_unit_identifier} not found in domain {domain_identifier}")
-    #             raise Exception(f"Parent domain unit {parent_domain_unit_identifier} not found in domain {domain_identifier}")
-    #         else:
-    #             logger.error(f"Error listing domain units for parent {parent_domain_unit_identifier} in domain {domain_identifier}: {str(e)}")
-    #             raise Exception(f"Error listing domain units for parent {parent_domain_unit_identifier} in domain {domain_identifier}: {str(e)}")
-    #     except Exception as e:
-    #         logger.error(f"Unexpected error listing domain units for parent {parent_domain_unit_identifier} in domain {domain_identifier}: {str(e)}")
-    #         raise Exception(f"Unexpected error listing domain units for parent {parent_domain_unit_identifier} in domain {domain_identifier}: {str(e)}")
+        except ClientError as e:
+            error_code = e.response['Error']['Code']
+            if error_code == 'AccessDeniedException':
+                logger.error(f"Access denied while listing domain units for parent {parent_domain_unit_identifier} in domain {domain_identifier}")
+                raise Exception(f"Access denied while listing domain units for parent {parent_domain_unit_identifier} in domain {domain_identifier}")
+            elif error_code == 'ResourceNotFoundException':
+                logger.error(f"Parent domain unit {parent_domain_unit_identifier} not found in domain {domain_identifier}")
+                raise Exception(f"Parent domain unit {parent_domain_unit_identifier} not found in domain {domain_identifier}")
+            else:
+                logger.error(f"Error listing domain units for parent {parent_domain_unit_identifier} in domain {domain_identifier}: {str(e)}")
+                raise Exception(f"Error listing domain units for parent {parent_domain_unit_identifier} in domain {domain_identifier}: {str(e)}")
+        except Exception as e:
+            logger.error(f"Unexpected error listing domain units for parent {parent_domain_unit_identifier} in domain {domain_identifier}: {str(e)}")
+            raise Exception(f"Unexpected error listing domain units for parent {parent_domain_unit_identifier} in domain {domain_identifier}: {str(e)}")
 
-    # @mcp.tool()
-    # async def update_domain_unit(
-    #     domain_identifier: str,
-    #     identifier: str,
-    #     name: str = None,
-    #     description: str = None
-    # ) -> Dict[str, Any]:
-    #     """
-    #     Updates an existing domain unit in Amazon DataZone.
+    @mcp.tool()
+    async def update_domain_unit(
+        domain_identifier: str,
+        identifier: str,
+        name: str = None,
+        description: str = None
+    ) -> Dict[str, Any]:
+        """
+        Updates an existing domain unit in Amazon DataZone.
         
-    #     Args:
-    #         domain_identifier (str): The ID of the domain where the domain unit exists
-    #             Pattern: ^dzd[-_][a-zA-Z0-9_-]{1,36}$
-    #         identifier (str): The ID of the domain unit to update
-    #             Pattern: ^[a-z0-9_-]+$
-    #         name (str, optional): New name for the domain unit (1-128 characters)
-    #             Pattern: ^[\\w -]+$
-    #         description (str, optional): New description for the domain unit (0-2048 characters)
+        Args:
+            domain_identifier (str): The ID of the domain where the domain unit exists
+                Pattern: ^dzd[-_][a-zA-Z0-9_-]{1,36}$
+            identifier (str): The ID of the domain unit to update
+                Pattern: ^[a-z0-9_-]+$
+            name (str, optional): New name for the domain unit (1-128 characters)
+                Pattern: ^[\\w -]+$
+            description (str, optional): New description for the domain unit (0-2048 characters)
         
-    #     Returns:
-    #         Dict containing:
-    #             - id: Domain unit identifier
-    #             - name: Updated domain unit name
-    #             - description: Updated domain unit description
-    #             - domain_id: Domain ID
-    #             - parent_domain_unit_id: Parent domain unit ID
-    #             - created_at: Creation timestamp
-    #             - created_by: Creator information
-    #             - owners: List of domain unit owners
-    #             - last_updated_at: Last update timestamp
-    #             - last_updated_by: Last updater information
-    #     """
-    #     try:
-    #         logger.info(f"Updating domain unit {identifier} in domain {domain_identifier}")
+        Returns:
+            Dict containing:
+                - id: Domain unit identifier
+                - name: Updated domain unit name
+                - description: Updated domain unit description
+                - domain_id: Domain ID
+                - parent_domain_unit_id: Parent domain unit ID
+                - created_at: Creation timestamp
+                - created_by: Creator information
+                - owners: List of domain unit owners
+                - last_updated_at: Last update timestamp
+                - last_updated_by: Last updater information
+        """
+        try:
+            logger.info(f"Updating domain unit {identifier} in domain {domain_identifier}")
             
-    #         # Prepare request parameters
-    #         params = {
-    #             'domainIdentifier': domain_identifier,
-    #             'identifier': identifier
-    #         }
+            # Prepare request parameters
+            params = {
+                'domainIdentifier': domain_identifier,
+                'identifier': identifier
+            }
             
-    #         # Add optional parameters
-    #         if name:
-    #             params['name'] = name
-    #         if description:
-    #             params['description'] = description
-    #         # if client_token:
-    #         #     params['clientToken'] = client_token
+            # Add optional parameters
+            if name:
+                params['name'] = name
+            if description:
+                params['description'] = description
+            # if client_token:
+            #     params['clientToken'] = client_token
             
-    #         # Update the domain unit
-    #         response = datazone_client.update_domain_unit(**params)
+            # Update the domain unit
+            response = datazone_client.update_domain_unit(**params)
             
-    #         # Format the response
-    #         result = {
-    #             'id': response.get('id'),
-    #             'name': response.get('name'),
-    #             'description': response.get('description'),
-    #             'domain_id': response.get('domainId'),
-    #             'parent_domain_unit_id': response.get('parentDomainUnitId'),
-    #             'created_at': response.get('createdAt'),
-    #             'created_by': response.get('createdBy'),
-    #             'owners': response.get('owners', []),
-    #             'updated_at': response.get('updatedAt'),
-    #             'updated_by': response.get('updatedBy')
-    #         }
+            # Format the response
+            result = {
+                'id': response.get('id'),
+                'name': response.get('name'),
+                'description': response.get('description'),
+                'domain_id': response.get('domainId'),
+                'parent_domain_unit_id': response.get('parentDomainUnitId'),
+                'created_at': response.get('createdAt'),
+                'created_by': response.get('createdBy'),
+                'owners': response.get('owners', []),
+                'updated_at': response.get('updatedAt'),
+                'updated_by': response.get('updatedBy')
+            }
             
-    #         logger.info(f"Successfully updated domain unit {identifier} in domain {domain_identifier}")
-    #         return result
+            logger.info(f"Successfully updated domain unit {identifier} in domain {domain_identifier}")
+            return result
             
-    #     except ClientError as e:
-    #         error_code = e.response['Error']['Code']
-    #         if error_code == 'AccessDeniedException':
-    #             logger.error(f"Access denied while updating domain unit {identifier} in domain {domain_identifier}")
-    #             raise Exception(f"Access denied while updating domain unit {identifier} in domain {domain_identifier}")
-    #         elif error_code == 'ResourceNotFoundException':
-    #             logger.error(f"Domain unit {identifier} not found in domain {domain_identifier}")
-    #             raise Exception(f"Domain unit {identifier} not found in domain {domain_identifier}")
-    #         elif error_code == 'ValidationException':
-    #             logger.error(f"Invalid parameters for updating domain unit {identifier} in domain {domain_identifier}")
-    #             raise Exception(f"Invalid parameters for updating domain unit {identifier} in domain {domain_identifier}")
-    #         else:
-    #             logger.error(f"Error updating domain unit {identifier} in domain {domain_identifier}: {str(e)}")
-    #             raise Exception(f"Error updating domain unit {identifier} in domain {domain_identifier}: {str(e)}")
-    #     except Exception as e:
-    #         logger.error(f"Unexpected error updating domain unit {identifier} in domain {domain_identifier}: {str(e)}")
-    #         raise Exception(f"Unexpected error updating domain unit {identifier} in domain {domain_identifier}: {str(e)}")
+        except ClientError as e:
+            error_code = e.response['Error']['Code']
+            if error_code == 'AccessDeniedException':
+                logger.error(f"Access denied while updating domain unit {identifier} in domain {domain_identifier}")
+                raise Exception(f"Access denied while updating domain unit {identifier} in domain {domain_identifier}")
+            elif error_code == 'ResourceNotFoundException':
+                logger.error(f"Domain unit {identifier} not found in domain {domain_identifier}")
+                raise Exception(f"Domain unit {identifier} not found in domain {domain_identifier}")
+            elif error_code == 'ValidationException':
+                logger.error(f"Invalid parameters for updating domain unit {identifier} in domain {domain_identifier}")
+                raise Exception(f"Invalid parameters for updating domain unit {identifier} in domain {domain_identifier}")
+            else:
+                logger.error(f"Error updating domain unit {identifier} in domain {domain_identifier}: {str(e)}")
+                raise Exception(f"Error updating domain unit {identifier} in domain {domain_identifier}: {str(e)}")
+        except Exception as e:
+            logger.error(f"Unexpected error updating domain unit {identifier} in domain {domain_identifier}: {str(e)}")
+            raise Exception(f"Unexpected error updating domain unit {identifier} in domain {domain_identifier}: {str(e)}")
 
     # @mcp.tool()
     # async def add_entity_owner(
@@ -853,8 +853,8 @@ def register_tools(mcp: FastMCP):
         "list_domains": list_domains,
         "create_domain_unit": create_domain_unit,
         "get_domain_unit": get_domain_unit,
-        # "list_domain_units_for_parent": list_domain_units_for_parent,
-        # "update_domain_unit": update_domain_unit,
+        "list_domain_units_for_parent": list_domain_units_for_parent,
+        "update_domain_unit": update_domain_unit,
         # "add_entity_owner": add_entity_owner,
         # "add_policy_grant": add_policy_grant,
         # "list_policy_grants": list_policy_grants,

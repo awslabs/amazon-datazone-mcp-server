@@ -168,38 +168,38 @@ def register_tools(mcp: FastMCP):
     #         except httpx.HTTPStatusError as e:
     #             raise Exception(f"Failed to create project membership: {e}")
 
-    # @mcp.tool()
-    # async def list_project_profiles(
-    #     domain_identifier: str,
-    #     max_results: int = 50,
-    #     next_token: str = None
-    # ) -> Any:
-    #     """
-    #     Lists all project profiles available in an AWS DataZone domain.
+    @mcp.tool()
+    async def list_project_profiles(
+        domain_identifier: str,
+        max_results: int = 50,
+        next_token: str = None
+    ) -> Any:
+        """
+        Lists all project profiles available in an AWS DataZone domain.
         
-    #     Args:
-    #         domain_identifier (str): The ID of the domain
-    #         max_results (int, optional): Maximum number of profiles to return (1-50, default: 50)
-    #         next_token (str, optional): Token for pagination
+        Args:
+            domain_identifier (str): The ID of the domain
+            max_results (int, optional): Maximum number of profiles to return (1-50, default: 50)
+            next_token (str, optional): Token for pagination
         
-    #     Returns:
-    #         Any: The API response containing the list of project profiles
-    #     """
-    #     try:
-    #         # Prepare the request parameters
-    #         params = {
-    #             "domainIdentifier": domain_identifier,
-    #             "maxResults": min(max_results, 50)  # Ensure maxResults is within valid range
-    #         }
+        Returns:
+            Any: The API response containing the list of project profiles
+        """
+        try:
+            # Prepare the request parameters
+            params = {
+                "domainIdentifier": domain_identifier,
+                "maxResults": min(max_results, 50)  # Ensure maxResults is within valid range
+            }
             
-    #         # Add optional next token if provided
-    #         if next_token:
-    #             params["nextToken"] = next_token
+            # Add optional next token if provided
+            if next_token:
+                params["nextToken"] = next_token
 
-    #         response = datazone_client.list_project_profiles(**params)
-    #         return response
-    #     except ClientError as e:
-    #         raise Exception(f"Error listing project profiles in domain {domain_identifier}: {e}")
+            response = datazone_client.list_project_profiles(**params)
+            return response
+        except ClientError as e:
+            raise Exception(f"Error listing project profiles in domain {domain_identifier}: {e}")
 
     # @mcp.tool()
     # async def create_project_profile(
@@ -315,6 +315,6 @@ def register_tools(mcp: FastMCP):
         "get_project": get_project,
         "list_projects": list_projects,
         # "create_project_membership": create_project_membership,
-        # "list_project_profiles": list_project_profiles,
+        "list_project_profiles": list_project_profiles,
         # "create_project_profile": create_project_profile
     } 

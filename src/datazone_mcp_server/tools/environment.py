@@ -323,97 +323,97 @@ def register_tools(mcp: FastMCP):
             else:
                 raise Exception(f"Unexpected error listing connections in domain {domain_identifier}: {error_message}")
 
-    @mcp.tool()
-    async def list_environment_blueprints(
-        domain_identifier: str,
-        managed: bool = None,
-        max_results: int = 50,
-        name: str = None,
-        next_token: str = None
-    ) -> Dict[str, Any]:
-        """
-        Lists environment blueprints in an Amazon DataZone domain.
+    # @mcp.tool()
+    # async def list_environment_blueprints(
+    #     domain_identifier: str,
+    #     managed: bool = None,
+    #     max_results: int = 50,
+    #     name: str = None,
+    #     next_token: str = None
+    # ) -> Dict[str, Any]:
+    #     """
+    #     Lists environment blueprints in an Amazon DataZone domain.
         
-        Args:
-            domain_identifier (str): The ID of the domain where the blueprints are listed
-                Pattern: ^dzd[-_][a-zA-Z0-9_-]{1,36}$
-            managed (bool, optional): Specifies whether to list only managed blueprints
-            max_results (int, optional): Maximum number of blueprints to return (1-50, default: 50)
-            name (str, optional): Filter blueprints by name (1-64 characters)
-                Pattern: ^[\\w -]+$
-            next_token (str, optional): Token for pagination (1-8192 characters)
+    #     Args:
+    #         domain_identifier (str): The ID of the domain where the blueprints are listed
+    #             Pattern: ^dzd[-_][a-zA-Z0-9_-]{1,36}$
+    #         managed (bool, optional): Specifies whether to list only managed blueprints
+    #         max_results (int, optional): Maximum number of blueprints to return (1-50, default: 50)
+    #         name (str, optional): Filter blueprints by name (1-64 characters)
+    #             Pattern: ^[\\w -]+$
+    #         next_token (str, optional): Token for pagination (1-8192 characters)
         
-        Returns:
-            Dict containing:
-                - items: List of environment blueprints, each containing:
-                    - id: Blueprint identifier
-                    - name: Blueprint name
-                    - description: Blueprint description
-                    - provider: Blueprint provider
-                    - provisioning_properties: Blueprint provisioning properties
-                    - created_at: Creation timestamp
-                    - updated_at: Last update timestamp
-                - next_token: Token for pagination if more results are available
-        """
-        try:
-            logger.info(f"Listing environment blueprints in domain {domain_identifier}")
+    #     Returns:
+    #         Dict containing:
+    #             - items: List of environment blueprints, each containing:
+    #                 - id: Blueprint identifier
+    #                 - name: Blueprint name
+    #                 - description: Blueprint description
+    #                 - provider: Blueprint provider
+    #                 - provisioning_properties: Blueprint provisioning properties
+    #                 - created_at: Creation timestamp
+    #                 - updated_at: Last update timestamp
+    #             - next_token: Token for pagination if more results are available
+    #     """
+    #     try:
+    #         logger.info(f"Listing environment blueprints in domain {domain_identifier}")
             
-            # Prepare request parameters
-            params = {
-                'domainIdentifier': domain_identifier,
-                'maxResults': min(max_results, 50)  # Ensure maxResults is within valid range
-            }
+    #         # Prepare request parameters
+    #         params = {
+    #             'domainIdentifier': domain_identifier,
+    #             'maxResults': min(max_results, 50)  # Ensure maxResults is within valid range
+    #         }
             
-            # Add optional parameters
-            if managed is not None:
-                params['managed'] = managed
-            if name:
-                params['name'] = name
-            if next_token:
-                params['nextToken'] = next_token
+    #         # Add optional parameters
+    #         if managed is not None:
+    #             params['managed'] = managed
+    #         if name:
+    #             params['name'] = name
+    #         if next_token:
+    #             params['nextToken'] = next_token
             
-            # List the environment blueprints
-            response = datazone_client.list_environment_blueprints(**params)
+    #         # List the environment blueprints
+    #         response = datazone_client.list_environment_blueprints(**params)
             
-            # Format the response
-            result = {
-                'items': [],
-                'next_token': response.get('nextToken')
-            }
+    #         # Format the response
+    #         result = {
+    #             'items': [],
+    #             'next_token': response.get('nextToken')
+    #         }
             
-            # Format each blueprint
-            for blueprint in response.get('items', []):
-                formatted_blueprint = {
-                    'id': blueprint.get('id'),
-                    'name': blueprint.get('name'),
-                    'description': blueprint.get('description'),
-                    'provider': blueprint.get('provider'),
-                    'provisioning_properties': blueprint.get('provisioningProperties'),
-                    'created_at': blueprint.get('createdAt'),
-                    'updated_at': blueprint.get('updatedAt')
-                }
-                result['items'].append(formatted_blueprint)
+    #         # Format each blueprint
+    #         for blueprint in response.get('items', []):
+    #             formatted_blueprint = {
+    #                 'id': blueprint.get('id'),
+    #                 'name': blueprint.get('name'),
+    #                 'description': blueprint.get('description'),
+    #                 'provider': blueprint.get('provider'),
+    #                 'provisioning_properties': blueprint.get('provisioningProperties'),
+    #                 'created_at': blueprint.get('createdAt'),
+    #                 'updated_at': blueprint.get('updatedAt')
+    #             }
+    #             result['items'].append(formatted_blueprint)
             
-            logger.info(f"Successfully listed {len(result['items'])} environment blueprints in domain {domain_identifier}")
-            return result
+    #         logger.info(f"Successfully listed {len(result['items'])} environment blueprints in domain {domain_identifier}")
+    #         return result
             
-        except ClientError as e:
-            error_code = e.response['Error']['Code']
-            if error_code == 'AccessDeniedException':
-                logger.error(f"Access denied while listing environment blueprints in domain {domain_identifier}")
-                raise Exception(f"Access denied while listing environment blueprints in domain {domain_identifier}")
-            elif error_code == 'ResourceNotFoundException':
-                logger.error(f"Domain {domain_identifier} not found while listing environment blueprints")
-                raise Exception(f"Domain {domain_identifier} not found while listing environment blueprints")
-            elif error_code == 'ValidationException':
-                logger.error(f"Invalid parameters for listing environment blueprints in domain {domain_identifier}")
-                raise Exception(f"Invalid parameters for listing environment blueprints in domain {domain_identifier}")
-            else:
-                logger.error(f"Error listing environment blueprints in domain {domain_identifier}: {str(e)}")
-                raise Exception(f"Error listing environment blueprints in domain {domain_identifier}: {str(e)}")
-        except Exception as e:
-            logger.error(f"Unexpected error listing environment blueprints in domain {domain_identifier}: {str(e)}")
-            raise Exception(f"Unexpected error listing environment blueprints in domain {domain_identifier}: {str(e)}")
+    #     except ClientError as e:
+    #         error_code = e.response['Error']['Code']
+    #         if error_code == 'AccessDeniedException':
+    #             logger.error(f"Access denied while listing environment blueprints in domain {domain_identifier}")
+    #             raise Exception(f"Access denied while listing environment blueprints in domain {domain_identifier}")
+    #         elif error_code == 'ResourceNotFoundException':
+    #             logger.error(f"Domain {domain_identifier} not found while listing environment blueprints")
+    #             raise Exception(f"Domain {domain_identifier} not found while listing environment blueprints")
+    #         elif error_code == 'ValidationException':
+    #             logger.error(f"Invalid parameters for listing environment blueprints in domain {domain_identifier}")
+    #             raise Exception(f"Invalid parameters for listing environment blueprints in domain {domain_identifier}")
+    #         else:
+    #             logger.error(f"Error listing environment blueprints in domain {domain_identifier}: {str(e)}")
+    #             raise Exception(f"Error listing environment blueprints in domain {domain_identifier}: {str(e)}")
+    #     except Exception as e:
+    #         logger.error(f"Unexpected error listing environment blueprints in domain {domain_identifier}: {str(e)}")
+    #         raise Exception(f"Unexpected error listing environment blueprints in domain {domain_identifier}: {str(e)}")
 
     # Return the decorated functions for testing purposes
     return {
@@ -421,5 +421,5 @@ def register_tools(mcp: FastMCP):
         "create_connection": create_connection,
         "get_connection": get_connection,
         "list_connections": list_connections,
-        "list_environment_blueprints": list_environment_blueprints
+        # "list_environment_blueprints": list_environment_blueprints
     } 
