@@ -356,7 +356,7 @@ def register_tools(mcp: FastMCP):
         Gets an Amazon DataZone environment blueprint.
                 
         Args:
-            domain_identifier (str): The ID of the domain where the environment exists.
+            domain_identifier (str): The ID of the domain in which this blueprint exists.
                 Pattern: ^dzd[-_][a-zA-Z0-9_-]{1,36}$
             identifier (str): The ID of the environment to retrieve.
                 Length Constraints: Minimum length of 0. Maximum length of 128.
@@ -411,6 +411,66 @@ def register_tools(mcp: FastMCP):
                 raise Exception(f"Invalid parameters while getting environment {identifier} blueprint in domain {domain_identifier}: {error_message}")
             else:
                 raise Exception(f"Error getting environment {identifier} blueprint in domain {domain_identifier}: {error_message}")
+
+    @mcp.tool()
+    async def get_environment_blueprint_configuration(
+        domain_identifier: str,
+        identifier: str
+    ) -> Any:
+        """
+        Gets an Amazon DataZone environment blueprint configuration.
+                
+        Args:
+            domain_identifier (str): The ID of the domain where where this blueprint exists.
+                Pattern: ^dzd[-_][a-zA-Z0-9_-]{1,36}$
+            identifier (str): The ID of the environment blueprint.
+                Pattern: ^[a-zA-Z0-9_-]{1,36}$
+        
+        Returns:
+            Any: The API response containing information about the Amazon DataZone environment blueprint configuration:
+
+                - createdAt (str): Timestamp indicating when the blueprint was created.
+                - domainId (str): ID of the DataZone domain associated with the blueprint.
+                    - Pattern: ^dzd[-_][a-zA-Z0-9_-]{1,36}$
+                - enabledRegions (list of str): List of AWS regions where the blueprint is enabled.
+                    - Each region string must follow the pattern: ^[a-z]{2}-?(iso|gov)?-{1}[a-z]*-{1}[0-9]$
+                    - Length constraints: 4–16 characters.
+                - environmentBlueprintId (str): Unique ID of the blueprint.
+                    - Pattern: ^[a-zA-Z0-9_-]{1,36}$
+                - environmentRolePermissionBoundary (str): ARN of the IAM policy that defines the permission boundary for environment roles.
+                    - Pattern: ^arn:aws[^:]*:iam::(aws|\d{12}):policy/[\w+=,.@-]*$
+                - manageAccessRoleArn (str): ARN of the IAM role used to manage access to the blueprint.
+                    - Pattern: ^arn:aws[^:]*:iam::\d{12}:(role|role/service-role)/[\w+=,.@-]*$
+                - provisioningConfigurations (list of dict): Provisioning configurations associated with the blueprint.
+                    - Each item is a `ProvisioningConfiguration` object describing how resources are provisioned.
+                - provisioningRoleArn (str): ARN of the IAM role used for provisioning resources.
+                    - Pattern: ^arn:aws[^:]*:iam::\d{12}:(role|role/service-role)/[\w+=,.@-]*$
+                - regionalParameters (dict): A nested map of region-specific parameters.
+                    - Outer keys: Region codes (e.g., "us-west-2")
+                        - Constraints: 4–16 characters, pattern: ^[a-z]{2}-?(iso|gov)?-{1}[a-z]*-{1}[0-9]$
+                    - Inner dicts: Key-value pairs of configuration parameters for that region.
+                - updatedAt (str): Timestamp indicating when the blueprint was last updated.
+        """
+        try:
+            # Prepare the request parameters
+            params = {
+                "domainIdentifier": domain_identifier,
+                "identifier": identifier
+            }
+            response = datazone_client.get_environment_blueprint_configuration(**params)
+            return response
+        except ClientError as e:
+            error_code = e.response.get("Error", {}).get("Code", "")
+            error_message = e.response.get("Error", {}).get("Message", str(e))
+            
+            if error_code == "AccessDeniedException":
+                raise Exception(f"Access denied while getting environment blueprint {identifier}  configuration in domain {domain_identifier}: {error_message}")
+            elif error_code == "ResourceNotFoundException":
+                raise Exception(f"Environment blueprint {identifier} not found in domain {domain_identifier}: {error_message}")
+            elif error_code == "ValidationException":
+                raise Exception(f"Invalid parameters while getting environment blueprint {identifier} configuration in domain {domain_identifier}: {error_message}")
+            else:
+                raise Exception(f"Error getting environment blueprint {identifier} configuration in domain {domain_identifier}: {error_message}")
 
     @mcp.tool()
     async def list_connections(
@@ -579,6 +639,7 @@ def register_tools(mcp: FastMCP):
         "get_connection": get_connection,
         "get_environment": get_environment,
         "get_environment_blueprint": get_environment_blueprint,
+        "get_environment_blueprint_configuration": get_environment_blueprint_configuration,
         "list_connections": list_connections,
         # "list_environment_blueprints": list_environment_blueprints
     } 

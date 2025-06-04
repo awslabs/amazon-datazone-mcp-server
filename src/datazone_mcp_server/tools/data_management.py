@@ -434,88 +434,88 @@ def register_tools(mcp: FastMCP):
         except ClientError as e:
             raise Exception(f"Error getting data source {identifier}: {e}")
 
-    @mcp.tool()
-    async def start_data_source_run(
-        domain_identifier: str,
-        data_source_identifier: str,
-        client_token: str = None
-    ) -> Any:
-        """
-        Starts a data source run in Amazon DataZone.
+    # @mcp.tool()
+    # async def start_data_source_run(
+    #     domain_identifier: str,
+    #     data_source_identifier: str,
+    #     client_token: str = None
+    # ) -> Any:
+    #     """
+    #     Starts a data source run in Amazon DataZone.
         
-        Args:
-            domain_identifier (str): The identifier of the Amazon DataZone domain in which to start a data source run
-                Pattern: ^dzd[-_][a-zA-Z0-9_-]{1,36}$
-            data_source_identifier (str): The identifier of the data source
-                Pattern: ^[a-zA-Z0-9_-]{1,36}$
-            client_token (str, optional): A unique, case-sensitive identifier that is provided to ensure the idempotency of the request
-                Length: 1-128 characters
+    #     Args:
+    #         domain_identifier (str): The identifier of the Amazon DataZone domain in which to start a data source run
+    #             Pattern: ^dzd[-_][a-zA-Z0-9_-]{1,36}$
+    #         data_source_identifier (str): The identifier of the data source
+    #             Pattern: ^[a-zA-Z0-9_-]{1,36}$
+    #         client_token (str, optional): A unique, case-sensitive identifier that is provided to ensure the idempotency of the request
+    #             Length: 1-128 characters
         
-        Returns:
-            Any: The API response containing:
-                - createdAt: Timestamp when the data source run was created
-                - dataSourceConfigurationSnapshot: Configuration snapshot of the data source
-                - dataSourceId: Identifier of the data source
-                - domainId: Identifier of the domain
-                - errorMessage: Error details if the operation failed
-                - id: Identifier of the data source run
-                - projectId: Identifier of the project
-                - runStatisticsForAssets: Statistics about the run including:
-                    - added: Number of assets added
-                    - failed: Number of assets that failed
-                    - skipped: Number of assets skipped
-                    - unchanged: Number of assets unchanged
-                    - updated: Number of assets updated
-                - startedAt: Timestamp when the run started
-                - status: Status of the run (REQUESTED, RUNNING, FAILED, PARTIALLY_SUCCEEDED, SUCCESS)
-                - stoppedAt: Timestamp when the run stopped
-                - type: Type of the run (PRIORITIZED, SCHEDULED)
-                - updatedAt: Timestamp when the run was last updated
+    #     Returns:
+    #         Any: The API response containing:
+    #             - createdAt: Timestamp when the data source run was created
+    #             - dataSourceConfigurationSnapshot: Configuration snapshot of the data source
+    #             - dataSourceId: Identifier of the data source
+    #             - domainId: Identifier of the domain
+    #             - errorMessage: Error details if the operation failed
+    #             - id: Identifier of the data source run
+    #             - projectId: Identifier of the project
+    #             - runStatisticsForAssets: Statistics about the run including:
+    #                 - added: Number of assets added
+    #                 - failed: Number of assets that failed
+    #                 - skipped: Number of assets skipped
+    #                 - unchanged: Number of assets unchanged
+    #                 - updated: Number of assets updated
+    #             - startedAt: Timestamp when the run started
+    #             - status: Status of the run (REQUESTED, RUNNING, FAILED, PARTIALLY_SUCCEEDED, SUCCESS)
+    #             - stoppedAt: Timestamp when the run stopped
+    #             - type: Type of the run (PRIORITIZED, SCHEDULED)
+    #             - updatedAt: Timestamp when the run was last updated
         
-        Example:
-            ```python
-            response = await start_data_source_run(
-                domain_identifier="dzd-1234567890",
-                data_source_identifier="ds-1234567890",
-                client_token="unique-token-123"
-            )
-            ```
-        """
-        try:
-            # Prepare the request parameters
-            params = {
-                "domainIdentifier": domain_identifier,
-                "dataSourceIdentifier": data_source_identifier
-            }
+    #     Example:
+    #         ```python
+    #         response = await start_data_source_run(
+    #             domain_identifier="dzd-1234567890",
+    #             data_source_identifier="ds-1234567890",
+    #             client_token="unique-token-123"
+    #         )
+    #         ```
+    #     """
+    #     try:
+    #         # Prepare the request parameters
+    #         params = {
+    #             "domainIdentifier": domain_identifier,
+    #             "dataSourceIdentifier": data_source_identifier
+    #         }
             
-            # Add optional client_token if provided
-            if client_token:
-                params["clientToken"] = client_token
+    #         # Add optional client_token if provided
+    #         if client_token:
+    #             params["clientToken"] = client_token
 
-            response = datazone_client.start_data_source_run(**params)
-            return response
-        except ClientError as e:
-            error_code = e.response['Error']['Code']
-            if error_code == 'AccessDeniedException':
-                raise Exception(f"Access denied while starting data source run for {data_source_identifier} in domain {domain_identifier}")
-            elif error_code == 'ConflictException':
-                raise Exception(f"Conflict while starting data source run for {data_source_identifier} in domain {domain_identifier}")
-            elif error_code == 'InternalServerException':
-                raise Exception(f"Internal server error while starting data source run for {data_source_identifier} in domain {domain_identifier}")
-            elif error_code == 'ResourceNotFoundException':
-                raise Exception(f"Data source {data_source_identifier} or domain {domain_identifier} not found")
-            elif error_code == 'ServiceQuotaExceededException':
-                raise Exception(f"Service quota exceeded while starting data source run for {data_source_identifier} in domain {domain_identifier}")
-            elif error_code == 'ThrottlingException':
-                raise Exception(f"Request throttled while starting data source run for {data_source_identifier} in domain {domain_identifier}")
-            elif error_code == 'UnauthorizedException':
-                raise Exception(f"Unauthorized to start data source run for {data_source_identifier} in domain {domain_identifier}")
-            elif error_code == 'ValidationException':
-                raise Exception(f"Invalid input while starting data source run for {data_source_identifier} in domain {domain_identifier}")
-            else:
-                raise Exception(f"Error starting data source run for {data_source_identifier} in domain {domain_identifier}: {str(e)}")
-        except Exception as e:
-            raise Exception(f"Unexpected error starting data source run for {data_source_identifier} in domain {domain_identifier}: {str(e)}")
+    #         response = datazone_client.start_data_source_run(**params)
+    #         return response
+    #     except ClientError as e:
+    #         error_code = e.response['Error']['Code']
+    #         if error_code == 'AccessDeniedException':
+    #             raise Exception(f"Access denied while starting data source run for {data_source_identifier} in domain {domain_identifier}")
+    #         elif error_code == 'ConflictException':
+    #             raise Exception(f"Conflict while starting data source run for {data_source_identifier} in domain {domain_identifier}")
+    #         elif error_code == 'InternalServerException':
+    #             raise Exception(f"Internal server error while starting data source run for {data_source_identifier} in domain {domain_identifier}")
+    #         elif error_code == 'ResourceNotFoundException':
+    #             raise Exception(f"Data source {data_source_identifier} or domain {domain_identifier} not found")
+    #         elif error_code == 'ServiceQuotaExceededException':
+    #             raise Exception(f"Service quota exceeded while starting data source run for {data_source_identifier} in domain {domain_identifier}")
+    #         elif error_code == 'ThrottlingException':
+    #             raise Exception(f"Request throttled while starting data source run for {data_source_identifier} in domain {domain_identifier}")
+    #         elif error_code == 'UnauthorizedException':
+    #             raise Exception(f"Unauthorized to start data source run for {data_source_identifier} in domain {domain_identifier}")
+    #         elif error_code == 'ValidationException':
+    #             raise Exception(f"Invalid input while starting data source run for {data_source_identifier} in domain {domain_identifier}")
+    #         else:
+    #             raise Exception(f"Error starting data source run for {data_source_identifier} in domain {domain_identifier}: {str(e)}")
+    #     except Exception as e:
+    #         raise Exception(f"Unexpected error starting data source run for {data_source_identifier} in domain {domain_identifier}: {str(e)}")
 
     @mcp.tool()
     async def create_subscription_request(
@@ -845,7 +845,7 @@ def register_tools(mcp: FastMCP):
         "search_listings": search_listings,
         "create_data_source": create_data_source,
         "get_data_source": get_data_source,
-        "start_data_source_run": start_data_source_run,
+        # "start_data_source_run": start_data_source_run,
         "create_subscription_request": create_subscription_request,
         "accept_subscription_request": accept_subscription_request,
         "get_subscription": get_subscription,
