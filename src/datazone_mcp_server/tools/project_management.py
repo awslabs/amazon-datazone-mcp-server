@@ -309,6 +309,151 @@ def register_tools(mcp: FastMCP):
     #         logger.error(f"Unexpected error creating project profile '{name}' in domain {domain_identifier}: {str(e)}")
     #         raise Exception(f"Unexpected error creating project profile '{name}' in domain {domain_identifier}: {str(e)}")
 
+    @mcp.tool()
+    async def get_project_profile(
+        domain_identifier: str,
+        identifier: str
+    ) -> Any:
+        """
+        Get the details of the project profile in an AWS DataZone domain.
+        
+        Args:
+            domain_identifier (str): The ID of the domain
+                Pattern: ^dzd[-_][a-zA-Z0-9_-]{1,36}$
+            identifier (str): The ID of the project profile (1-50, default: 50)
+                Pattern: ^[a-zA-Z0-9_-]{1,36}$
+        
+        Returns:
+            dict: A dictionary with the following fields:
+                createdAt (str): The timestamp when the project profile was created.
+                createdBy (str): The user who created the project profile.
+                description (str): Description of the project profile. (0–2048 characters)
+                domainId (str): The identifier of the domain the project profile belongs to.
+                    Pattern: ^dzd[-_][a-zA-Z0-9_-]{1,36}$
+                domainUnitId (str): The identifier of the domain unit within the domain.
+                    Pattern: ^[a-z0-9_\-]+$, length 1–256
+                environmentConfigurations (List[dict]): A list of environment configurations. Each item includes:
+                    - awsAccount (dict): AWS account details.
+                    - awsRegion (dict): AWS region.
+                    - configurationParameters (dict): Parameters for deployment.
+                        - parameterOverrides (List[dict]): Overridden parameters with:
+                            - isEditable (bool): Whether the parameter can be edited.
+                            - name (str): Parameter name.
+                            - value (str): Parameter value.
+                        - resolvedParameters (List[dict]): Final resolved parameters, same structure as above.
+                        - ssmPath (str): SSM path for configuration parameters.
+                    - deploymentMode (str): Mode of deployment.
+                    - deploymentOrder (int): Order in which to deploy this environment.
+                    - description (str): Description of the environment configuration.
+                    - environmentBlueprintId (str): Identifier of the environment blueprint.
+                    - id (str): Unique ID of the environment configuration.
+                    - name (str): Name of the environment configuration.
+                id (str): Unique identifier for the project profile.
+                    Pattern: ^[a-zA-Z0-9_-]{1,36}$
+                lastUpdatedAt (str): The timestamp when the project profile was last updated.
+                name (str): The name of the project profile (1–64 characters).
+                    Pattern: ^[\w -]+$
+                status (str): Status of the project profile. Valid values: "ENABLED" | "DISABLED"
+        """
+        try:
+            # Prepare the request parameters
+            params = {
+                "domainIdentifier": domain_identifier,
+                "identifier": identifier  
+            }
+
+            response = datazone_client.get_project_profile(**params)
+            return response
+        except ClientError as e:
+            error_code = e.response['Error']['Code']
+            if error_code == 'AccessDeniedException':
+                logger.error(f"Access denied while getting project profile '{identifier}' in domain {domain_identifier}")
+                raise Exception(f"Access denied while getting project profile '{name}' in domain {domain_identifier}")
+            elif error_code == 'ResourceNotFoundException':
+                logger.error(f"Domain or project profile not found")
+                raise Exception(f"Domain or project profile not found")
+            elif error_code == 'InternalServerException':
+                logger.error(f"Getting project profile '{identifier}' in domain {domain_identifier} failed because of an unknown error, exception or failure")
+                raise Exception(f"Getting project profile '{identifier}' in domain {domain_identifier} failed because of an unknown error, exception or failure")
+            elif error_code == 'ValidationException':
+                logger.error(f"Invalid parameters for getting project profile '{identifier}' in domain {domain_identifier}")
+                raise Exception(f"Invalid parameters for getting project profile '{identifier}' in domain {domain_identifier}")
+            elif error_code == 'UnauthorizedException':
+                logger.error(f"You do not have permission to get project profile '{identifier}' in domain {domain_identifier}")
+                raise Exception(f"You do not have permission to get project profile '{identifier}' in domain {domain_identifier}")
+            elif error_code == 'ThrottlingException':
+                logger.error(f"Request to get project profile '{identifier}' in domain {domain_identifier} is denied due to request throttling")
+                raise Exception(f"Request to get project profile '{identifier}' in domain {domain_identifier} is denied due to request throttling")
+            else:
+                logger.error(f"Error creating project profile '{name}' in domain {domain_identifier}: {str(e)}")
+                raise Exception(f"Error creating project profile '{name}' in domain {domain_identifier}: {str(e)}")
+        except Exception as e:
+            logger.error(f"Unexpected error creating project profile '{name}' in domain {domain_identifier}: {str(e)}")
+            raise Exception(f"Unexpected error creating project profile '{name}' in domain {domain_identifier}: {str(e)}")
+
+    @mcp.tool()
+    async def list_project_memberships(
+        domain_identifier: str,
+        project_identifier: str,
+        max_results: int = 50,
+        next_token: str = None,
+        sort_by: str = None,
+        sort_order: str = None
+    ) -> Any:
+        """
+        Lists the memberships of a specified Amazon DataZone project within a domain.
+
+        Args:
+            domainIdentifier (str): The identifier of the Amazon DataZone domain.
+                Pattern: ^dzd[-_][a-zA-Z0-9_-]{1,36}$
+                Required: Yes
+
+            projectIdentifier (str): The identifier of the project whose memberships you want to list.
+                Pattern: ^[a-zA-Z0-9_-]{1,36}$
+                Required: Yes
+
+            maxResults (int, optional): The maximum number of memberships to return in a single call (1–50).
+
+            nextToken (str, optional): A token for pagination. Use this token from a previous response to retrieve the next set of memberships.
+                Length: 1–8192 characters
+
+            sortBy (str, optional): The attribute by which to sort the memberships.
+                Valid Values: "NAME"
+
+            sortOrder (str, optional): The sort order for the results.
+                Valid Values: "ASCENDING" | "DESCENDING"
+
+        Returns:
+            dict: A dictionary containing:
+                - members (List[dict]): A list of project members, where each member includes:
+                    - designation (str): The role or designation of the member within the project.
+                    - memberDetails (dict): Additional details about the member (structure depends on implementation).
+
+                - nextToken (str, optional): A token to retrieve the next page of results if more memberships exist.
+                    Length: 1–8192 characters
+        """
+        try:
+            # Prepare the request parameters
+            params = {
+                "domainIdentifier": domain_identifier,
+                "projectIdentifier": project_identifier,
+                "maxResults": min(max_results, 50)  # Ensure maxResults is within valid range
+            }
+            
+            # Add optional next token if provided
+            if next_token:
+                params["nextToken"] = next_token
+            if sort_by:
+                params["sortBy"] = sort_by
+            if sort_order:
+                params["sortOrder"] = sort_order
+
+            response = datazone_client.list_project_memberships(**params)
+            return response
+        except ClientError as e:
+            raise Exception(f"Error listing project {project_identifier} memberships in domain {domain_identifier}: {e}")
+
+
     # Return the decorated functions for testing purposes
     return {
         "create_project": create_project,
@@ -316,5 +461,7 @@ def register_tools(mcp: FastMCP):
         "list_projects": list_projects,
         # "create_project_membership": create_project_membership,
         "list_project_profiles": list_project_profiles,
-        # "create_project_profile": create_project_profile
+        # "create_project_profile": create_project_profile,
+        "get_project_profile": get_project_profile,
+        "list_project_memberships": list_project_memberships
     } 

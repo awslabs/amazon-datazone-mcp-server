@@ -8,65 +8,65 @@ from .common import datazone_client, logger, ClientError
 def register_tools(mcp: FastMCP):
     """Register glossary tools with the MCP server."""
     
-    @mcp.tool()
-    async def create_glossary(
-        domain_identifier: str,
-        name: str,
-        owning_project_identifier: str,
-        description: str = None,
-        status: str = "ENABLED",
-        client_token: str = None
-    ) -> Any:
-        """
-        Creates a new business glossary in Amazon DataZone.
+    # @mcp.tool()
+    # async def create_glossary(
+    #     domain_identifier: str,
+    #     name: str,
+    #     owning_project_identifier: str,
+    #     description: str = None,
+    #     status: str = "ENABLED",
+    #     client_token: str = None
+    # ) -> Any:
+    #     """
+    #     Creates a new business glossary in Amazon DataZone.
         
-        Args:
-            domain_identifier (str): The ID of the domain where the glossary will be created
-            name (str): The name of the glossary (1-256 characters)
-            owning_project_identifier (str): The ID of the project that will own the glossary
-            description (str, optional): The description of the glossary (0-4096 characters)
-            status (str, optional): The status of the glossary (ENABLED or DISABLED, default: ENABLED)
-            client_token (str, optional): A unique token to ensure idempotency (1-128 characters)
+    #     Args:
+    #         domain_identifier (str): The ID of the domain where the glossary will be created
+    #         name (str): The name of the glossary (1-256 characters)
+    #         owning_project_identifier (str): The ID of the project that will own the glossary
+    #         description (str, optional): The description of the glossary (0-4096 characters)
+    #         status (str, optional): The status of the glossary (ENABLED or DISABLED, default: ENABLED)
+    #         client_token (str, optional): A unique token to ensure idempotency (1-128 characters)
         
-        Returns:
-            Any: The API response containing the created glossary details
+    #     Returns:
+    #         Any: The API response containing the created glossary details
             
-        Example:
-            ```python
-            response = await create_glossary(
-                domain_identifier="dzd_123456789",
-                name="Sales Glossary",
-                owning_project_identifier="prj_987654321",
-                description="Glossary for sales-related terms",
-                status="ENABLED"
-            )
-            ```
-        """
-        try:
-            # Validate status
-            if status not in ["ENABLED", "DISABLED"]:
-                raise ValueError("status must be either 'ENABLED' or 'DISABLED'")
+    #     Example:
+    #         ```python
+    #         response = await create_glossary(
+    #             domain_identifier="dzd_123456789",
+    #             name="Sales Glossary",
+    #             owning_project_identifier="prj_987654321",
+    #             description="Glossary for sales-related terms",
+    #             status="ENABLED"
+    #         )
+    #         ```
+    #     """
+    #     try:
+    #         # Validate status
+    #         if status not in ["ENABLED", "DISABLED"]:
+    #             raise ValueError("status must be either 'ENABLED' or 'DISABLED'")
             
-            # Prepare the request parameters
-            params = {
-                "name": name,
-                "owningProjectIdentifier": owning_project_identifier,
-                "status": status
-            }
+    #         # Prepare the request parameters
+    #         params = {
+    #             "name": name,
+    #             "owningProjectIdentifier": owning_project_identifier,
+    #             "status": status
+    #         }
             
-            # Add optional parameters if provided
-            if description:
-                params["description"] = description
-            if client_token:
-                params["clientToken"] = client_token
+    #         # Add optional parameters if provided
+    #         if description:
+    #             params["description"] = description
+    #         if client_token:
+    #             params["clientToken"] = client_token
 
-            response = datazone_client.create_glossary(
-                domainIdentifier=domain_identifier,
-                **params
-            )
-            return response
-        except ClientError as e:
-            raise Exception(f"Error creating glossary in domain {domain_identifier}: {e}")
+    #         response = datazone_client.create_glossary(
+    #             domainIdentifier=domain_identifier,
+    #             **params
+    #         )
+    #         return response
+    #     except ClientError as e:
+    #         raise Exception(f"Error creating glossary in domain {domain_identifier}: {e}")
 
     # @mcp.tool()
     # async def create_glossary_term(
@@ -148,49 +148,49 @@ def register_tools(mcp: FastMCP):
     #     except ClientError as e:
     #         raise Exception(f"Error creating glossary term in domain {domain_identifier}: {e}")
 
-    @mcp.tool()
-    async def get_glossary(
-        domain_identifier: str,
-        identifier: str
-    ) -> Any:
-        """
-        Retrieves detailed information about a specific business glossary in Amazon DataZone.
+    # @mcp.tool()
+    # async def get_glossary(
+    #     domain_identifier: str,
+    #     identifier: str
+    # ) -> Any:
+    #     """
+    #     Retrieves detailed information about a specific business glossary in Amazon DataZone.
         
-        Args:
-            domain_identifier (str): The ID of the domain where the glossary exists
-                Pattern: ^dzd[-_][a-zA-Z0-9_-]{1,36}$
-            identifier (str): The ID of the glossary to retrieve
-                Pattern: ^[a-zA-Z0-9_-]{1,36}$
+    #     Args:
+    #         domain_identifier (str): The ID of the domain where the glossary exists
+    #             Pattern: ^dzd[-_][a-zA-Z0-9_-]{1,36}$
+    #         identifier (str): The ID of the glossary to retrieve
+    #             Pattern: ^[a-zA-Z0-9_-]{1,36}$
         
-        Returns:
-            Any: The API response containing glossary details including:
-                - createdAt (number): Timestamp of when the glossary was created
-                - createdBy (str): The user who created the glossary
-                - description (str): The description of the glossary (0-4096 characters)
-                - domainId (str): The ID of the domain
-                - id (str): The ID of the glossary
-                - name (str): The name of the glossary (1-256 characters)
-                - owningProjectId (str): The ID of the project that owns the glossary
-                - status (str): The status of the glossary (DISABLED or ENABLED)
-                - updatedAt (number): Timestamp of when the glossary was updated
-                - updatedBy (str): The user who updated the glossary
+    #     Returns:
+    #         Any: The API response containing glossary details including:
+    #             - createdAt (number): Timestamp of when the glossary was created
+    #             - createdBy (str): The user who created the glossary
+    #             - description (str): The description of the glossary (0-4096 characters)
+    #             - domainId (str): The ID of the domain
+    #             - id (str): The ID of the glossary
+    #             - name (str): The name of the glossary (1-256 characters)
+    #             - owningProjectId (str): The ID of the project that owns the glossary
+    #             - status (str): The status of the glossary (DISABLED or ENABLED)
+    #             - updatedAt (number): Timestamp of when the glossary was updated
+    #             - updatedBy (str): The user who updated the glossary
             
-        Example:
-            ```python
-            response = await get_glossary(
-                domain_identifier="dzd_123456789",
-                identifier="gloss_987654321"
-            )
-            ```
-        """
-        try:
-            response = datazone_client.get_glossary(
-                domainIdentifier=domain_identifier,
-                identifier=identifier
-            )
-            return response
-        except ClientError as e:
-            raise Exception(f"Error getting glossary {identifier} in domain {domain_identifier}: {e}")
+    #     Example:
+    #         ```python
+    #         response = await get_glossary(
+    #             domain_identifier="dzd_123456789",
+    #             identifier="gloss_987654321"
+    #         )
+    #         ```
+    #     """
+    #     try:
+    #         response = datazone_client.get_glossary(
+    #             domainIdentifier=domain_identifier,
+    #             identifier=identifier
+    #         )
+    #         return response
+    #     except ClientError as e:
+    #         raise Exception(f"Error getting glossary {identifier} in domain {domain_identifier}: {e}")
 
     # @mcp.tool()
     # async def get_glossary_term(
@@ -244,8 +244,8 @@ def register_tools(mcp: FastMCP):
 
     # Return the decorated functions for testing purposes
     return {
-        "create_glossary": create_glossary,
+        # "create_glossary": create_glossary,
         # "create_glossary_term": create_glossary_term,
-        "get_glossary": get_glossary,
+        # "get_glossary": get_glossary,
         # "get_glossary_term": get_glossary_term
     } 

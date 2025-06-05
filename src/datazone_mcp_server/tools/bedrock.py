@@ -7,13 +7,13 @@ def tool(func):
     return func
 
 @tool
-def ask_bedrock(prompt: str, model_id: str = "anthropic.claude-3-7-sonnet-20250219-v1:0") -> str:
+def ask_bedrock(prompt: str, model_id: str = "amazon.nova-lite-v1:0") -> str:
     """
     Ask a question to an Amazon Bedrock model and get the response.
     
     Args:
         prompt: The question or prompt to send to the model
-        model_id: The Bedrock model ID to use (default: anthropic.claude-v2)
+        model_id: The Bedrock model ID to use (default: anthropic.claude-3-5-sonnet-20241022-v2:0)
     
     Returns:
         The model's response

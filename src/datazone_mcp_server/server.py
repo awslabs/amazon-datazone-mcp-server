@@ -5,7 +5,6 @@ import logging
 from mcp.server.fastmcp import FastMCP
 # import boto3
 # from botocore.config import Config
-# from tools import bedrock
 
 # Import tool modules
 from .tools import (
@@ -13,7 +12,8 @@ from .tools import (
     project_management,
     data_management,
     glossary,
-    environment
+    environment,
+    # bedrock
 )
 
 # initialize FastMCP server 
@@ -26,7 +26,7 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
 # bedrock_config = Config(
-#     region_name="us-west-2",  # or your preferred region
+#     region_name="us-east-2",  # or your preferred region
 #     retries={
 #         'max_attempts': 5,
 #         'mode': 'standard'
@@ -34,13 +34,13 @@ logger.setLevel(logging.INFO)
 # )
 # bedrock_runtime = boto3.client('bedrock-runtime', config=bedrock_config)
 
-# def invoke_bedrock_model(prompt: str, model_id: str = "anthropic.claude-3-7-sonnet-20250219-v1:0") -> str:
+# def invoke_bedrock_model(prompt: str, model_id: str = "amazon.nova-lite-v1:0") -> str:
 #     """
 #     Invoke a Bedrock model with the given prompt.
     
 #     Args:
 #         prompt: The input prompt for the model
-#         model_id: The Bedrock model ID (e.g., "anthropic.claude-v2")
+#         model_id: The Bedrock model ID (e.g., "anthropic.claude-3-5-sonnet-20241022-v2:0")
     
 #     Returns:
 #         The model's response as a string

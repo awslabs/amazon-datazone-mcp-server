@@ -194,324 +194,324 @@ def register_tools(mcp: FastMCP):
             logger.error(f"Unexpected error listing domains")
             raise Exception(f"Unexpected error listing domains")
 
-    @mcp.tool()
-    async def create_domain_unit(
-        domain_identifier: str,
-        name: str,
-        parent_domain_unit_identifier: str,
-        description: str = None,
-        client_token: str = None
-    ) -> Dict[str, Any]:
-        """
-        Creates a new domain unit in Amazon DataZone.
+    # @mcp.tool()
+    # async def create_domain_unit(
+    #     domain_identifier: str,
+    #     name: str,
+    #     parent_domain_unit_identifier: str,
+    #     description: str = None,
+    #     client_token: str = None
+    # ) -> Dict[str, Any]:
+    #     """
+    #     Creates a new domain unit in Amazon DataZone.
         
-        Args:
-            domain_identifier (str): The ID of the domain where the domain unit will be created
-                Pattern: ^dzd[-_][a-zA-Z0-9_-]{1,36}$
-            name (str): The name of the domain unit (1-128 characters)
-                Pattern: ^[\\w -]+$
-            parent_domain_unit_identifier (str): The ID of the parent domain unit
-                Pattern: ^[a-z0-9_-]+$
-            description (str, optional): Description of the domain unit (0-2048 characters)
-            client_token (str, optional): A unique token to ensure idempotency (1-128 characters)
-                Pattern: ^[\\x21-\\x7E]+$
+    #     Args:
+    #         domain_identifier (str): The ID of the domain where the domain unit will be created
+    #             Pattern: ^dzd[-_][a-zA-Z0-9_-]{1,36}$
+    #         name (str): The name of the domain unit (1-128 characters)
+    #             Pattern: ^[\\w -]+$
+    #         parent_domain_unit_identifier (str): The ID of the parent domain unit
+    #             Pattern: ^[a-z0-9_-]+$
+    #         description (str, optional): Description of the domain unit (0-2048 characters)
+    #         client_token (str, optional): A unique token to ensure idempotency (1-128 characters)
+    #             Pattern: ^[\\x21-\\x7E]+$
         
-        Returns:
-            Dict containing:
-                - id: Domain unit identifier
-                - name: Domain unit name
-                - description: Domain unit description
-                - domain_id: Domain ID
-                - parent_domain_unit_id: Parent domain unit ID
-                - ancestor_domain_unit_ids: List of ancestor domain unit IDs
-                - created_at: Creation timestamp
-                - created_by: Creator information
-                - owners: List of domain unit owners
-        """
-        try:
-            logger.info(f"Creating domain unit '{name}' in domain {domain_identifier}")
+    #     Returns:
+    #         Dict containing:
+    #             - id: Domain unit identifier
+    #             - name: Domain unit name
+    #             - description: Domain unit description
+    #             - domain_id: Domain ID
+    #             - parent_domain_unit_id: Parent domain unit ID
+    #             - ancestor_domain_unit_ids: List of ancestor domain unit IDs
+    #             - created_at: Creation timestamp
+    #             - created_by: Creator information
+    #             - owners: List of domain unit owners
+    #     """
+    #     try:
+    #         logger.info(f"Creating domain unit '{name}' in domain {domain_identifier}")
             
-            # Prepare request parameters
-            params = {
-                'domainIdentifier': domain_identifier,
-                'name': name,
-                'parentDomainUnitIdentifier': parent_domain_unit_identifier
-            }
+    #         # Prepare request parameters
+    #         params = {
+    #             'domainIdentifier': domain_identifier,
+    #             'name': name,
+    #             'parentDomainUnitIdentifier': parent_domain_unit_identifier
+    #         }
             
-            # Add optional parameters
-            if description:
-                params['description'] = description
-            if client_token:
-                params['clientToken'] = client_token
+    #         # Add optional parameters
+    #         if description:
+    #             params['description'] = description
+    #         if client_token:
+    #             params['clientToken'] = client_token
             
-            # Create the domain unit
-            response = datazone_client.create_domain_unit(**params)
+    #         # Create the domain unit
+    #         response = datazone_client.create_domain_unit(**params)
             
-            # Format the response
-            result = {
-                'id': response.get('id'),
-                'name': response.get('name'),
-                'description': response.get('description'),
-                'domain_id': response.get('domainId'),
-                'parent_domain_unit_id': response.get('parentDomainUnitId'),
-                'ancestor_domain_unit_ids': response.get('ancestorDomainUnitIds', []),
-                'created_at': response.get('createdAt'),
-                'created_by': response.get('createdBy'),
-                'owners': response.get('owners', [])
-            }
+    #         # Format the response
+    #         result = {
+    #             'id': response.get('id'),
+    #             'name': response.get('name'),
+    #             'description': response.get('description'),
+    #             'domain_id': response.get('domainId'),
+    #             'parent_domain_unit_id': response.get('parentDomainUnitId'),
+    #             'ancestor_domain_unit_ids': response.get('ancestorDomainUnitIds', []),
+    #             'created_at': response.get('createdAt'),
+    #             'created_by': response.get('createdBy'),
+    #             'owners': response.get('owners', [])
+    #         }
             
-            logger.info(f"Successfully created domain unit '{name}' in domain {domain_identifier}")
-            return result
+    #         logger.info(f"Successfully created domain unit '{name}' in domain {domain_identifier}")
+    #         return result
             
-        except ClientError as e:
-            error_code = e.response['Error']['Code']
-            if error_code == 'AccessDeniedException':
-                logger.error(f"Access denied while creating domain unit '{name}' in domain {domain_identifier}")
-                raise Exception(f"Access denied while creating domain unit '{name}' in domain {domain_identifier}")
-            elif error_code == 'ConflictException':
-                logger.error(f"Domain unit '{name}' already exists in domain {domain_identifier}")
-                raise Exception(f"Domain unit '{name}' already exists in domain {domain_identifier}")
-            elif error_code == 'ServiceQuotaExceededException':
-                logger.error(f"Service quota exceeded while creating domain unit '{name}' in domain {domain_identifier}")
-                raise Exception(f"Service quota exceeded while creating domain unit '{name}' in domain {domain_identifier}")
-            elif error_code == 'ValidationException':
-                logger.error(f"Invalid parameters for creating domain unit '{name}' in domain {domain_identifier}")
-                raise Exception(f"Invalid parameters for creating domain unit '{name}' in domain {domain_identifier}")
-            else:
-                logger.error(f"Error creating domain unit '{name}' in domain {domain_identifier}: {str(e)}")
-                raise Exception(f"Error creating domain unit '{name}' in domain {domain_identifier}: {str(e)}")
-        except Exception as e:
-            logger.error(f"Unexpected error creating domain unit '{name}' in domain {domain_identifier}: {str(e)}")
-            raise Exception(f"Unexpected error creating domain unit '{name}' in domain {domain_identifier}: {str(e)}")
+    #     except ClientError as e:
+    #         error_code = e.response['Error']['Code']
+    #         if error_code == 'AccessDeniedException':
+    #             logger.error(f"Access denied while creating domain unit '{name}' in domain {domain_identifier}")
+    #             raise Exception(f"Access denied while creating domain unit '{name}' in domain {domain_identifier}")
+    #         elif error_code == 'ConflictException':
+    #             logger.error(f"Domain unit '{name}' already exists in domain {domain_identifier}")
+    #             raise Exception(f"Domain unit '{name}' already exists in domain {domain_identifier}")
+    #         elif error_code == 'ServiceQuotaExceededException':
+    #             logger.error(f"Service quota exceeded while creating domain unit '{name}' in domain {domain_identifier}")
+    #             raise Exception(f"Service quota exceeded while creating domain unit '{name}' in domain {domain_identifier}")
+    #         elif error_code == 'ValidationException':
+    #             logger.error(f"Invalid parameters for creating domain unit '{name}' in domain {domain_identifier}")
+    #             raise Exception(f"Invalid parameters for creating domain unit '{name}' in domain {domain_identifier}")
+    #         else:
+    #             logger.error(f"Error creating domain unit '{name}' in domain {domain_identifier}: {str(e)}")
+    #             raise Exception(f"Error creating domain unit '{name}' in domain {domain_identifier}: {str(e)}")
+    #     except Exception as e:
+    #         logger.error(f"Unexpected error creating domain unit '{name}' in domain {domain_identifier}: {str(e)}")
+    #         raise Exception(f"Unexpected error creating domain unit '{name}' in domain {domain_identifier}: {str(e)}")
 
-    @mcp.tool()
-    async def get_domain_unit(
-        domain_identifier: str,
-        identifier: str
-    ) -> Dict[str, Any]:
-        """
-        Retrieves detailed information about a specific domain unit in Amazon DataZone.
+    # @mcp.tool()
+    # async def get_domain_unit(
+    #     domain_identifier: str,
+    #     identifier: str
+    # ) -> Dict[str, Any]:
+    #     """
+    #     Retrieves detailed information about a specific domain unit in Amazon DataZone.
         
-        Args:
-            domain_identifier (str): The ID of the domain where the domain unit exists
-                Pattern: ^dzd[-_][a-zA-Z0-9_-]{1,36}$
-            identifier (str): The ID of the domain unit to retrieve
-                Pattern: ^[a-z0-9_-]+$
+    #     Args:
+    #         domain_identifier (str): The ID of the domain where the domain unit exists
+    #             Pattern: ^dzd[-_][a-zA-Z0-9_-]{1,36}$
+    #         identifier (str): The ID of the domain unit to retrieve
+    #             Pattern: ^[a-z0-9_-]+$
         
-        Returns:
-            Dict containing:
-                - id: Domain unit identifier
-                - name: Domain unit name
-                - description: Domain unit description
-                - domain_id: Domain ID
-                - parent_domain_unit_id: Parent domain unit ID
-                - created_at: Creation timestamp
-                - created_by: Creator information
-                - owners: List of domain unit owners
-                - lastUpdatedAt: The timestamp at which the domain unit was last updated
-                - lastUpdatedBy: The user who last updated the domain unit
-        """
-        try:
-            logger.info(f"Getting domain unit {identifier} in domain {domain_identifier}")
+    #     Returns:
+    #         Dict containing:
+    #             - id: Domain unit identifier
+    #             - name: Domain unit name
+    #             - description: Domain unit description
+    #             - domain_id: Domain ID
+    #             - parent_domain_unit_id: Parent domain unit ID
+    #             - created_at: Creation timestamp
+    #             - created_by: Creator information
+    #             - owners: List of domain unit owners
+    #             - lastUpdatedAt: The timestamp at which the domain unit was last updated
+    #             - lastUpdatedBy: The user who last updated the domain unit
+    #     """
+    #     try:
+    #         logger.info(f"Getting domain unit {identifier} in domain {domain_identifier}")
             
-            # Get the domain unit
-            response = datazone_client.get_domain_unit(
-                domainIdentifier=domain_identifier,
-                identifier=identifier
-            )
+    #         # Get the domain unit
+    #         response = datazone_client.get_domain_unit(
+    #             domainIdentifier=domain_identifier,
+    #             identifier=identifier
+    #         )
             
-            # Format the response
-            result = {
-                'id': response.get('id'),
-                'name': response.get('name'),
-                'description': response.get('description'),
-                'domain_id': response.get('domainId'),
-                'parent_domain_unit_id': response.get('parentDomainUnitId'),
-                'created_at': response.get('createdAt'),
-                'created_by': response.get('createdBy'),
-                'owners': response.get('owners', []),
-                'lastUpdatedAt': response.get('lastUpdatedAt'),
-                'lastUpdatedBy': response.get('lastUpdatedBy')
-            }
+    #         # Format the response
+    #         result = {
+    #             'id': response.get('id'),
+    #             'name': response.get('name'),
+    #             'description': response.get('description'),
+    #             'domain_id': response.get('domainId'),
+    #             'parent_domain_unit_id': response.get('parentDomainUnitId'),
+    #             'created_at': response.get('createdAt'),
+    #             'created_by': response.get('createdBy'),
+    #             'owners': response.get('owners', []),
+    #             'lastUpdatedAt': response.get('lastUpdatedAt'),
+    #             'lastUpdatedBy': response.get('lastUpdatedBy')
+    #         }
             
-            logger.info(f"Successfully retrieved domain unit {identifier} in domain {domain_identifier}")
-            return result
+    #         logger.info(f"Successfully retrieved domain unit {identifier} in domain {domain_identifier}")
+    #         return result
             
-        except ClientError as e:
-            error_code = e.response['Error']['Code']
-            if error_code == 'AccessDeniedException':
-                logger.error(f"Access denied while getting domain unit {identifier} in domain {domain_identifier}")
-                raise Exception(f"Access denied while getting domain unit {identifier} in domain {domain_identifier}")
-            elif error_code == 'ResourceNotFoundException':
-                logger.error(f"Domain unit {identifier} not found in domain {domain_identifier}")
-                raise Exception(f"Domain unit {identifier} not found in domain {domain_identifier}")
-            else:
-                logger.error(f"Error getting domain unit {identifier} in domain {domain_identifier}: {str(e)}")
-                raise Exception(f"Error getting domain unit {identifier} in domain {domain_identifier}: {str(e)}")
-        except Exception as e:
-            logger.error(f"Unexpected error getting domain unit {identifier} in domain {domain_identifier}: {str(e)}")
-            raise Exception(f"Unexpected error getting domain unit {identifier} in domain {domain_identifier}: {str(e)}")
+    #     except ClientError as e:
+    #         error_code = e.response['Error']['Code']
+    #         if error_code == 'AccessDeniedException':
+    #             logger.error(f"Access denied while getting domain unit {identifier} in domain {domain_identifier}")
+    #             raise Exception(f"Access denied while getting domain unit {identifier} in domain {domain_identifier}")
+    #         elif error_code == 'ResourceNotFoundException':
+    #             logger.error(f"Domain unit {identifier} not found in domain {domain_identifier}")
+    #             raise Exception(f"Domain unit {identifier} not found in domain {domain_identifier}")
+    #         else:
+    #             logger.error(f"Error getting domain unit {identifier} in domain {domain_identifier}: {str(e)}")
+    #             raise Exception(f"Error getting domain unit {identifier} in domain {domain_identifier}: {str(e)}")
+    #     except Exception as e:
+    #         logger.error(f"Unexpected error getting domain unit {identifier} in domain {domain_identifier}: {str(e)}")
+    #         raise Exception(f"Unexpected error getting domain unit {identifier} in domain {domain_identifier}: {str(e)}")
 
-    @mcp.tool()
-    async def list_domain_units_for_parent(
-        domain_identifier: str,
-        parent_domain_unit_identifier: str,
-        max_results: int = 50,
-        next_token: str = None
-    ) -> Dict[str, Any]:
-        """
-        Lists child domain units for a specific parent domain unit in Amazon DataZone.
+    # @mcp.tool()
+    # async def list_domain_units_for_parent(
+    #     domain_identifier: str,
+    #     parent_domain_unit_identifier: str,
+    #     max_results: int = 50,
+    #     next_token: str = None
+    # ) -> Dict[str, Any]:
+    #     """
+    #     Lists child domain units for a specific parent domain unit in Amazon DataZone.
         
-        Args:
-            domain_identifier (str): The ID of the domain where the domain units exist
-                Pattern: ^dzd[-_][a-zA-Z0-9_-]{1,36}$
-            parent_domain_unit_identifier (str): The ID of the parent domain unit
-                Pattern: ^[a-z0-9_-]+$
-            max_results (int, optional): Maximum number of domain units to return (1-50, default: 50)
-            next_token (str, optional): Token for pagination (1-8192 characters)
+    #     Args:
+    #         domain_identifier (str): The ID of the domain where the domain units exist
+    #             Pattern: ^dzd[-_][a-zA-Z0-9_-]{1,36}$
+    #         parent_domain_unit_identifier (str): The ID of the parent domain unit
+    #             Pattern: ^[a-z0-9_-]+$
+    #         max_results (int, optional): Maximum number of domain units to return (1-50, default: 50)
+    #         next_token (str, optional): Token for pagination (1-8192 characters)
         
-        Returns:
-            Dict containing:
-                - items: List of domain units, each containing:
-                    - id: Domain unit identifier
-                    - name: Domain unit name
-                - next_token: Token for pagination if more results are available
-        """
-        try:
-            logger.info(f"Listing domain units for parent {parent_domain_unit_identifier} in domain {domain_identifier}")
+    #     Returns:
+    #         Dict containing:
+    #             - items: List of domain units, each containing:
+    #                 - id: Domain unit identifier
+    #                 - name: Domain unit name
+    #             - next_token: Token for pagination if more results are available
+    #     """
+    #     try:
+    #         logger.info(f"Listing domain units for parent {parent_domain_unit_identifier} in domain {domain_identifier}")
             
-            # Prepare request parameters
-            params = {
-                'domainIdentifier': domain_identifier,
-                'parentDomainUnitIdentifier': parent_domain_unit_identifier,
-                'maxResults': min(max_results, 50)  # Ensure maxResults is within valid range
-            }
+    #         # Prepare request parameters
+    #         params = {
+    #             'domainIdentifier': domain_identifier,
+    #             'parentDomainUnitIdentifier': parent_domain_unit_identifier,
+    #             'maxResults': min(max_results, 50)  # Ensure maxResults is within valid range
+    #         }
             
-            # Add optional next token if provided
-            if next_token:
-                params['nextToken'] = next_token
+    #         # Add optional next token if provided
+    #         if next_token:
+    #             params['nextToken'] = next_token
             
-            # List the domain units
-            response = datazone_client.list_domain_units_for_parent(**params)
+    #         # List the domain units
+    #         response = datazone_client.list_domain_units_for_parent(**params)
             
-            # Format the response
-            result = {
-                'items': [],
-                'next_token': response.get('nextToken')
-            }
+    #         # Format the response
+    #         result = {
+    #             'items': [],
+    #             'next_token': response.get('nextToken')
+    #         }
             
-            # Format each domain unit
-            for domain_unit in response.get('items', []):
-                formatted_domain_unit = {
-                    'id': domain_unit.get('id'),
-                    'name': domain_unit.get('name')
-                }
-                result['items'].append(formatted_domain_unit)
+    #         # Format each domain unit
+    #         for domain_unit in response.get('items', []):
+    #             formatted_domain_unit = {
+    #                 'id': domain_unit.get('id'),
+    #                 'name': domain_unit.get('name')
+    #             }
+    #             result['items'].append(formatted_domain_unit)
             
-            logger.info(f"Successfully listed {len(result['items'])} domain units for parent {parent_domain_unit_identifier} in domain {domain_identifier}")
-            return result
+    #         logger.info(f"Successfully listed {len(result['items'])} domain units for parent {parent_domain_unit_identifier} in domain {domain_identifier}")
+    #         return result
             
-        except ClientError as e:
-            error_code = e.response['Error']['Code']
-            if error_code == 'AccessDeniedException':
-                logger.error(f"Access denied while listing domain units for parent {parent_domain_unit_identifier} in domain {domain_identifier}")
-                raise Exception(f"Access denied while listing domain units for parent {parent_domain_unit_identifier} in domain {domain_identifier}")
-            elif error_code == 'ResourceNotFoundException':
-                logger.error(f"Parent domain unit {parent_domain_unit_identifier} not found in domain {domain_identifier}")
-                raise Exception(f"Parent domain unit {parent_domain_unit_identifier} not found in domain {domain_identifier}")
-            else:
-                logger.error(f"Error listing domain units for parent {parent_domain_unit_identifier} in domain {domain_identifier}: {str(e)}")
-                raise Exception(f"Error listing domain units for parent {parent_domain_unit_identifier} in domain {domain_identifier}: {str(e)}")
-        except Exception as e:
-            logger.error(f"Unexpected error listing domain units for parent {parent_domain_unit_identifier} in domain {domain_identifier}: {str(e)}")
-            raise Exception(f"Unexpected error listing domain units for parent {parent_domain_unit_identifier} in domain {domain_identifier}: {str(e)}")
+    #     except ClientError as e:
+    #         error_code = e.response['Error']['Code']
+    #         if error_code == 'AccessDeniedException':
+    #             logger.error(f"Access denied while listing domain units for parent {parent_domain_unit_identifier} in domain {domain_identifier}")
+    #             raise Exception(f"Access denied while listing domain units for parent {parent_domain_unit_identifier} in domain {domain_identifier}")
+    #         elif error_code == 'ResourceNotFoundException':
+    #             logger.error(f"Parent domain unit {parent_domain_unit_identifier} not found in domain {domain_identifier}")
+    #             raise Exception(f"Parent domain unit {parent_domain_unit_identifier} not found in domain {domain_identifier}")
+    #         else:
+    #             logger.error(f"Error listing domain units for parent {parent_domain_unit_identifier} in domain {domain_identifier}: {str(e)}")
+    #             raise Exception(f"Error listing domain units for parent {parent_domain_unit_identifier} in domain {domain_identifier}: {str(e)}")
+    #     except Exception as e:
+    #         logger.error(f"Unexpected error listing domain units for parent {parent_domain_unit_identifier} in domain {domain_identifier}: {str(e)}")
+    #         raise Exception(f"Unexpected error listing domain units for parent {parent_domain_unit_identifier} in domain {domain_identifier}: {str(e)}")
 
-    @mcp.tool()
-    async def update_domain_unit(
-        domain_identifier: str,
-        identifier: str,
-        name: str = None,
-        description: str = None
-    ) -> Dict[str, Any]:
-        """
-        Updates an existing domain unit in Amazon DataZone.
+    # @mcp.tool()
+    # async def update_domain_unit(
+    #     domain_identifier: str,
+    #     identifier: str,
+    #     name: str = None,
+    #     description: str = None
+    # ) -> Dict[str, Any]:
+    #     """
+    #     Updates an existing domain unit in Amazon DataZone.
         
-        Args:
-            domain_identifier (str): The ID of the domain where the domain unit exists
-                Pattern: ^dzd[-_][a-zA-Z0-9_-]{1,36}$
-            identifier (str): The ID of the domain unit to update
-                Pattern: ^[a-z0-9_-]+$
-            name (str, optional): New name for the domain unit (1-128 characters)
-                Pattern: ^[\\w -]+$
-            description (str, optional): New description for the domain unit (0-2048 characters)
+    #     Args:
+    #         domain_identifier (str): The ID of the domain where the domain unit exists
+    #             Pattern: ^dzd[-_][a-zA-Z0-9_-]{1,36}$
+    #         identifier (str): The ID of the domain unit to update
+    #             Pattern: ^[a-z0-9_-]+$
+    #         name (str, optional): New name for the domain unit (1-128 characters)
+    #             Pattern: ^[\\w -]+$
+    #         description (str, optional): New description for the domain unit (0-2048 characters)
         
-        Returns:
-            Dict containing:
-                - id: Domain unit identifier
-                - name: Updated domain unit name
-                - description: Updated domain unit description
-                - domain_id: Domain ID
-                - parent_domain_unit_id: Parent domain unit ID
-                - created_at: Creation timestamp
-                - created_by: Creator information
-                - owners: List of domain unit owners
-                - last_updated_at: Last update timestamp
-                - last_updated_by: Last updater information
-        """
-        try:
-            logger.info(f"Updating domain unit {identifier} in domain {domain_identifier}")
+    #     Returns:
+    #         Dict containing:
+    #             - id: Domain unit identifier
+    #             - name: Updated domain unit name
+    #             - description: Updated domain unit description
+    #             - domain_id: Domain ID
+    #             - parent_domain_unit_id: Parent domain unit ID
+    #             - created_at: Creation timestamp
+    #             - created_by: Creator information
+    #             - owners: List of domain unit owners
+    #             - last_updated_at: Last update timestamp
+    #             - last_updated_by: Last updater information
+    #     """
+    #     try:
+    #         logger.info(f"Updating domain unit {identifier} in domain {domain_identifier}")
             
-            # Prepare request parameters
-            params = {
-                'domainIdentifier': domain_identifier,
-                'identifier': identifier
-            }
+    #         # Prepare request parameters
+    #         params = {
+    #             'domainIdentifier': domain_identifier,
+    #             'identifier': identifier
+    #         }
             
-            # Add optional parameters
-            if name:
-                params['name'] = name
-            if description:
-                params['description'] = description
-            # if client_token:
-            #     params['clientToken'] = client_token
+    #         # Add optional parameters
+    #         if name:
+    #             params['name'] = name
+    #         if description:
+    #             params['description'] = description
+    #         # if client_token:
+    #         #     params['clientToken'] = client_token
             
-            # Update the domain unit
-            response = datazone_client.update_domain_unit(**params)
+    #         # Update the domain unit
+    #         response = datazone_client.update_domain_unit(**params)
             
-            # Format the response
-            result = {
-                'id': response.get('id'),
-                'name': response.get('name'),
-                'description': response.get('description'),
-                'domain_id': response.get('domainId'),
-                'parent_domain_unit_id': response.get('parentDomainUnitId'),
-                'created_at': response.get('createdAt'),
-                'created_by': response.get('createdBy'),
-                'owners': response.get('owners', []),
-                'updated_at': response.get('updatedAt'),
-                'updated_by': response.get('updatedBy')
-            }
+    #         # Format the response
+    #         result = {
+    #             'id': response.get('id'),
+    #             'name': response.get('name'),
+    #             'description': response.get('description'),
+    #             'domain_id': response.get('domainId'),
+    #             'parent_domain_unit_id': response.get('parentDomainUnitId'),
+    #             'created_at': response.get('createdAt'),
+    #             'created_by': response.get('createdBy'),
+    #             'owners': response.get('owners', []),
+    #             'updated_at': response.get('updatedAt'),
+    #             'updated_by': response.get('updatedBy')
+    #         }
             
-            logger.info(f"Successfully updated domain unit {identifier} in domain {domain_identifier}")
-            return result
+    #         logger.info(f"Successfully updated domain unit {identifier} in domain {domain_identifier}")
+    #         return result
             
-        except ClientError as e:
-            error_code = e.response['Error']['Code']
-            if error_code == 'AccessDeniedException':
-                logger.error(f"Access denied while updating domain unit {identifier} in domain {domain_identifier}")
-                raise Exception(f"Access denied while updating domain unit {identifier} in domain {domain_identifier}")
-            elif error_code == 'ResourceNotFoundException':
-                logger.error(f"Domain unit {identifier} not found in domain {domain_identifier}")
-                raise Exception(f"Domain unit {identifier} not found in domain {domain_identifier}")
-            elif error_code == 'ValidationException':
-                logger.error(f"Invalid parameters for updating domain unit {identifier} in domain {domain_identifier}")
-                raise Exception(f"Invalid parameters for updating domain unit {identifier} in domain {domain_identifier}")
-            else:
-                logger.error(f"Error updating domain unit {identifier} in domain {domain_identifier}: {str(e)}")
-                raise Exception(f"Error updating domain unit {identifier} in domain {domain_identifier}: {str(e)}")
-        except Exception as e:
-            logger.error(f"Unexpected error updating domain unit {identifier} in domain {domain_identifier}: {str(e)}")
-            raise Exception(f"Unexpected error updating domain unit {identifier} in domain {domain_identifier}: {str(e)}")
+    #     except ClientError as e:
+    #         error_code = e.response['Error']['Code']
+    #         if error_code == 'AccessDeniedException':
+    #             logger.error(f"Access denied while updating domain unit {identifier} in domain {domain_identifier}")
+    #             raise Exception(f"Access denied while updating domain unit {identifier} in domain {domain_identifier}")
+    #         elif error_code == 'ResourceNotFoundException':
+    #             logger.error(f"Domain unit {identifier} not found in domain {domain_identifier}")
+    #             raise Exception(f"Domain unit {identifier} not found in domain {domain_identifier}")
+    #         elif error_code == 'ValidationException':
+    #             logger.error(f"Invalid parameters for updating domain unit {identifier} in domain {domain_identifier}")
+    #             raise Exception(f"Invalid parameters for updating domain unit {identifier} in domain {domain_identifier}")
+    #         else:
+    #             logger.error(f"Error updating domain unit {identifier} in domain {domain_identifier}: {str(e)}")
+    #             raise Exception(f"Error updating domain unit {identifier} in domain {domain_identifier}: {str(e)}")
+    #     except Exception as e:
+    #         logger.error(f"Unexpected error updating domain unit {identifier} in domain {domain_identifier}: {str(e)}")
+    #         raise Exception(f"Unexpected error updating domain unit {identifier} in domain {domain_identifier}: {str(e)}")
 
     # @mcp.tool()
     # async def add_entity_owner(
@@ -845,19 +845,346 @@ def register_tools(mcp: FastMCP):
                 raise Exception(f"Error searching in domain {domain_identifier}: {str(e)}")
         except Exception as e:
             raise Exception(f"Unexpected error searching in domain {domain_identifier}: {str(e)}")
+    
+    @mcp.tool()
+    async def search_types(
+        domain_identifier: str,
+        managed: bool,
+        search_scope: str,
+        filters: Dict[str, Any] = None,
+        max_results: int = 50,
+        next_token: str = None,
+        search_in: List[Dict[str, str]] = None,
+        owning_project_identifier: str = None,
+        search_text: str = None,
+        sort: Dict[str, str] = None
+    ) -> Any:
+        """
+        Invokes the SearchTypes action in a specified Amazon DataZone domain to retrieve type definitions 
+        (e.g., asset types, form types, or lineage node types) that match the search criteria.
+
+        Args:
+            domain_identifier (str): The identifier of the Amazon DataZone domain in which to invoke the SearchTypes action. 
+                Pattern: ^dzd[-_][a-zA-Z0-9_-]{1,36}$ (Required)
+
+            managed (bool): Whether the search is for managed types. (Required)
+
+            filters (dict, optional): A FilterClause object specifying a single filter for the search. 
+                Only one member of the union type may be used.
+
+            max_results (int, optional): The maximum number of results to return in a single call. 
+                Valid range: 1–50. Default is service-defined.
+
+            next_token (str, optional): Token for paginating results. Used to retrieve the next page of results 
+                when the number of results exceeds max_results.
+                Length constraints: 1–8192 characters.
+
+            search_in (List[dict], optional): A list of SearchInItem objects specifying search fields. 
+                Minimum of 1 item, maximum of 10.
+
+            search_scope (str): The scope of the search. Valid values: 
+                "ASSET_TYPE", "FORM_TYPE", "LINEAGE_NODE_TYPE". (Required)
+
+            search_text (str, optional): The free-text string to search for. 
+                Length constraints: 1–4096 characters.
+
+            sort (dict, optional): A SearchSort object specifying how to sort the results.
+
+        Returns:
+            dict: A response object containing:
+                - items (List[dict]): A list of SearchTypesResultItem objects matching the query.
+                - nextToken (str): A pagination token for retrieving the next set of results.
+                - totalMatchCount (int): Total number of matching items.
+        """
+        try:
+            logger.info(f"Searching types {search_scope.lower()} in domain {domain_identifier}")
+            # Validate search_scope
+            valid_scopes = ["ASSET_TYPE", "FORM_TYPE", "LINEAGE_NODE_TYPE"]
+            if search_scope not in valid_scopes:
+                raise ValueError(f"search_scope must be one of {valid_scopes}")
+            
+            # Prepare the request parameters
+            params = {
+                "domainIdentifier": domain_identifier,
+                "searchScope": search_scope,
+                "maxResults": min(max_results, 50),  # Ensure maxResults is within valid range
+                "managed": managed
+            }
+            
+            # Add optional parameters if provided
+            if filters:
+                params["filters"] = filters
+            if next_token:
+                params["nextToken"] = next_token
+            if search_in:
+                params["searchIn"] = search_in
+            if search_text:
+                params["searchText"] = search_text
+            if sort:
+                params["sort"] = sort
+
+            response = datazone_client.search_types(**params)
+            logger.info(f"Successfully searched types {search_scope.lower()} in domain {domain_identifier}")
+            return response
+        except ClientError as e:
+            error_code = e.response['Error']['Code']
+            if error_code == 'AccessDeniedException':
+                raise Exception(f"Access denied while searching types in domain {domain_identifier}")
+            elif error_code == 'InternalServerException':
+                raise Exception(f"Internal server error while searching types in domain {domain_identifier}")
+            elif error_code == 'ThrottlingException':
+                raise Exception(f"Request throttled while searching types in domain {domain_identifier}")
+            elif error_code == 'UnauthorizedException':
+                raise Exception(f"Unauthorized to search types in domain {domain_identifier}")
+            elif error_code == 'ValidationException':
+                raise Exception(f"Invalid input while searching types in domain {domain_identifier}")
+            else:
+                raise Exception(f"Error searching types in domain {domain_identifier}: {str(e)}")
+        except Exception as e:
+            raise Exception(f"Unexpected error searching types in domain {domain_identifier}: {str(e)}")
+
+    @mcp.tool()
+    async def get_user_profile(
+        domain_identifier: str,
+        user_identifier: str,
+        user_type: str = None
+        ) -> Any:
+        """
+        Retrieves the user profile in a specified Amazon DataZone domain for a given user.
+
+        Args:
+            domain_identifier (str): The ID of the Amazon DataZone domain from which to retrieve the user profile.
+                Pattern: ^dzd[-_][a-zA-Z0-9_-]{1,36}$
+                Required: Yes
+
+            type (str): The type of the user profile.
+                Valid values: "IAM" | "SSO"
+                Required: Yes
+
+            user_identifier (str): The identifier of the user for whom to retrieve the profile.
+                Pattern: (^([0-9a-f]{10}-|)[A-Fa-f0-9]{8}-[A-Fa-f0-9]{4}-[A-Fa-f0-9]{4}-[A-Fa-f0-9]{4}-[A-Fa-f0-9]{12}$|
+                        ^[a-zA-Z_0-9+=,.@-]+$|^arn:aws:iam::\d{12}:.+$)
+                Required: Yes
+
+        Returns:
+            dict: A response object containing:
+                - details (dict): A UserProfileDetails object with specific IAM or SSO profile data.
+                - domainId (str): The identifier of the DataZone domain.
+                - id (str): The identifier of the user profile.
+                - status (str): The status of the user profile. Valid values: "ASSIGNED", "NOT_ASSIGNED", "ACTIVATED", "DEACTIVATED".
+                - type (str): The type of the user profile. Valid values: "IAM", "SSO".
+        """
+        try:
+            params = {
+                "domainIdentifier": domain_identifier,
+                "userIdentifier": user_identifier
+            }
+            
+            # Add optional parameters if provided
+            if user_type:
+                valid_types = ["IAM", "SSO"]
+                if user_type not in valid_types:
+                    raise ValueError(f"user_type must be one of {valid_types}")
+                params["type"] = user_type
+            response = datazone_client.get_user_profile(**params)
+            return response
+        except ClientError as e:
+            raise Exception(f"Error getting user {user_identifier} profile in domain {domain_identifier}: {e}")
+
+    @mcp.tool()
+    async def search_user_profiles(
+        domain_identifier: str,
+        user_type: str,
+        max_results: int = 50,
+        next_token: str = None,
+        search_text: str = None
+    ) -> Any:
+        """
+        Searches for user profiles within a specified Amazon DataZone domain.
+
+        This API supports filtering results by user type and search text, as well as pagination through `maxResults` and `nextToken`.
+
+        Args:
+            domain_identifier (str): The identifier of the Amazon DataZone domain in which to perform the search.
+                Pattern: ^dzd[-_][a-zA-Z0-9_-]{1,36}$
+                Required: Yes
+
+            max_results (int, optional): The maximum number of user profiles to return in a single call.
+                Valid Range: 1–50
+                Required: No
+
+            next_token (str, optional): Pagination token from a previous response. Use to retrieve the next page of results.
+                Min length: 1, Max length: 8192
+                Required: No
+
+            search_text (str, optional): Text to search for in user profiles.
+                Max length: 1024
+                Required: No
+
+            user_type (str): The type of user profile to search for.
+                Valid values:
+                    - "SSO_USER"
+                    - "DATAZONE_USER"
+                    - "DATAZONE_SSO_USER"
+                    - "DATAZONE_IAM_USER"
+                Required: Yes
+
+        Returns:
+            dict: A response object containing:
+                - items (List[dict]): A list of user profile summaries. Each summary includes:
+                    - details (dict): UserProfileDetails (union type)
+                    - domainId (str): Domain ID the user profile belongs to.
+                    - id (str): The identifier of the user profile.
+                    - status (str): Profile status. Possible values: "ASSIGNED", "NOT_ASSIGNED", "ACTIVATED", "DEACTIVATED".
+                    - type (str): Type of the user profile. Possible values: "IAM", "SSO".
+                - nextToken (str, optional): Token for paginated responses.
+                    Min length: 1, Max length: 8192
+        """
+        try:
+            logger.info(f"Searching {user_type} user profiles in domain {domain_identifier}")
+            # Validate user_type
+            valid_types = ["SSO_USER", "DATAZONE_USER", "DATAZONE_SSO_USER", "DATAZONE_IAM_USER"]
+            if user_type not in valid_types:
+                raise ValueError(f"user_type must be one of {valid_types}")
+            
+            # Prepare the request parameters
+            params = {
+                "domainIdentifier": domain_identifier,
+                "userType": user_type,
+                "maxResults": min(max_results, 50)
+            }
+            
+            # Add optional parameters if provided
+            if search_text:
+                params["searchText"] = search_text
+            if next_token:
+                params["nextToken"] = next_token
+
+            response = datazone_client.search_user_profiles(**params)
+            logger.info(f"Successfully searched {user_type} user profiles in domain {domain_identifier}")
+            return response
+        except ClientError as e:
+            error_code = e.response['Error']['Code']
+            if error_code == 'AccessDeniedException':
+                raise Exception(f"Access denied while searching {user_type} user profiles in domain {domain_identifier}")
+            elif error_code == 'InternalServerException':
+                raise Exception(f"Internal server error while searching {user_type} user profiles in domain {domain_identifier}")
+            elif error_code == 'ThrottlingException':
+                raise Exception(f"Request throttled while searching {user_type} user profiles in domain {domain_identifier}")
+            elif error_code == 'UnauthorizedException':
+                raise Exception(f"Unauthorized to search {user_type} user profiles in domain {domain_identifier}")
+            elif error_code == 'ValidationException':
+                raise Exception(f"Invalid input while searching {user_type} user profiles in domain {domain_identifier}")
+            else:
+                raise Exception(f"Error searching {user_type} user profiles in domain {domain_identifier}: {str(e)}")
+        except Exception as e:
+            raise Exception(f"Unexpected error searching t{user_type} user profiles in domain {domain_identifier}: {str(e)}")
+
+    @mcp.tool()
+    async def search_group_profiles(
+        domain_identifier: str,
+        group_type: str,
+        max_results: int = 50,
+        next_token: str = None,
+        search_text: str = None
+    ) -> Any:
+        """
+        Searches for group profiles within a specified Amazon DataZone domain.
+
+        This operation allows you to find groups by specifying a group type and optional search text. Pagination is supported through `maxResults` and `nextToken`.
+
+        Args:
+            domain_identifier (str): The identifier of the Amazon DataZone domain in which to search group profiles.
+                Pattern: ^dzd[-_][a-zA-Z0-9_-]{1,36}$
+                Required: Yes
+
+            group_type (str): The type of group to search for.
+                Valid values:
+                    - "SSO_GROUP"
+                    - "DATAZONE_SSO_GROUP"
+                Required: Yes
+
+            max_results (int, optional): The maximum number of results to return in a single call.
+                Valid range: 1–50
+                Required: No
+
+            next_token (str, optional): Pagination token from a previous response. Use this to retrieve the next set of results.
+                Length: 1–8192 characters
+                Required: No
+
+            search_text (str, optional): Free-text string used to filter group profiles.
+                Max length: 1024
+                Required: No
+
+        Returns:
+            dict: A response object containing:
+                - items (List[dict]): A list of group profile summaries. Each summary includes:
+                    - domainId (str): The domain to which the group belongs.
+                    - groupName (str): The name of the group.
+                    - id (str): The unique identifier of the group profile.
+                    - status (str): The current status of the group profile.
+                - nextToken (str, optional): A token to retrieve the next page of results, if more are available.
+                    Length: 1–8192 characters
+
+        Raises:
+            HTTPError: If the API request fails or returns an error.
+        """
+        try:
+            logger.info(f"Searching {group_type} group profiles in domain {domain_identifier}")
+            # Validate user_type
+            valid_types = ["SSO_GROUP", "DATAZONE_SSO_GROUP"]
+            if group_type not in valid_types:
+                raise ValueError(f"group_type must be one of {valid_types}")
+            
+            # Prepare the request parameters
+            params = {
+                "domainIdentifier": domain_identifier,
+                "groupType": group_type,
+                "maxResults": min(max_results, 50)
+            }
+            
+            # Add optional parameters if provided
+            if search_text:
+                params["searchText"] = search_text
+            if next_token:
+                params["nextToken"] = next_token
+
+            response = datazone_client.search_group_profiles(**params)
+            logger.info(f"Successfully searched {group_type} group profiles in domain {domain_identifier}")
+            return response
+        except ClientError as e:
+            error_code = e.response['Error']['Code']
+            if error_code == 'AccessDeniedException':
+                raise Exception(f"Access denied while searching {group_type} group profiles in domain {domain_identifier}")
+            elif error_code == 'InternalServerException':
+                raise Exception(f"Internal server error while searching {group_type} group profiles in domain {domain_identifier}")
+            elif error_code == 'ThrottlingException':
+                raise Exception(f"Request throttled while searching {group_type} group profiles in domain {domain_identifier}")
+            elif error_code == 'UnauthorizedException':
+                raise Exception(f"Unauthorized to search {group_type} group profiles in domain {domain_identifier}")
+            elif error_code == 'ValidationException':
+                raise Exception(f"Invalid input while searching {group_type} group profiles in domain {domain_identifier}")
+            else:
+                raise Exception(f"Error searching {group_type} group profiles in domain {domain_identifier}: {str(e)}")
+        except Exception as e:
+            raise Exception(f"Unexpected error searching t{group_type} group profiles in domain {domain_identifier}: {str(e)}")
 
     # Return the decorated functions for testing purposes
     return {
         "get_domain": get_domain,
         "create_domain": create_domain,
         "list_domains": list_domains,
-        "create_domain_unit": create_domain_unit,
-        "get_domain_unit": get_domain_unit,
-        "list_domain_units_for_parent": list_domain_units_for_parent,
-        "update_domain_unit": update_domain_unit,
+        # "create_domain_unit": create_domain_unit,
+        # "get_domain_unit": get_domain_unit,
+        # "list_domain_units_for_parent": list_domain_units_for_parent,
+        # "update_domain_unit": update_domain_unit,
         # "add_entity_owner": add_entity_owner,
         # "add_policy_grant": add_policy_grant,
         # "list_policy_grants": list_policy_grants,
         # "remove_policy_grant": remove_policy_grant,
-        "search": search
+        "search": search,
+        "search_types": search_types,
+        "get_user_profile": get_user_profile,
+        "search_user_profiles": search_user_profiles,
+        "search_group_profiles": search_group_profiles
     } 

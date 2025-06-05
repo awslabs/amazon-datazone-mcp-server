@@ -80,108 +80,108 @@ def register_tools(mcp: FastMCP):
         except ClientError as e:
             raise Exception(f"Error listing environments: {e}")
 
-    @mcp.tool()
-    async def create_connection(
-        domain_identifier: str,
-        name: str,
-        environment_identifier: str = None,
-        aws_location: Dict[str, str] = None,
-        description: str = None,
-        client_token: str = None,
-        props: Dict[str, Any] = None
-    ) -> Any:
-        """
-        Creates a new connection in Amazon DataZone. A connection enables you to connect your resources
-        (domains, projects, and environments) to external resources and services.
+    # @mcp.tool()
+    # async def create_connection(
+    #     domain_identifier: str,
+    #     name: str,
+    #     environment_identifier: str = None,
+    #     aws_location: Dict[str, str] = None,
+    #     description: str = None,
+    #     client_token: str = None,
+    #     props: Dict[str, Any] = None
+    # ) -> Any:
+    #     """
+    #     Creates a new connection in Amazon DataZone. A connection enables you to connect your resources
+    #     (domains, projects, and environments) to external resources and services.
 
-        This is specifically for creating DataZone connections and should be used in the DataZone MCP server.
+    #     This is specifically for creating DataZone connections and should be used in the DataZone MCP server.
         
-        Args:
-            domain_identifier (str): The ID of the domain where the connection is created.
-                Pattern: ^dzd[-_][a-zA-Z0-9_-]{1,36}$
-            name (str): The connection name.
-                Length Constraints: Minimum length of 0. Maximum length of 64.
-            environment_identifier (str, optional): The ID of the environment where the connection is created.
-                Pattern: ^[a-zA-Z0-9_-]{1,36}$
-            aws_location (Dict[str, str], optional): The location where the connection is created.
-                Contains:
-                    - accessRole (str): The access role for the connection
-                    - awsAccountId (str): The AWS account ID
-                    - awsRegion (str): The AWS region
-                    - iamConnectionId (str): The IAM connection ID
-            description (str, optional): A connection description.
-                Length Constraints: Minimum length of 0. Maximum length of 128.
-            client_token (str, optional): A unique, case-sensitive identifier to ensure idempotency.
-            props (Dict[str, Any], optional): The connection properties.
-                Type: ConnectionPropertiesInput object (Union type)
+    #     Args:
+    #         domain_identifier (str): The ID of the domain where the connection is created.
+    #             Pattern: ^dzd[-_][a-zA-Z0-9_-]{1,36}$
+    #         name (str): The connection name.
+    #             Length Constraints: Minimum length of 0. Maximum length of 64.
+    #         environment_identifier (str, optional): The ID of the environment where the connection is created.
+    #             Pattern: ^[a-zA-Z0-9_-]{1,36}$
+    #         aws_location (Dict[str, str], optional): The location where the connection is created.
+    #             Contains:
+    #                 - accessRole (str): The access role for the connection
+    #                 - awsAccountId (str): The AWS account ID
+    #                 - awsRegion (str): The AWS region
+    #                 - iamConnectionId (str): The IAM connection ID
+    #         description (str, optional): A connection description.
+    #             Length Constraints: Minimum length of 0. Maximum length of 128.
+    #         client_token (str, optional): A unique, case-sensitive identifier to ensure idempotency.
+    #         props (Dict[str, Any], optional): The connection properties.
+    #             Type: ConnectionPropertiesInput object (Union type)
         
-        Returns:
-            Any: The API response containing:
-                - connectionId (str): The ID of the created connection
-                - description (str): The connection description
-                - domainId (str): The domain ID
-                - domainUnitId (str): The domain unit ID
-                - environmentId (str): The environment ID
-                - name (str): The connection name
-                - physicalEndpoints (list): The physical endpoints of the connection
-                - projectId (str): The project ID
-                - props (dict): The connection properties
-                - type (str): The connection type
+    #     Returns:
+    #         Any: The API response containing:
+    #             - connectionId (str): The ID of the created connection
+    #             - description (str): The connection description
+    #             - domainId (str): The domain ID
+    #             - domainUnitId (str): The domain unit ID
+    #             - environmentId (str): The environment ID
+    #             - name (str): The connection name
+    #             - physicalEndpoints (list): The physical endpoints of the connection
+    #             - projectId (str): The project ID
+    #             - props (dict): The connection properties
+    #             - type (str): The connection type
         
-        Example:
-            >>> create_connection(
-            ...     domain_identifier="dzd_4p9n6sw4qt9xgn",
-            ...     name="MyConnection",
-            ...     environment_identifier="env_123456789",
-            ...     aws_location={
-            ...         "accessRole": "arn:aws:iam::123456789012:role/DataZoneAccessRole",
-            ...         "awsAccountId": "123456789012",
-            ...         "awsRegion": "us-east-1",
-            ...         "iamConnectionId": "iam-123456789"
-            ...     },
-            ...     description="Connection to external service"
-            ... )
-        """
-        try:
-            # Prepare the request parameters
-            params = {
-                "domainIdentifier": domain_identifier,
-                "name": name
-            }
+    #     Example:
+    #         >>> create_connection(
+    #         ...     domain_identifier="dzd_4p9n6sw4qt9xgn",
+    #         ...     name="MyConnection",
+    #         ...     environment_identifier="env_123456789",
+    #         ...     aws_location={
+    #         ...         "accessRole": "arn:aws:iam::123456789012:role/DataZoneAccessRole",
+    #         ...         "awsAccountId": "123456789012",
+    #         ...         "awsRegion": "us-east-1",
+    #         ...         "iamConnectionId": "iam-123456789"
+    #         ...     },
+    #         ...     description="Connection to external service"
+    #         ... )
+    #     """
+    #     try:
+    #         # Prepare the request parameters
+    #         params = {
+    #             "domainIdentifier": domain_identifier,
+    #             "name": name
+    #         }
             
-            # Add optional parameters if provided
-            if environment_identifier:
-                params["environmentIdentifier"] = environment_identifier
-            if aws_location:
-                params["awsLocation"] = aws_location
-            if description:
-                params["description"] = description
-            if client_token:
-                params["clientToken"] = client_token
-            if props:
-                params["props"] = props
+    #         # Add optional parameters if provided
+    #         if environment_identifier:
+    #             params["environmentIdentifier"] = environment_identifier
+    #         if aws_location:
+    #             params["awsLocation"] = aws_location
+    #         if description:
+    #             params["description"] = description
+    #         if client_token:
+    #             params["clientToken"] = client_token
+    #         if props:
+    #             params["props"] = props
             
-            response = datazone_client.create_connection(**params)
-            return response
-        except ClientError as e:
-            error_code = e.response["Error"]["Code"]
-            error_message = e.response["Error"]["Message"]
+    #         response = datazone_client.create_connection(**params)
+    #         return response
+    #     except ClientError as e:
+    #         error_code = e.response["Error"]["Code"]
+    #         error_message = e.response["Error"]["Message"]
 
-            if error_code == "AccessDeniedException":
-                raise Exception(f"Access denied while creating connection in domain {domain_identifier}: {error_message}")
-            elif error_code == "ConflictException":
-                raise Exception(f"Conflict while creating connection in domain {domain_identifier}: {error_message}")
-            elif error_code == "ResourceNotFoundException":
-                raise Exception(
-                    f"Resource not found while creating connection in domain {domain_identifier}: {error_message}")
-            elif error_code == "ServiceQuotaExceededException":
-                raise Exception(
-                    f"Service quota exceeded while creating connection in domain {domain_identifier}: {error_message}")
-            elif error_code == "ValidationException":
-                raise Exception(
-                    f"Invalid parameters while creating connection in domain {domain_identifier}: {error_message}")
-            else:
-                raise Exception(f"Unexpected error creating connection in domain {domain_identifier}: {error_message}")
+    #         if error_code == "AccessDeniedException":
+    #             raise Exception(f"Access denied while creating connection in domain {domain_identifier}: {error_message}")
+    #         elif error_code == "ConflictException":
+    #             raise Exception(f"Conflict while creating connection in domain {domain_identifier}: {error_message}")
+    #         elif error_code == "ResourceNotFoundException":
+    #             raise Exception(
+    #                 f"Resource not found while creating connection in domain {domain_identifier}: {error_message}")
+    #         elif error_code == "ServiceQuotaExceededException":
+    #             raise Exception(
+    #                 f"Service quota exceeded while creating connection in domain {domain_identifier}: {error_message}")
+    #         elif error_code == "ValidationException":
+    #             raise Exception(
+    #                 f"Invalid parameters while creating connection in domain {domain_identifier}: {error_message}")
+    #         else:
+    #             raise Exception(f"Unexpected error creating connection in domain {domain_identifier}: {error_message}")
 
     @mcp.tool()
     async def get_connection(
@@ -632,14 +632,238 @@ def register_tools(mcp: FastMCP):
     #         logger.error(f"Unexpected error listing environment blueprints in domain {domain_identifier}: {str(e)}")
     #         raise Exception(f"Unexpected error listing environment blueprints in domain {domain_identifier}: {str(e)}")
 
+    @mcp.tool()
+    async def list_environment_blueprint_configurations(
+        domain_identifier: str,
+        max_results: int = 50,
+        next_token: str = None
+    ) -> Dict[str, Any]:
+        """
+        Lists environment blueprints in an Amazon DataZone domain.
+        
+        Args:
+            domain_identifier (str): The ID of the domain where the blueprint configurations are listed
+                Pattern: ^dzd[-_][a-zA-Z0-9_-]{1,36}$
+            max_results (int, optional): Maximum number of blueprint configurations to return (1-50, default: 50)
+            next_token (str, optional): Token for pagination (1-8192 characters)
+        
+        Returns:
+            dict: A dictionary with the following structure:
+
+            Args:
+                items (List[dict]): A list of environment blueprint summaries, each including:
+                    - createdAt (str): The timestamp when the blueprint was created.
+                    - domainId (str): The identifier of the Amazon DataZone domain.
+                    - enabledRegions (List[str]): A list of AWS regions where the blueprint is enabled.
+                    - environmentBlueprintId (str): Unique ID of the environment blueprint.
+                    - environmentRolePermissionBoundary (str): ARN of the permission boundary used for environment roles.
+                    - manageAccessRoleArn (str): ARN of the IAM role used to manage environment access.
+                    - provisioningConfigurations (List[dict]): A list of provisioning configuration objects.
+                        (Details not expanded here — structure is custom and tool-dependent.)
+                    - provisioningRoleArn (str): ARN of the IAM role used to provision environments.
+                    - regionalParameters (dict): A dictionary mapping region names to parameter maps.
+                        Example: { "us-west-2": { "param1": "value1" } }
+                    - updatedAt (str): The timestamp when the blueprint was last updated.
+
+                nextToken (str): Token for paginated results. Use in subsequent requests to retrieve the next set of environment blueprints.
+        """
+        try:
+            logger.info(f"Listing environment blueprint configurations in domain {domain_identifier}")
+            
+            # Prepare request parameters
+            params = {
+                'domainIdentifier': domain_identifier,
+                'maxResults': min(max_results, 50)  # Ensure maxResults is within valid range
+            }
+            
+            if next_token:
+                params['nextToken'] = next_token
+            
+            # List the environment blueprint configurations
+            response = datazone_client.list_environment_blueprint_configurations(**params)
+            
+            # Format the response
+            result = {
+                'items': [],
+                'next_token': response.get('nextToken')
+            }
+            
+            # Format each blueprint
+            for configuration in response.get('items', []):
+                formatted_configuration = {
+                    'createdAt': configuration.get('createdAt'),
+                    'domainId': configuration.get('domainId'),
+                    'enabledRegions': configuration.get('enabledRegions'),
+                    'environmentBlueprintId': configuration.get('environmentBlueprintId'),
+                    'environmentRolePermissionBoundary': configuration.get('environmentRolePermissionBoundary'),
+                    'manageAccessRoleArn': configuration.get('manageAccessRoleArn'),
+                    'provisioningConfigurations': configuration.get('provisioningConfigurations'),
+                    'provisioningRoleArn': configuration.get('provisioningRoleArn'),
+                    'regionalParameters': configuration.get('regionalParameters'),
+                    'updatedAt': configuration.get('updatedAt'),
+                }
+                result['items'].append(formatted_configuration)
+            
+            logger.info(f"Successfully listed {len(result['items'])} environment blueprint configurations in domain {domain_identifier}")
+            return result
+            
+        except ClientError as e:
+            error_code = e.response['Error']['Code']
+            if error_code == 'AccessDeniedException':
+                logger.error(f"Access denied while listing environment blueprint configurations in domain {domain_identifier}")
+                raise Exception(f"Access denied while listing environment blueprint configurations in domain {domain_identifier}")
+            elif error_code == 'ResourceNotFoundException':
+                logger.error(f"Domain {domain_identifier} not found while listing environment blueprint configurations")
+                raise Exception(f"Domain {domain_identifier} not found while listing environment blueprint configurations")
+            elif error_code == 'ValidationException':
+                logger.error(f"Invalid parameters for listing environment blueprint configurations in domain {domain_identifier}")
+                raise Exception(f"Invalid parameters for listing environment blueprint configurations in domain {domain_identifier}")
+            else:
+                logger.error(f"Error listing environment blueprint configurations in domain {domain_identifier}: {str(e)}")
+                raise Exception(f"Error listing environment blueprint configurations in domain {domain_identifier}: {str(e)}")
+        except Exception as e:
+            logger.error(f"Unexpected error listing environment blueprint configurations in domain {domain_identifier}: {str(e)}")
+            raise Exception(f"Unexpected error listing environment blueprint configurations in domain {domain_identifier}: {str(e)}")
+
+    @mcp.tool()
+    async def list_environment_profiles(
+        domain_identifier: str,
+        aws_account_id: str = None,
+        aws_account_region: str = None,
+        environment_blueprint_identifier: str = None,
+        max_results: int = 50,
+        name: str = None,
+        next_token: str = None,
+        project_identifer: str = None
+    ) -> Dict[str, Any]:
+        """
+        Lists environment profiles within a specified Amazon DataZone domain, optionally filtered by AWS account, region, blueprint, and project.
+
+        Args:
+            domainIdentifier (str): The identifier of the Amazon DataZone domain.
+                Pattern: ^dzd[-_][a-zA-Z0-9_-]{1,36}$
+                Required: Yes
+
+            awsAccountId (str, optional): The AWS account ID to filter results.
+                Pattern: ^\d{12}$
+
+            awsAccountRegion (str, optional): The AWS region to filter results.
+                Pattern: ^[a-z]{2}-[a-z]{4,10}-\d$
+
+            environmentBlueprintIdentifier (str, optional): The identifier of the blueprint used to create the environment profiles.
+                Pattern: ^[a-zA-Z0-9_-]{1,36}$
+
+            maxResults (int, optional): Maximum number of results to return (1–50).
+
+            name (str, optional): Filter environment profiles by name.
+                Length: 1–64 characters
+                Pattern: ^[\w -]+$
+
+            nextToken (str, optional): A pagination token returned from a previous call to retrieve the next set of results.
+                Length: 1–8192 characters
+
+            projectIdentifier (str, optional): The identifier of the Amazon DataZone project.
+                Pattern: ^[a-zA-Z0-9_-]{1,36}$
+
+        Returns:
+            dict: A dictionary containing:
+                - items (List[dict]): A list of environment profile summaries. Each item includes:
+                    - awsAccountId (str): AWS account where the profile exists.
+                    - awsAccountRegion (str): AWS region of the profile.
+                    - createdAt (str): Timestamp when the profile was created.
+                    - createdBy (str): Identifier of the user who created the profile.
+                    - description (str): Description of the profile.
+                    - domainId (str): The domain associated with the profile.
+                    - environmentBlueprintId (str): ID of the blueprint used.
+                    - id (str): Unique ID of the environment profile.
+                    - name (str): Name of the environment profile.
+                    - projectId (str): ID of the associated project.
+                    - updatedAt (str): Timestamp of last update.
+
+                - nextToken (str): Token for retrieving the next page of results, if any.
+"""
+        try:
+            logger.info(f"Listing environment profiles in domain {domain_identifier}")
+            
+            # Prepare request parameters
+            params = {
+                'domainIdentifier': domain_identifier,
+                'maxResults': min(max_results, 50)  # Ensure maxResults is within valid range
+            }
+            
+            # Add optional parameters
+            if aws_account_id:
+                params['awsAccountId'] = aws_account_id
+            if aws_account_region:
+                params['awsAccountRegion'] = aws_account_region
+            if environment_blueprint_identifier:
+                params['environmentBlueprintIdentifier'] = environment_blueprint_identifier
+            if name:
+                params['name'] = name
+            if next_token:
+                params['nextToken'] = next_token
+            if project_identifer:
+                params['projectIdentifier'] = project_identifer
+            
+            # List the environment profiles
+            response = datazone_client.list_environment_profiles(**params)
+            
+            # Format the response
+            result = {
+                'items': [],
+                'next_token': response.get('nextToken')
+            }
+            
+            # Format each profile
+            for profile in response.get('items', []):
+                formatted_profile = {
+                    'aws_account_id': profile.get('awsAccountId'),
+                    'aws_account_region': profile.get('awsAccountRegion'),
+                    'created_at': profile.get('createdAt'),
+                    'created_by': profile.get('createdBy'),
+                    'description': profile.get('description'),
+                    'domain_id': profile.get('domain_id'),
+                    'environment_blueprint_id': profile.get('environmentBlueprintId'),
+                    'id': profile.get('id'),
+                    'name': profile.get('name'),
+                    'description': profile.get('description'),
+                    'project_id': profile.get('projectId'),
+                    'updated_at': profile.get('updatedAt')
+                }
+                result['items'].append(formatted_profile)
+            
+            logger.info(f"Successfully listed {len(result['items'])} environment profiles in domain {domain_identifier}")
+            return result
+            
+        except ClientError as e:
+            error_code = e.response['Error']['Code']
+            if error_code == 'AccessDeniedException':
+                logger.error(f"Access denied while listing environment profiles in domain {domain_identifier}")
+                raise Exception(f"Access denied while listing environment profiles in domain {domain_identifier}")
+            elif error_code == 'ResourceNotFoundException':
+                logger.error(f"Domain {domain_identifier} not found while listing environment profiles")
+                raise Exception(f"Domain {domain_identifier} not found while listing environment profiles")
+            elif error_code == 'ValidationException':
+                logger.error(f"Invalid parameters for listing environment profiles in domain {domain_identifier}")
+                raise Exception(f"Invalid parameters for listing environment profiles in domain {domain_identifier}")
+            else:
+                logger.error(f"Error listing environment profiles in domain {domain_identifier}: {str(e)}")
+                raise Exception(f"Error listing environment profiles in domain {domain_identifier}: {str(e)}")
+        except Exception as e:
+            logger.error(f"Unexpected error listing environment profiles in domain {domain_identifier}: {str(e)}")
+            raise Exception(f"Unexpected error listing environment profiles in domain {domain_identifier}: {str(e)}")
+
+
     # Return the decorated functions for testing purposes
     return {
         "list_environments": list_environments,
-        "create_connection": create_connection,
+        # "create_connection": create_connection,
         "get_connection": get_connection,
         "get_environment": get_environment,
         "get_environment_blueprint": get_environment_blueprint,
         "get_environment_blueprint_configuration": get_environment_blueprint_configuration,
         "list_connections": list_connections,
-        # "list_environment_blueprints": list_environment_blueprints
+        # "list_environment_blueprints": list_environment_blueprints,
+        "list_environment_blueprint_configurations" : list_environment_blueprint_configurations,
+        "list_environment_profiles": list_environment_profiles
     } 

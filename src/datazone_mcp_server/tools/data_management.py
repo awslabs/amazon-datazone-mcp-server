@@ -174,49 +174,49 @@ def register_tools(mcp: FastMCP):
         except Exception as e:
             raise Exception(f"Unexpected error getting asset {asset_identifier} in domain {domain_identifier}")
 
-    @mcp.tool()
-    async def publish_asset(
-        domain_identifier: str,
-        asset_identifier: str,
-        revision: str = None,
-        client_token: str = None
-    ) -> Any:
-        """
-        Publishes an asset to the Amazon DataZone catalog.
+    # @mcp.tool()
+    # async def publish_asset(
+    #     domain_identifier: str,
+    #     asset_identifier: str,
+    #     revision: str = None,
+    #     client_token: str = None
+    # ) -> Any:
+    #     """
+    #     Publishes an asset to the Amazon DataZone catalog.
         
-        Args:
-            domain_identifier (str): The ID of the domain containing the asset
-            asset_identifier (str): The ID of the asset to publishenecccfltudgieffcgfhbvujhvtlinkbbcnfdgbekgdi
+    #     Args:
+    #         domain_identifier (str): The ID of the domain containing the asset
+    #         asset_identifier (str): The ID of the asset to publishenecccfltudgieffcgfhbvujhvtlinkbbcnfdgbekgdi
 
-            revision (str, optional): The specific revision of the asset to publish
-            client_token (str, optional): Token for idempotency
+    #         revision (str, optional): The specific revision of the asset to publish
+    #         client_token (str, optional): Token for idempotency
         
-        Returns:
-            Any: The API response containing:
-                - Published asset ID and revision
-                - Listing status
-                - Creation and update timestamps
-                - Domain and project IDs
-                - Forms and metadata
-                - Glossary terms
-        """
-        try:
-            # Prepare the request parameters
-            params = {
-                "domainIdentifier": domain_identifier,
-                "identifier": asset_identifier
-            }
+    #     Returns:
+    #         Any: The API response containing:
+    #             - Published asset ID and revision
+    #             - Listing status
+    #             - Creation and update timestamps
+    #             - Domain and project IDs
+    #             - Forms and metadata
+    #             - Glossary terms
+    #     """
+    #     try:
+    #         # Prepare the request parameters
+    #         params = {
+    #             "domainIdentifier": domain_identifier,
+    #             "identifier": asset_identifier
+    #         }
             
-            # Add optional parameters if provided
-            if revision:
-                params["revision"] = revision
-            if client_token:
-                params["clientToken"] = client_token
+    #         # Add optional parameters if provided
+    #         if revision:
+    #             params["revision"] = revision
+    #         if client_token:
+    #             params["clientToken"] = client_token
 
-            response = datazone_client.publish_asset(**params)
-            return response
-        except ClientError as e:
-            raise Exception(f"Error publishing asset {asset_identifier} in domain {domain_identifier}: {e}")
+    #         response = datazone_client.publish_asset(**params)
+    #         return response
+    #     except ClientError as e:
+    #         raise Exception(f"Error publishing asset {asset_identifier} in domain {domain_identifier}: {e}")
 
     # @mcp.tool()
     # async def get_listing(
@@ -314,101 +314,101 @@ def register_tools(mcp: FastMCP):
         except ClientError as e:
             raise Exception(f"Error searching listings in domain {domain_identifier}: {e}")
 
-    @mcp.tool()
-    async def create_data_source(
-        domain_identifier: str,
-        project_identifier: str,
-        name: str,
-        type: str,
-        description: str = None,
-        enable_setting: str = "ENABLED",
-        environment_identifier: str = None,
-        connection_identifier: str = None,
-        configuration: Dict[str, Any] = None,
-        asset_forms_input: List[Dict[str, str]] = None,
-        publish_on_import: bool = False,
-        recommendation: Dict[str, bool] = None,
-        schedule: Dict[str, str] = None,
-        client_token: str = None
-    ) -> Any:
-        """
-        Creates a data source in Amazon DataZone and associates it with a project.
+    # @mcp.tool()
+    # async def create_data_source(
+    #     domain_identifier: str,
+    #     project_identifier: str,
+    #     name: str,
+    #     type: str,
+    #     description: str = None,
+    #     enable_setting: str = "ENABLED",
+    #     environment_identifier: str = None,
+    #     connection_identifier: str = None,
+    #     configuration: Dict[str, Any] = None,
+    #     asset_forms_input: List[Dict[str, str]] = None,
+    #     publish_on_import: bool = False,
+    #     recommendation: Dict[str, bool] = None,
+    #     schedule: Dict[str, str] = None,
+    #     client_token: str = None
+    # ) -> Any:
+    #     """
+    #     Creates a data source in Amazon DataZone and associates it with a project.
         
-        Args:
-            domain_identifier (str): The ID of the domain where the data source is created
-            project_identifier (str): The ID of the project to associate the data source with
-            name (str): The name of the data source (1-256 characters)
-            type (str): The type of data source (e.g., "S3", "GLUE", "REDSHIFT")
-            description (str, optional): Description of the data source (0-2048 characters)
-            enable_setting (str, optional): Whether the data source is enabled (ENABLED/DISABLED)
-            environment_identifier (str, optional): ID of the environment to publish assets to
-            connection_identifier (str, optional): ID of the connection to use
-            configuration (Dict[str, Any], optional): Data source configuration
-                Example for S3: {
-                    "s3Configuration": {
-                        "bucketName": "my-bucket",
-                        "prefix": "data/"
-                    }
-                }
-            asset_forms_input (List[Dict[str, str]], optional): Metadata forms for assets
-                Example: [{
-                    "content": "form-content",
-                    "formName": "form-name",
-                    "typeIdentifier": "type-id",
-                    "typeRevision": "type-rev"
-                }]
-            publish_on_import (bool, optional): Whether to automatically publish imported assets
-            recommendation (Dict[str, bool], optional): Recommendation settings
-                Example: {"enableBusinessNameGeneration": True}
-            schedule (Dict[str, str], optional): Schedule configuration
-                Example: {
-                    "schedule": "cron(0 12 * * ? *)",
-                    "timezone": "UTC"
-                }
-            client_token (str, optional): Token for idempotency
+    #     Args:
+    #         domain_identifier (str): The ID of the domain where the data source is created
+    #         project_identifier (str): The ID of the project to associate the data source with
+    #         name (str): The name of the data source (1-256 characters)
+    #         type (str): The type of data source (e.g., "S3", "GLUE", "REDSHIFT")
+    #         description (str, optional): Description of the data source (0-2048 characters)
+    #         enable_setting (str, optional): Whether the data source is enabled (ENABLED/DISABLED)
+    #         environment_identifier (str, optional): ID of the environment to publish assets to
+    #         connection_identifier (str, optional): ID of the connection to use
+    #         configuration (Dict[str, Any], optional): Data source configuration
+    #             Example for S3: {
+    #                 "s3Configuration": {
+    #                     "bucketName": "my-bucket",
+    #                     "prefix": "data/"
+    #                 }
+    #             }
+    #         asset_forms_input (List[Dict[str, str]], optional): Metadata forms for assets
+    #             Example: [{
+    #                 "content": "form-content",
+    #                 "formName": "form-name",
+    #                 "typeIdentifier": "type-id",
+    #                 "typeRevision": "type-rev"
+    #             }]
+    #         publish_on_import (bool, optional): Whether to automatically publish imported assets
+    #         recommendation (Dict[str, bool], optional): Recommendation settings
+    #             Example: {"enableBusinessNameGeneration": True}
+    #         schedule (Dict[str, str], optional): Schedule configuration
+    #             Example: {
+    #                 "schedule": "cron(0 12 * * ? *)",
+    #                 "timezone": "UTC"
+    #             }
+    #         client_token (str, optional): Token for idempotency
         
-        Returns:
-            Any: The API response containing:
-                - Data source ID and status
-                - Creation and update timestamps
-                - Domain and project IDs
-                - Configuration details
-                - Last run information
-                - Error messages (if any)
-        """
-        try:
-            # Prepare the request parameters
-            params = {
-                "domainIdentifier": domain_identifier,
-                "projectIdentifier": project_identifier,
-                "name": name,
-                "type": type,
-                "enableSetting": enable_setting,
-                "publishOnImport": publish_on_import
-            }
+    #     Returns:
+    #         Any: The API response containing:
+    #             - Data source ID and status
+    #             - Creation and update timestamps
+    #             - Domain and project IDs
+    #             - Configuration details
+    #             - Last run information
+    #             - Error messages (if any)
+    #     """
+    #     try:
+    #         # Prepare the request parameters
+    #         params = {
+    #             "domainIdentifier": domain_identifier,
+    #             "projectIdentifier": project_identifier,
+    #             "name": name,
+    #             "type": type,
+    #             "enableSetting": enable_setting,
+    #             "publishOnImport": publish_on_import
+    #         }
             
-            # Add optional parameters if provided
-            if description:
-                params["description"] = description
-            if environment_identifier:
-                params["environmentIdentifier"] = environment_identifier
-            if connection_identifier:
-                params["connectionIdentifier"] = connection_identifier
-            if configuration:
-                params["configuration"] = configuration
-            if asset_forms_input:
-                params["assetFormsInput"] = asset_forms_input
-            if recommendation:
-                params["recommendation"] = recommendation
-            if schedule:
-                params["schedule"] = schedule
-            if client_token:
-                params["clientToken"] = client_token
+    #         # Add optional parameters if provided
+    #         if description:
+    #             params["description"] = description
+    #         if environment_identifier:
+    #             params["environmentIdentifier"] = environment_identifier
+    #         if connection_identifier:
+    #             params["connectionIdentifier"] = connection_identifier
+    #         if configuration:
+    #             params["configuration"] = configuration
+    #         if asset_forms_input:
+    #             params["assetFormsInput"] = asset_forms_input
+    #         if recommendation:
+    #             params["recommendation"] = recommendation
+    #         if schedule:
+    #             params["schedule"] = schedule
+    #         if client_token:
+    #             params["clientToken"] = client_token
 
-            response = datazone_client.create_data_source(**params)
-            return response
-        except ClientError as e:
-            raise Exception(f"Error creating data source in domain {domain_identifier}: {e}")
+    #         response = datazone_client.create_data_source(**params)
+    #         return response
+    #     except ClientError as e:
+    #         raise Exception(f"Error creating data source in domain {domain_identifier}: {e}")
 
     @mcp.tool()
     async def get_data_source(
@@ -517,110 +517,110 @@ def register_tools(mcp: FastMCP):
     #     except Exception as e:
     #         raise Exception(f"Unexpected error starting data source run for {data_source_identifier} in domain {domain_identifier}: {str(e)}")
 
-    @mcp.tool()
-    async def create_subscription_request(
-        domain_identifier: str,
-        request_reason: str,
-        subscribed_listings: List[Dict[str, str]],
-        subscribed_principals: List[Dict[str, Any]],
-        metadata_forms: List[Dict[str, str]] = None,
-        client_token: str = None
-    ) -> Any:
-        """
-        Creates a subscription request in Amazon DataZone.
+    # @mcp.tool()
+    # async def create_subscription_request(
+    #     domain_identifier: str,
+    #     request_reason: str,
+    #     subscribed_listings: List[Dict[str, str]],
+    #     subscribed_principals: List[Dict[str, Any]],
+    #     metadata_forms: List[Dict[str, str]] = None,
+    #     client_token: str = None
+    # ) -> Any:
+    #     """
+    #     Creates a subscription request in Amazon DataZone.
         
-        Args:
-            domain_identifier (str): The ID of the domain where the subscription request is created
-            request_reason (str): The reason for the subscription request (1-4096 characters)
-            subscribed_listings (List[Dict[str, str]]): The published assets to subscribe to
-                Example: [{"identifier": "listing-id"}]
-            subscribed_principals (List[Dict[str, Any]]): The principals to subscribe using tagged union format
-                Example for project: [{"project": {"identifier": "project-id"}}]
-                Example for user: [{"user": {"userId": "user-id"}}]
-            metadata_forms (List[Dict[str, str]], optional): Additional metadata forms
-                Example: [{
-                    "content": "form-content",
-                    "formName": "form-name",
-                    "typeIdentifier": "type-id",
-                    "typeRevision": "type-rev"
-                }]
-            client_token (str, optional): A unique token to ensure idempotency
+    #     Args:
+    #         domain_identifier (str): The ID of the domain where the subscription request is created
+    #         request_reason (str): The reason for the subscription request (1-4096 characters)
+    #         subscribed_listings (List[Dict[str, str]]): The published assets to subscribe to
+    #             Example: [{"identifier": "listing-id"}]
+    #         subscribed_principals (List[Dict[str, Any]]): The principals to subscribe using tagged union format
+    #             Example for project: [{"project": {"identifier": "project-id"}}]
+    #             Example for user: [{"user": {"userId": "user-id"}}]
+    #         metadata_forms (List[Dict[str, str]], optional): Additional metadata forms
+    #             Example: [{
+    #                 "content": "form-content",
+    #                 "formName": "form-name",
+    #                 "typeIdentifier": "type-id",
+    #                 "typeRevision": "type-rev"
+    #             }]
+    #         client_token (str, optional): A unique token to ensure idempotency
         
-        Returns:
-            Any: The API response containing:
-                - Subscription request ID and status
-                - Creation and update timestamps
-                - Domain ID
-                - Request reason and decision comment
-                - Subscribed listings and principals
-                - Metadata forms
-                - Reviewer information
-        """
-        try:
-            # Prepare the request parameters
-            params = {
-                "domainIdentifier": domain_identifier,
-                "requestReason": request_reason,
-                "subscribedListings": subscribed_listings,
-                "subscribedPrincipals": subscribed_principals
-            }
+    #     Returns:
+    #         Any: The API response containing:
+    #             - Subscription request ID and status
+    #             - Creation and update timestamps
+    #             - Domain ID
+    #             - Request reason and decision comment
+    #             - Subscribed listings and principals
+    #             - Metadata forms
+    #             - Reviewer information
+    #     """
+    #     try:
+    #         # Prepare the request parameters
+    #         params = {
+    #             "domainIdentifier": domain_identifier,
+    #             "requestReason": request_reason,
+    #             "subscribedListings": subscribed_listings,
+    #             "subscribedPrincipals": subscribed_principals
+    #         }
             
-            # Add optional parameters if provided
-            if metadata_forms:
-                params["metadataForms"] = metadata_forms
-            if client_token:
-                params["clientToken"] = client_token
+    #         # Add optional parameters if provided
+    #         if metadata_forms:
+    #             params["metadataForms"] = metadata_forms
+    #         if client_token:
+    #             params["clientToken"] = client_token
 
-            response = datazone_client.create_subscription_request(**params)
-            return response
-        except ClientError as e:
-            raise Exception(f"Error creating subscription request in domain {domain_identifier}: {e}")
+    #         response = datazone_client.create_subscription_request(**params)
+    #         return response
+    #     except ClientError as e:
+    #         raise Exception(f"Error creating subscription request in domain {domain_identifier}: {e}")
 
-    @mcp.tool()
-    async def accept_subscription_request(
-        domain_identifier: str,
-        identifier: str,
-        asset_scopes: List[Dict[str, Any]] = None,
-        decision_comment: str = None
-    ) -> Any:
-        """
-        Accepts a subscription request to a specific asset in Amazon DataZone.
+    # @mcp.tool()
+    # async def accept_subscription_request(
+    #     domain_identifier: str,
+    #     identifier: str,
+    #     asset_scopes: List[Dict[str, Any]] = None,
+    #     decision_comment: str = None
+    # ) -> Any:
+    #     """
+    #     Accepts a subscription request to a specific asset in Amazon DataZone.
         
-        Args:
-            domain_identifier (str): The ID of the domain where the subscription request exists
-            identifier (str): The unique identifier of the subscription request to accept
-            asset_scopes (List[Dict[str, Any]], optional): The asset scopes of the accept subscription request
-                Example: [{"assetId": "asset-id", "filterIds": ["filter-id"]}]
-            decision_comment (str, optional): A description that specifies the reason for accepting the request
-                Length: 1-4096 characters
+    #     Args:
+    #         domain_identifier (str): The ID of the domain where the subscription request exists
+    #         identifier (str): The unique identifier of the subscription request to accept
+    #         asset_scopes (List[Dict[str, Any]], optional): The asset scopes of the accept subscription request
+    #             Example: [{"assetId": "asset-id", "filterIds": ["filter-id"]}]
+    #         decision_comment (str, optional): A description that specifies the reason for accepting the request
+    #             Length: 1-4096 characters
         
-        Returns:
-            Any: The API response containing:
-                - Subscription request ID and status
-                - Creation and update timestamps
-                - Domain ID
-                - Decision comment
-                - Subscribed listings and principals
-                - Metadata forms
-                - Reviewer information
-        """
-        try:
-            # Prepare the request parameters
-            params = {
-                "domainIdentifier": domain_identifier,
-                "identifier": identifier
-            }
+    #     Returns:
+    #         Any: The API response containing:
+    #             - Subscription request ID and status
+    #             - Creation and update timestamps
+    #             - Domain ID
+    #             - Decision comment
+    #             - Subscribed listings and principals
+    #             - Metadata forms
+    #             - Reviewer information
+    #     """
+    #     try:
+    #         # Prepare the request parameters
+    #         params = {
+    #             "domainIdentifier": domain_identifier,
+    #             "identifier": identifier
+    #         }
             
-            # Add optional parameters if provided
-            if asset_scopes:
-                params["assetScopes"] = asset_scopes
-            if decision_comment:
-                params["decisionComment"] = decision_comment
+    #         # Add optional parameters if provided
+    #         if asset_scopes:
+    #             params["assetScopes"] = asset_scopes
+    #         if decision_comment:
+    #             params["decisionComment"] = decision_comment
 
-            response = datazone_client.accept_subscription_request(**params)
-            return response
-        except ClientError as e:
-            raise Exception(f"Error accepting subscription request {identifier} in domain {domain_identifier}: {e}")
+    #         response = datazone_client.accept_subscription_request(**params)
+    #         return response
+    #     except ClientError as e:
+    #         raise Exception(f"Error accepting subscription request {identifier} in domain {domain_identifier}: {e}")
 
     @mcp.tool()
     async def get_subscription(
@@ -836,20 +836,112 @@ def register_tools(mcp: FastMCP):
     #     except ClientError as e:
     #         raise Exception(f"Error creating form type in domain {domain_identifier}: {e}")
 
+    @mcp.tool()
+    async def list_data_sources(
+        domain_identifier: str,
+        project_identifier: str,
+        connection_identifier: str = None,
+        environment_identifier: str = None,
+        max_results: int = 50,
+        name: str = None, 
+        next_token: str = None,
+        status: str = None,
+        data_source_type: str = None
+    ) -> Any:
+        """
+        Lists all form types available in an Amazon DataZone domain.
+        
+        Args:
+            domainIdentifier (str): The identifier of the Amazon DataZone domain in which to list the data sources.
+                Pattern: ^dzd[-_][a-zA-Z0-9_-]{1,36}$
+                Required: Yes
+            projectIdentifier (str): The identifier of the project in which to list data sources.
+                Required: Yes
+            connectionIdentifier (str, optional): The ID of the connection used to filter the data sources.
+            environmentIdentifier (str, optional): The identifier of the environment in which to list the data sources.
+            maxResults (int, optional): The maximum number of data sources to return in one response.
+                Valid Range: 1–50
+            name (str, optional): Filter by name of the data source.
+                Length Constraints: 1–256 characters
+            nextToken (str, optional): A pagination token for fetching the next set of results.
+                Length Constraints: 1–8192 characters
+            status (str, optional): Filter data sources by their current status.
+                Valid values:
+                    - CREATING
+                    - FAILED_CREATION
+                    - READY
+                    - UPDATING
+                    - FAILED_UPDATE
+                    - RUNNING
+                    - DELETING
+                    - FAILED_DELETION
+            type (str, optional): Filter by the type of data source (e.g., GLUE, REDSHIFT).
+                Length Constraints: 1–256 characters
+
+        Returns:
+            dict: A dictionary with the following keys:
+                - items (List[dict]): A list of DataSourceSummary objects containing:
+                    - connectionId (str)
+                    - createdAt (str)
+                    - dataSourceId (str)
+                    - description (str)
+                    - domainId (str)
+                    - enableSetting (str)
+                    - environmentId (str)
+                    - lastRunAssetCount (int)
+                    - lastRunAt (str)
+                    - lastRunErrorMessage (dict): Contains "errorDetail" and "errorType"
+                    - lastRunStatus (str)
+                    - name (str)
+                    - schedule (dict): Contains "schedule" and "timezone"
+                    - status (str)
+                    - type (str)
+                    - updatedAt (str)
+
+                - nextToken (str): Token to retrieve the next page of results, if any.
+        """
+        try:
+            # Prepare the request parameters
+            params = {
+                "domainIdentifier": domain_identifier,
+                "maxResults": min(max_results, 50),  # Ensure maxResults is within valid range
+                "projectIdentifier" : project_identifier
+            }
+            
+            # Add optional parameters if provided
+            if next_token:
+                params["nextToken"] = next_token
+            if status:
+                params["status"] = status
+            if connection_identifier:
+                params["connectionIdentifier"] = connection_identifier
+            if environment_identifier:
+                params["environmentIdentifier"] = environment_identifier
+            if name:
+                params["name"] = name
+            if data_source_type:
+                params["type"] = data_source_type
+
+            response = datazone_client.list_data_sources(**params)
+            return response
+        except ClientError as e:
+            raise Exception(f"Error listing data sources in project {project_identifier} in domain {domain_identifier}: {e}")
+
     # Return the decorated functions for testing purposes
     return {
         "get_asset": get_asset,
         "create_asset": create_asset,
-        "publish_asset": publish_asset,
+        # "publish_asset": publish_asset,
         # "get_listing": get_listing,
         "search_listings": search_listings,
-        "create_data_source": create_data_source,
+        # "create_data_source": create_data_source,
         "get_data_source": get_data_source,
         # "start_data_source_run": start_data_source_run,
-        "create_subscription_request": create_subscription_request,
-        "accept_subscription_request": accept_subscription_request,
+        # "create_subscription_request": create_subscription_request,
+        # "accept_subscription_request": accept_subscription_request,
         "get_subscription": get_subscription,
         # "get_form_type": get_form_type,
         # "list_form_types": list_form_types,
-        # "create_form_type": create_form_type
+        # "create_form_type": create_form_type,
+        "list_data_sources": list_data_sources
     } 
