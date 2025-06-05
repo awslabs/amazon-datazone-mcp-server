@@ -455,7 +455,7 @@ def register_tools(mcp: FastMCP):
             # Prepare the request parameters
             params = {
                 "domainIdentifier": domain_identifier,
-                "identifier": identifier
+                "environmentBlueprintIdentifier": identifier
             }
             response = datazone_client.get_environment_blueprint_configuration(**params)
             return response
@@ -725,133 +725,133 @@ def register_tools(mcp: FastMCP):
             logger.error(f"Unexpected error listing environment blueprint configurations in domain {domain_identifier}: {str(e)}")
             raise Exception(f"Unexpected error listing environment blueprint configurations in domain {domain_identifier}: {str(e)}")
 
-    @mcp.tool()
-    async def list_environment_profiles(
-        domain_identifier: str,
-        aws_account_id: str = None,
-        aws_account_region: str = None,
-        environment_blueprint_identifier: str = None,
-        max_results: int = 50,
-        name: str = None,
-        next_token: str = None,
-        project_identifer: str = None
-    ) -> Dict[str, Any]:
-        """
-        Lists environment profiles within a specified Amazon DataZone domain, optionally filtered by AWS account, region, blueprint, and project.
+#     @mcp.tool()
+#     async def list_environment_profiles(
+#         domain_identifier: str,
+#         aws_account_id: str = None,
+#         aws_account_region: str = None,
+#         environment_blueprint_identifier: str = None,
+#         max_results: int = 50,
+#         name: str = None,
+#         next_token: str = None,
+#         project_identifier: str = None
+#     ) -> Dict[str, Any]:
+#         """
+#         Lists environment profiles within a specified Amazon DataZone domain, optionally filtered by AWS account, region, blueprint, and project.
 
-        Args:
-            domainIdentifier (str): The identifier of the Amazon DataZone domain.
-                Pattern: ^dzd[-_][a-zA-Z0-9_-]{1,36}$
-                Required: Yes
+#         Args:
+#             domainIdentifier (str): The identifier of the Amazon DataZone domain.
+#                 Pattern: ^dzd[-_][a-zA-Z0-9_-]{1,36}$
+#                 Required: Yes
 
-            awsAccountId (str, optional): The AWS account ID to filter results.
-                Pattern: ^\d{12}$
+#             awsAccountId (str, optional): The AWS account ID to filter results.
+#                 Pattern: ^\d{12}$
 
-            awsAccountRegion (str, optional): The AWS region to filter results.
-                Pattern: ^[a-z]{2}-[a-z]{4,10}-\d$
+#             awsAccountRegion (str, optional): The AWS region to filter results.
+#                 Pattern: ^[a-z]{2}-[a-z]{4,10}-\d$
 
-            environmentBlueprintIdentifier (str, optional): The identifier of the blueprint used to create the environment profiles.
-                Pattern: ^[a-zA-Z0-9_-]{1,36}$
+#             environmentBlueprintIdentifier (str, optional): The identifier of the blueprint used to create the environment profiles.
+#                 Pattern: ^[a-zA-Z0-9_-]{1,36}$
 
-            maxResults (int, optional): Maximum number of results to return (1–50).
+#             maxResults (int, optional): Maximum number of results to return (1–50).
 
-            name (str, optional): Filter environment profiles by name.
-                Length: 1–64 characters
-                Pattern: ^[\w -]+$
+#             name (str, optional): Filter environment profiles by name.
+#                 Length: 1–64 characters
+#                 Pattern: ^[\w -]+$
 
-            nextToken (str, optional): A pagination token returned from a previous call to retrieve the next set of results.
-                Length: 1–8192 characters
+#             nextToken (str, optional): A pagination token returned from a previous call to retrieve the next set of results.
+#                 Length: 1–8192 characters
 
-            projectIdentifier (str, optional): The identifier of the Amazon DataZone project.
-                Pattern: ^[a-zA-Z0-9_-]{1,36}$
+#             projectIdentifier (str, optional): The identifier of the Amazon DataZone project.
+#                 Pattern: ^[a-zA-Z0-9_-]{1,36}$
 
-        Returns:
-            dict: A dictionary containing:
-                - items (List[dict]): A list of environment profile summaries. Each item includes:
-                    - awsAccountId (str): AWS account where the profile exists.
-                    - awsAccountRegion (str): AWS region of the profile.
-                    - createdAt (str): Timestamp when the profile was created.
-                    - createdBy (str): Identifier of the user who created the profile.
-                    - description (str): Description of the profile.
-                    - domainId (str): The domain associated with the profile.
-                    - environmentBlueprintId (str): ID of the blueprint used.
-                    - id (str): Unique ID of the environment profile.
-                    - name (str): Name of the environment profile.
-                    - projectId (str): ID of the associated project.
-                    - updatedAt (str): Timestamp of last update.
+#         Returns:
+#             dict: A dictionary containing:
+#                 - items (List[dict]): A list of environment profile summaries. Each item includes:
+#                     - awsAccountId (str): AWS account where the profile exists.
+#                     - awsAccountRegion (str): AWS region of the profile.
+#                     - createdAt (str): Timestamp when the profile was created.
+#                     - createdBy (str): Identifier of the user who created the profile.
+#                     - description (str): Description of the profile.
+#                     - domainId (str): The domain associated with the profile.
+#                     - environmentBlueprintId (str): ID of the blueprint used.
+#                     - id (str): Unique ID of the environment profile.
+#                     - name (str): Name of the environment profile.
+#                     - projectId (str): ID of the associated project.
+#                     - updatedAt (str): Timestamp of last update.
 
-                - nextToken (str): Token for retrieving the next page of results, if any.
-"""
-        try:
-            logger.info(f"Listing environment profiles in domain {domain_identifier}")
+#                 - nextToken (str): Token for retrieving the next page of results, if any.
+# """
+#         try:
+#             logger.info(f"Listing environment profiles in domain {domain_identifier}")
             
-            # Prepare request parameters
-            params = {
-                'domainIdentifier': domain_identifier,
-                'maxResults': min(max_results, 50)  # Ensure maxResults is within valid range
-            }
+#             # Prepare request parameters
+#             params = {
+#                 'domainIdentifier': domain_identifier,
+#                 'maxResults': min(max_results, 50)  # Ensure maxResults is within valid range
+#             }
             
-            # Add optional parameters
-            if aws_account_id:
-                params['awsAccountId'] = aws_account_id
-            if aws_account_region:
-                params['awsAccountRegion'] = aws_account_region
-            if environment_blueprint_identifier:
-                params['environmentBlueprintIdentifier'] = environment_blueprint_identifier
-            if name:
-                params['name'] = name
-            if next_token:
-                params['nextToken'] = next_token
-            if project_identifer:
-                params['projectIdentifier'] = project_identifer
+#             # Add optional parameters
+#             if aws_account_id:
+#                 params['awsAccountId'] = aws_account_id
+#             if aws_account_region:
+#                 params['awsAccountRegion'] = aws_account_region
+#             if environment_blueprint_identifier:
+#                 params['environmentBlueprintIdentifier'] = environment_blueprint_identifier
+#             if name:
+#                 params['name'] = name
+#             if next_token:
+#                 params['nextToken'] = next_token
+#             if project_identifier:
+#                 params['projectIdentifier'] = project_identifier
             
-            # List the environment profiles
-            response = datazone_client.list_environment_profiles(**params)
+#             # List the environment profiles
+#             response = datazone_client.list_environment_profiles(**params)
             
-            # Format the response
-            result = {
-                'items': [],
-                'next_token': response.get('nextToken')
-            }
+#             # Format the response
+#             result = {
+#                 'items': [],
+#                 'next_token': response.get('nextToken')
+#             }
             
-            # Format each profile
-            for profile in response.get('items', []):
-                formatted_profile = {
-                    'aws_account_id': profile.get('awsAccountId'),
-                    'aws_account_region': profile.get('awsAccountRegion'),
-                    'created_at': profile.get('createdAt'),
-                    'created_by': profile.get('createdBy'),
-                    'description': profile.get('description'),
-                    'domain_id': profile.get('domain_id'),
-                    'environment_blueprint_id': profile.get('environmentBlueprintId'),
-                    'id': profile.get('id'),
-                    'name': profile.get('name'),
-                    'description': profile.get('description'),
-                    'project_id': profile.get('projectId'),
-                    'updated_at': profile.get('updatedAt')
-                }
-                result['items'].append(formatted_profile)
+#             # Format each profile
+#             for profile in response.get('items', []):
+#                 formatted_profile = {
+#                     'aws_account_id': profile.get('awsAccountId'),
+#                     'aws_account_region': profile.get('awsAccountRegion'),
+#                     'created_at': profile.get('createdAt'),
+#                     'created_by': profile.get('createdBy'),
+#                     'description': profile.get('description'),
+#                     'domain_id': profile.get('domain_id'),
+#                     'environment_blueprint_id': profile.get('environmentBlueprintId'),
+#                     'id': profile.get('id'),
+#                     'name': profile.get('name'),
+#                     'description': profile.get('description'),
+#                     'project_id': profile.get('projectId'),
+#                     'updated_at': profile.get('updatedAt')
+#                 }
+#                 result['items'].append(formatted_profile)
             
-            logger.info(f"Successfully listed {len(result['items'])} environment profiles in domain {domain_identifier}")
-            return result
+#             logger.info(f"Successfully listed {len(result['items'])} environment profiles in domain {domain_identifier}")
+#             return result
             
-        except ClientError as e:
-            error_code = e.response['Error']['Code']
-            if error_code == 'AccessDeniedException':
-                logger.error(f"Access denied while listing environment profiles in domain {domain_identifier}")
-                raise Exception(f"Access denied while listing environment profiles in domain {domain_identifier}")
-            elif error_code == 'ResourceNotFoundException':
-                logger.error(f"Domain {domain_identifier} not found while listing environment profiles")
-                raise Exception(f"Domain {domain_identifier} not found while listing environment profiles")
-            elif error_code == 'ValidationException':
-                logger.error(f"Invalid parameters for listing environment profiles in domain {domain_identifier}")
-                raise Exception(f"Invalid parameters for listing environment profiles in domain {domain_identifier}")
-            else:
-                logger.error(f"Error listing environment profiles in domain {domain_identifier}: {str(e)}")
-                raise Exception(f"Error listing environment profiles in domain {domain_identifier}: {str(e)}")
-        except Exception as e:
-            logger.error(f"Unexpected error listing environment profiles in domain {domain_identifier}: {str(e)}")
-            raise Exception(f"Unexpected error listing environment profiles in domain {domain_identifier}: {str(e)}")
+#         except ClientError as e:
+#             error_code = e.response['Error']['Code']
+#             if error_code == 'AccessDeniedException':
+#                 logger.error(f"Access denied while listing environment profiles in domain {domain_identifier}")
+#                 raise Exception(f"Access denied while listing environment profiles in domain {domain_identifier}")
+#             elif error_code == 'ResourceNotFoundException':
+#                 logger.error(f"Domain {domain_identifier} not found while listing environment profiles")
+#                 raise Exception(f"Domain {domain_identifier} not found while listing environment profiles")
+#             elif error_code == 'ValidationException':
+#                 logger.error(f"Invalid parameters for listing environment profiles in domain {domain_identifier}")
+#                 raise Exception(f"Invalid parameters for listing environment profiles in domain {domain_identifier}")
+#             else:
+#                 logger.error(f"Error listing environment profiles in domain {domain_identifier}: {str(e)}")
+#                 raise Exception(f"Error listing environment profiles in domain {domain_identifier}: {str(e)}")
+#         except Exception as e:
+#             logger.error(f"Unexpected error listing environment profiles in domain {domain_identifier}: {str(e)}")
+#             raise Exception(f"Unexpected error listing environment profiles in domain {domain_identifier}: {str(e)}")
 
 
     # Return the decorated functions for testing purposes
@@ -865,5 +865,5 @@ def register_tools(mcp: FastMCP):
         "list_connections": list_connections,
         # "list_environment_blueprints": list_environment_blueprints,
         "list_environment_blueprint_configurations" : list_environment_blueprint_configurations,
-        "list_environment_profiles": list_environment_profiles
+        # "list_environment_profiles": list_environment_profiles
     } 
