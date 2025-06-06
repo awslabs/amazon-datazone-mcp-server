@@ -1,3 +1,45 @@
+Metadata-Version: 2.4
+Name: datazone-mcp-server
+Version: 0.1.0
+Summary: MCP server for AWS DataZone service
+Author-email: AWS DataZone MCP Community <trwang@amazon.com>
+License: Apache-2.0
+Project-URL: Homepage, https://github.com/wangtianren/datazone-mcp-server
+Project-URL: Documentation, https://github.com/wangtianren/datazone-mcp-server/blob/main/docs/README.md
+Project-URL: Repository, https://github.com/wangtianren/datazone-mcp-server
+Project-URL: Issues, https://github.com/wangtianren/datazone-mcp-server/issues
+Project-URL: Changelog, https://github.com/wangtianren/datazone-mcp-server/blob/main/CHANGELOG.md
+Keywords: aws,datazone,mcp,model-context-protocol,data-governance
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: Apache Software License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Classifier: Topic :: Database
+Classifier: Topic :: Internet :: WWW/HTTP
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+License-File: LICENSE
+License-File: NOTICE
+Requires-Dist: boto3
+Requires-Dist: httpx
+Requires-Dist: mcp[cli]>=1.9.2
+Provides-Extra: cli
+Requires-Dist: click>=8.0.0; extra == "cli"
+Provides-Extra: dev
+Requires-Dist: pytest>=7.0.0; extra == "dev"
+Requires-Dist: pytest-cov>=4.0.0; extra == "dev"
+Requires-Dist: pytest-asyncio>=0.21.0; extra == "dev"
+Requires-Dist: black>=23.0.0; extra == "dev"
+Requires-Dist: isort>=5.12.0; extra == "dev"
+Requires-Dist: mypy>=1.0.0; extra == "dev"
+Requires-Dist: flake8>=6.0.0; extra == "dev"
+Requires-Dist: pre-commit>=3.0.0; extra == "dev"
+Dynamic: license-file
+
 # AWS DataZone MCP Server
 
 [![Python](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
