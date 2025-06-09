@@ -17,6 +17,7 @@ src/datazone_mcp_server.egg-info/requires.txt
 src/datazone_mcp_server.egg-info/top_level.txt
 src/datazone_mcp_server.egg-info/zip-safe
 src/datazone_mcp_server/tools/__init__.py
+src/datazone_mcp_server/tools/bedrock.py
 src/datazone_mcp_server/tools/common.py
 src/datazone_mcp_server/tools/data_management.py
 src/datazone_mcp_server/tools/domain_management.py

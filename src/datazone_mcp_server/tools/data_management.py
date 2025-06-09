@@ -174,61 +174,61 @@ def register_tools(mcp: FastMCP):
         except Exception as e:
             raise Exception(f"Unexpected error getting asset {asset_identifier} in domain {domain_identifier}")
 
-    @mcp.tool()
-    async def delete_asset(
-        domain_identifier: str,
-        asset_identifier: str
-    ) -> Any:
-        """
-        Deletes an asset in Amazon DataZone. This operation removes the specified asset from the given domain.
-        No request body is required.
+    # @mcp.tool()
+    # async def delete_asset(
+    #     domain_identifier: str,
+    #     asset_identifier: str
+    # ) -> Any:
+    #     """
+    #     Deletes an asset in Amazon DataZone. This operation removes the specified asset from the given domain.
+    #     No request body is required.
 
-        This is specifically used for asset deletion in the Amazon DataZone MCP server.
+    #     This is specifically used for asset deletion in the Amazon DataZone MCP server.
 
-        Args:
-            domain_identifier (str): The ID of the Amazon DataZone domain in which the asset resides.
-                Pattern: ^dzd[-_][a-zA-Z0-9_-]{1,36}$
-                Required: Yes
+    #     Args:
+    #         domain_identifier (str): The ID of the Amazon DataZone domain in which the asset resides.
+    #             Pattern: ^dzd[-_][a-zA-Z0-9_-]{1,36}$
+    #             Required: Yes
 
-            identifier (str): The identifier of the asset to be deleted.
-                Pattern: ^[a-zA-Z0-9_-]{1,36}$
-                Required: Yes
+    #         identifier (str): The identifier of the asset to be deleted.
+    #             Pattern: ^[a-zA-Z0-9_-]{1,36}$
+    #             Required: Yes
 
-        Returns:
-            None: If successful, the service returns HTTP status code 204 (No Content) with an empty response body.
-        """
-        try:
-            # Prepare the request parameters
-            params = {
-                "domainIdentifier": domain_identifier,
-                "identifier": asset_identifier
-            }
-            response = datazone_client.delete_asset(**params)
-            return response
-        except ClientError as e:
-            error_code = e.response['Error']['Code']
-            if error_code == 'AccessDeniedException':
-                logger.error(f"Access denied while deleting asset {asset_identifier} in domain {domain_identifier}")
-                raise Exception(f"Access denied while deleting asset {asset_identifier} in domain {domain_identifier}")
-            elif error_code == 'InternalServerException':
-                logger.error(f"Unknown error, exception or failure while getdeletingting asset {asset_identifier} in domain {domain_identifier}")
-                raise Exception(f"Unknown error, exception or failure while deleting asset {asset_identifier} in domain {domain_identifier}")
-            elif error_code == 'ResourceNotFoundException':
-                logger.error(f"Data asset {asset_identifier} not found in domain {domain_identifier}")
-                raise Exception(f"Data asset {asset_identifier} or domain {domain_identifier} not found")
-            elif error_code == 'ThrottlingException':
-                logger.error(f"Request throttled while deleting asset {asset_identifier} in domain {domain_identifier}")
-                raise Exception(f"Request throttled while deleting asset {asset_identifier} in domain {domain_identifier}")
-            elif error_code == 'UnauthorizedException':
-                logger.error(f"Unauthorized to delete asset {asset_identifier} in domain {domain_identifier}")
-                raise Exception(f"Unauthorized to delete asset {asset_identifier} in domain {domain_identifier}")
-            elif error_code == 'ValidationException':
-                logger.error(f"Invalid input while deleting asset {asset_identifier} in domain {domain_identifier}")
-                raise Exception(f"Invalid input while deleting asset {asset_identifier} in domain {domain_identifier}")
-            else:
-                raise Exception(f"Error deleting asset {asset_identifier} in domain {domain_identifier}")
-        except Exception as e:
-            raise Exception(f"Unexpected error deleting asset {asset_identifier} in domain {domain_identifier}")
+    #     Returns:
+    #         None: If successful, the service returns HTTP status code 204 (No Content) with an empty response body.
+    #     """
+    #     try:
+    #         # Prepare the request parameters
+    #         params = {
+    #             "domainIdentifier": domain_identifier,
+    #             "identifier": asset_identifier
+    #         }
+    #         response = datazone_client.delete_asset(**params)
+    #         return response
+    #     except ClientError as e:
+    #         error_code = e.response['Error']['Code']
+    #         if error_code == 'AccessDeniedException':
+    #             logger.error(f"Access denied while deleting asset {asset_identifier} in domain {domain_identifier}")
+    #             raise Exception(f"Access denied while deleting asset {asset_identifier} in domain {domain_identifier}")
+    #         elif error_code == 'InternalServerException':
+    #             logger.error(f"Unknown error, exception or failure while getdeletingting asset {asset_identifier} in domain {domain_identifier}")
+    #             raise Exception(f"Unknown error, exception or failure while deleting asset {asset_identifier} in domain {domain_identifier}")
+    #         elif error_code == 'ResourceNotFoundException':
+    #             logger.error(f"Data asset {asset_identifier} not found in domain {domain_identifier}")
+    #             raise Exception(f"Data asset {asset_identifier} or domain {domain_identifier} not found")
+    #         elif error_code == 'ThrottlingException':
+    #             logger.error(f"Request throttled while deleting asset {asset_identifier} in domain {domain_identifier}")
+    #             raise Exception(f"Request throttled while deleting asset {asset_identifier} in domain {domain_identifier}")
+    #         elif error_code == 'UnauthorizedException':
+    #             logger.error(f"Unauthorized to delete asset {asset_identifier} in domain {domain_identifier}")
+    #             raise Exception(f"Unauthorized to delete asset {asset_identifier} in domain {domain_identifier}")
+    #         elif error_code == 'ValidationException':
+    #             logger.error(f"Invalid input while deleting asset {asset_identifier} in domain {domain_identifier}")
+    #             raise Exception(f"Invalid input while deleting asset {asset_identifier} in domain {domain_identifier}")
+    #         else:
+    #             raise Exception(f"Error deleting asset {asset_identifier} in domain {domain_identifier}")
+    #     except Exception as e:
+    #         raise Exception(f"Unexpected error deleting asset {asset_identifier} in domain {domain_identifier}")
 
     # @mcp.tool()
     # async def publish_asset(
@@ -987,7 +987,7 @@ def register_tools(mcp: FastMCP):
     return {
         "get_asset": get_asset,
         "create_asset": create_asset,
-        "delete_asset": delete_asset,
+        # "delete_asset": delete_asset,
         # "publish_asset": publish_asset,
         # "get_listing": get_listing,
         "search_listings": search_listings,
