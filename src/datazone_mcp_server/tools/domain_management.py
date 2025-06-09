@@ -356,7 +356,7 @@ def register_tools(mcp: FastMCP):
     async def list_domain_units_for_parent(
         domain_identifier: str,
         parent_domain_unit_identifier: str,
-        max_results: int = 50,
+        max_results: int = 25,
         next_token: str = None
     ) -> Dict[str, Any]:
         """
@@ -384,7 +384,7 @@ def register_tools(mcp: FastMCP):
             params = {
                 'domainIdentifier': domain_identifier,
                 'parentDomainUnitIdentifier': parent_domain_unit_identifier,
-                'maxResults': min(max_results, 50)  # Ensure maxResults is within valid range
+                'maxResults': min(max_results, 25)  # Ensure maxResults is within valid range
             }
             
             # Add optional next token if provided
