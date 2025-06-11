@@ -806,7 +806,7 @@ def register_tools(mcp: FastMCP):
                 - userProfileId (str): The ID of the user's profile in the domain.
         """
         try:
-            response = datazone_client.get_iam_portal_login_url(domain_identifier)
+            response = datazone_client.get_iam_portal_login_url(domainIdentifier = domain_identifier)
             return response
         except ClientError as e:
             raise Exception(f"Error getting IAM portal login URL in domain {domain_identifier}: {e}")
