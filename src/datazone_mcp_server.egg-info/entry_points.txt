@@ -1,2 +1,0 @@
-[console_scripts]
-datazone-mcp-server = datazone_mcp_server.server:main

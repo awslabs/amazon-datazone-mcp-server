@@ -1,1 +1,0 @@
-datazone_mcp_server
