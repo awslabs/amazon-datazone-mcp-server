@@ -130,17 +130,20 @@ def register_tools(mcp: FastMCP):
         Lists AWS DataZone domains.
 
         Args:
-            domain_identifier (str): The identifier of the domain (e.g., "dzd_4p9n6sw4qt9xgn")
-            parent_domain_unit_identifier (str): The identifier of the parent domain unit (e.g., "3thjq258ficc2v")
+            max_results (int, optional): Maximum number of results to return (default: 25, max: 25)
+            next_token (str, optional): Token for pagination to get next page of results
+            status (str, optional): Filter domains by status (e.g., "AVAILABLE", "CREATING", "DELETING")
 
         Returns:
-            Any: The API response containing the list of domain units
+            Dict containing:
+                - items: List of domains with details including ID, name, status, ARN, etc.
+                - next_token: Token for next page of results (if available)
         """
         try:
             logger.info(f"Listing domains")
             params = {"maxResults": min(max_results, 25)}  # Ensure maxResults is within valid range
             if next_token:
-                params["next_token"] = next_token
+                params["nextToken"] = next_token  # Fixed: AWS API expects 'nextToken', not 'next_token'
             if status:
                 params["status"] = status
 
