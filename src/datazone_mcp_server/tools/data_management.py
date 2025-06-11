@@ -172,7 +172,7 @@ def register_tools(mcp: FastMCP):
             else:
                 raise Exception(f"Error creating asset in domain {domain_identifier}")
         except Exception as e:
-            raise Exception(f"Unexpected error getting asset {asset_identifier} in domain {domain_identifier}")
+            raise Exception(f"Unexpected error creating asset in domain {domain_identifier}")
 
     @mcp.tool()
     async def delete_asset(
@@ -242,7 +242,7 @@ def register_tools(mcp: FastMCP):
         
         Args:
             domain_identifier (str): The ID of the domain containing the asset
-            asset_identifier (str): The ID of the asset to publishenecccfltudgieffcgfhbvujhvtlinkbbcnfdgbekgdi
+            asset_identifier (str): The ID of the asset to publish
 
             revision (str, optional): The specific revision of the asset to publish
             client_token (str, optional): Token for idempotency
@@ -809,7 +809,7 @@ def register_tools(mcp: FastMCP):
             if ended_at:
                 params["endedAt"] = ended_at
             if nex_token:
-                params["nextToken"] = nex_token
+                params["nextToken"] = next_token
             if started_at:
                 params["startedAt"] = started_at
             response = datazone_client.list_time_series_data_points(**params)
@@ -873,8 +873,6 @@ def register_tools(mcp: FastMCP):
                 "domainIdentifier": domain_identifier,
                 "identifier": identifier
             }
-            if revision:
-                params["revision"] = revision
             response = datazone_client.get_data_product(**params)
             return response
         except ClientError as e:

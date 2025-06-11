@@ -368,7 +368,7 @@ def register_tools(mcp: FastMCP):
             error_code = e.response['Error']['Code']
             if error_code == 'AccessDeniedException':
                 logger.error(f"Access denied while getting project profile '{identifier}' in domain {domain_identifier}")
-                raise Exception(f"Access denied while getting project profile '{name}' in domain {domain_identifier}")
+                raise Exception(f"Access denied while getting project profile '{identifier}' in domain {domain_identifier}")
             elif error_code == 'ResourceNotFoundException':
                 logger.error(f"Domain or project profile not found")
                 raise Exception(f"Domain or project profile not found")
@@ -385,11 +385,11 @@ def register_tools(mcp: FastMCP):
                 logger.error(f"Request to get project profile '{identifier}' in domain {domain_identifier} is denied due to request throttling")
                 raise Exception(f"Request to get project profile '{identifier}' in domain {domain_identifier} is denied due to request throttling")
             else:
-                logger.error(f"Error creating project profile '{name}' in domain {domain_identifier}: {str(e)}")
-                raise Exception(f"Error creating project profile '{name}' in domain {domain_identifier}: {str(e)}")
+                logger.error(f"Error creating project profile '{identifier}' in domain {domain_identifier}: {str(e)}")
+                raise Exception(f"Error creating project profile '{identifier}' in domain {domain_identifier}: {str(e)}")
         except Exception as e:
-            logger.error(f"Unexpected error creating project profile '{name}' in domain {domain_identifier}: {str(e)}")
-            raise Exception(f"Unexpected error creating project profile '{name}' in domain {domain_identifier}: {str(e)}")
+            logger.error(f"Unexpected error creating project profile '{identifier}' in domain {domain_identifier}: {str(e)}")
+            raise Exception(f"Unexpected error creating project profile '{identifier}' in domain {domain_identifier}: {str(e)}")
 
     @mcp.tool()
     async def list_project_memberships(
