@@ -2,8 +2,9 @@
 Tests for domain management tools.
 """
 
-import pytest
 from unittest.mock import patch
+
+import pytest
 from botocore.exceptions import ClientError
 
 

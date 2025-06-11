@@ -3,8 +3,10 @@ Glossary management tools for AWS DataZone.
 """
 
 from typing import Any, Dict, List
+
 from mcp.server.fastmcp import FastMCP
-from .common import datazone_client, logger, ClientError
+
+from .common import ClientError, datazone_client, logger
 
 
 def register_tools(mcp: FastMCP):

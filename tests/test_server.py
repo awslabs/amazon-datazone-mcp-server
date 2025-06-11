@@ -2,9 +2,10 @@
 Tests for the main MCP server functionality.
 """
 
-import pytest
 import json
-from unittest.mock import patch, Mock, MagicMock
+from unittest.mock import MagicMock, Mock, patch
+
+import pytest
 
 
 class TestMCPServer:
@@ -131,6 +132,7 @@ class TestServerConfiguration:
     def test_logger_configuration(self):
         """Test that logger is properly configured."""
         import logging
+
         from datazone_mcp_server import server
 
         # Check that the logger exists and has the right level
@@ -166,11 +168,11 @@ class TestToolRegistration:
     def test_tool_modules_have_register_functions(self):
         """Test that all tool modules have register_tools functions."""
         from datazone_mcp_server.tools import (
-            domain_management,
-            project_management,
             data_management,
-            glossary,
+            domain_management,
             environment,
+            glossary,
+            project_management,
         )
 
         # Verify all modules have register_tools function
@@ -200,11 +202,11 @@ class TestModuleImports:
     def test_tool_modules_import(self):
         """Test that all tool modules can be imported."""
         from datazone_mcp_server.tools import (
-            domain_management,
-            project_management,
             data_management,
-            glossary,
+            domain_management,
             environment,
+            glossary,
+            project_management,
         )
 
         # Verify modules are not None
@@ -217,8 +219,8 @@ class TestModuleImports:
     def test_standard_library_imports(self):
         """Test that standard library modules work."""
         import json
-        import sys
         import logging
+        import sys
 
         # Basic functionality test
         test_data = {"test": "value"}
@@ -261,6 +263,7 @@ class TestServerIntegration:
 
         # Re-import to test initialization time
         import importlib
+
         from datazone_mcp_server import server
 
         importlib.reload(server)
@@ -273,8 +276,9 @@ class TestServerIntegration:
 
     def test_memory_usage_reasonable(self):
         """Test that memory usage is reasonable after import."""
-        import psutil
         import os
+
+        import psutil
 
         process = psutil.Process(os.getpid())
         memory_before = process.memory_info().rss

@@ -7,6 +7,7 @@ Run this script after updating the VERSION file.
 import re
 from pathlib import Path
 
+
 def update_readme_version():
     """Update version badge in README.md from VERSION file."""
     # Read version from VERSION file

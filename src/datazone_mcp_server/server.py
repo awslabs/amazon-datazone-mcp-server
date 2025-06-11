@@ -1,21 +1,22 @@
-from typing import Any
 import json
-import sys
 import logging
+import sys
+from typing import Any
+
 from mcp.server.fastmcp import FastMCP
+
+# Import tool modules
+from .tools import (  # bedrock
+    data_management,
+    domain_management,
+    environment,
+    glossary,
+    project_management,
+)
 
 # import boto3
 # from botocore.config import Config
 
-# Import tool modules
-from .tools import (
-    domain_management,
-    project_management,
-    data_management,
-    glossary,
-    environment,
-    # bedrock
-)
 
 # initialize FastMCP server
 mcp = FastMCP("datazone")

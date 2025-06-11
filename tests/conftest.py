@@ -2,13 +2,14 @@
 Test configuration and fixtures for AWS DataZone MCP Server tests.
 """
 
-import pytest
 import asyncio
-from unittest.mock import Mock, patch, AsyncMock
-from typing import Dict, Any, List
 import os
-from mcp.server.fastmcp import FastMCP
+from typing import Any, Dict, List
+from unittest.mock import AsyncMock, Mock, patch
+
+import pytest
 from botocore.exceptions import ClientError
+from mcp.server.fastmcp import FastMCP
 
 
 @pytest.fixture(scope="session")
@@ -141,16 +142,17 @@ def mcp_server_with_tools(mock_datazone_client):
     try:
         # Now import and reload the modules to get the mocked client
         import importlib
+
         from datazone_mcp_server.tools import common
 
         importlib.reload(common)  # This will recreate datazone_client with our mock
 
         from datazone_mcp_server.tools import (
-            domain_management,
-            project_management,
             data_management,
-            glossary,
+            domain_management,
             environment,
+            glossary,
+            project_management,
         )
 
         # Reload the tool modules to pick up the new common module

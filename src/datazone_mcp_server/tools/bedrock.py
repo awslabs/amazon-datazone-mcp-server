@@ -1,7 +1,6 @@
-from typing import Any, Dict
-
 # from mcp import tool
 import sys
+from typing import Any, Dict
 
 
 def tool(func):

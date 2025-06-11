@@ -2,8 +2,9 @@
 Unit tests for environment tools.
 """
 
-import pytest
 from unittest.mock import Mock
+
+import pytest
 
 
 class TestEnvironment:

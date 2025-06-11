@@ -3,8 +3,10 @@ Project management tools for AWS DataZone.
 """
 
 from typing import Any, Dict, List
+
 from mcp.server.fastmcp import FastMCP
-from .common import datazone_client, logger, ClientError, httpx, USER_AGENT
+
+from .common import USER_AGENT, ClientError, datazone_client, httpx, logger
 
 
 def register_tools(mcp: FastMCP):

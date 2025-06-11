@@ -20,8 +20,9 @@ Usage:
 import asyncio
 import json
 import os
+from typing import Any, Dict
+
 from mcp import create_client
-from typing import Dict, Any
 
 
 class DomainOperationsExample:

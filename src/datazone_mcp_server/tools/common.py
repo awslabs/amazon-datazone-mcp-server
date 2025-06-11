@@ -2,11 +2,12 @@
 Common utilities, imports, and constants for DataZone MCP Server tools.
 """
 
-from typing import Any, List, Dict, Optional
 import logging
+from typing import Any, Dict, List, Optional
+
 import boto3
-from botocore.exceptions import ClientError
 import httpx
+from botocore.exceptions import ClientError
 
 # Constants
 USER_AGENT = "datazone-app/1.0"

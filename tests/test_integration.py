@@ -10,12 +10,13 @@ Requirements:
 - TEST_DATAZONE_PROJECT_ID environment variable (optional - will create if needed)
 """
 
-import os
-import pytest
-import boto3
-from botocore.exceptions import ClientError, NoCredentialsError
-from unittest.mock import patch
 import asyncio
+import os
+from unittest.mock import patch
+
+import boto3
+import pytest
+from botocore.exceptions import ClientError, NoCredentialsError
 
 # Skip all tests if running in CI or if AWS tests are disabled
 pytestmark = pytest.mark.integration
@@ -112,11 +113,11 @@ def tool_extractor():
         # For integration tests, we need to access the actual implementation
         # This is a simplified version - in real integration we'd call through MCP
         from datazone_mcp_server.tools import (
-            domain_management,
-            project_management,
             data_management,
-            glossary,
+            domain_management,
             environment,
+            glossary,
+            project_management,
         )
 
         # Map tool names to modules and functions

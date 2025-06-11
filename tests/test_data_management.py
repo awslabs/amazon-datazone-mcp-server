@@ -2,8 +2,9 @@
 Unit tests for data_management tools.
 """
 
-import pytest
 from unittest.mock import Mock
+
+import pytest
 
 
 class TestDataManagement:

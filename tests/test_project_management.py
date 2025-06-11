@@ -2,9 +2,9 @@
 Unit tests for project_management tools.
 """
 
+from unittest.mock import AsyncMock, Mock, patch
+
 import pytest
-from unittest.mock import Mock
-from unittest.mock import patch, AsyncMock
 
 
 class TestProjectManagement:
