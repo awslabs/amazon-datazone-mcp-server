@@ -638,7 +638,7 @@ def register_tools(mcp: FastMCP):
     #     domain_identifier: str,
     #     project_identifier: str,
     #     name: str,
-    #     type: str,
+    #     data_src_type: str,
     #     description: str = None,
     #     enable_setting: str = "ENABLED",
     #     environment_identifier: str = None,
@@ -701,7 +701,7 @@ def register_tools(mcp: FastMCP):
     #             "domainIdentifier": domain_identifier,
     #             "projectIdentifier": project_identifier,
     #             "name": name,
-    #             "type": type,
+    #             "type": data_src_type,
     #             "enableSetting": enable_setting,
     #             "publishOnImport": publish_on_import
     #         }
