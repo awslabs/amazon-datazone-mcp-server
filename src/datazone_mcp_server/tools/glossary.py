@@ -1,13 +1,15 @@
 """
 Glossary management tools for AWS DataZone.
 """
+
 from typing import Any, Dict, List
 from mcp.server.fastmcp import FastMCP
 from .common import datazone_client, logger, ClientError
 
+
 def register_tools(mcp: FastMCP):
     """Register glossary tools with the MCP server."""
-    
+
     # @mcp.tool()
     # async def create_glossary(
     #     domain_identifier: str,
@@ -19,7 +21,7 @@ def register_tools(mcp: FastMCP):
     # ) -> Any:
     #     """
     #     Creates a new business glossary in Amazon DataZone.
-        
+
     #     Args:
     #         domain_identifier (str): The ID of the domain where the glossary will be created
     #         name (str): The name of the glossary (1-256 characters)
@@ -27,10 +29,10 @@ def register_tools(mcp: FastMCP):
     #         description (str, optional): The description of the glossary (0-4096 characters)
     #         status (str, optional): The status of the glossary (ENABLED or DISABLED, default: ENABLED)
     #         client_token (str, optional): A unique token to ensure idempotency (1-128 characters)
-        
+
     #     Returns:
     #         Any: The API response containing the created glossary details
-            
+
     #     Example:
     #         ```python
     #         response = await create_glossary(
@@ -46,14 +48,14 @@ def register_tools(mcp: FastMCP):
     #         # Validate status
     #         if status not in ["ENABLED", "DISABLED"]:
     #             raise ValueError("status must be either 'ENABLED' or 'DISABLED'")
-            
+
     #         # Prepare the request parameters
     #         params = {
     #             "name": name,
     #             "owningProjectIdentifier": owning_project_identifier,
     #             "status": status
     #         }
-            
+
     #         # Add optional parameters if provided
     #         if description:
     #             params["description"] = description
@@ -81,7 +83,7 @@ def register_tools(mcp: FastMCP):
     # ) -> Any:
     #     """
     #     Creates a new business glossary term in Amazon DataZone.
-        
+
     #     Args:
     #         domain_identifier (str): The ID of the domain where the glossary term will be created
     #             Pattern: ^dzd[-_][a-zA-Z0-9_-]{1,36}$
@@ -98,10 +100,10 @@ def register_tools(mcp: FastMCP):
     #             }
     #         client_token (str, optional): A unique token to ensure idempotency (1-128 characters)
     #             Pattern: ^[\x21-\x7E]+$
-        
+
     #     Returns:
     #         Any: The API response containing the created glossary term details
-            
+
     #     Example:
     #         ```python
     #         response = await create_glossary_term(
@@ -122,14 +124,14 @@ def register_tools(mcp: FastMCP):
     #         # Validate status
     #         if status not in ["ENABLED", "DISABLED"]:
     #             raise ValueError("status must be either 'ENABLED' or 'DISABLED'")
-            
+
     #         # Prepare the request parameters
     #         params = {
     #             "glossaryIdentifier": glossary_identifier,
     #             "name": name,
     #             "status": status
     #         }
-            
+
     #         # Add optional parameters if provided
     #         if short_description:
     #             params["shortDescription"] = short_description
@@ -155,13 +157,13 @@ def register_tools(mcp: FastMCP):
     # ) -> Any:
     #     """
     #     Retrieves detailed information about a specific business glossary in Amazon DataZone.
-        
+
     #     Args:
     #         domain_identifier (str): The ID of the domain where the glossary exists
     #             Pattern: ^dzd[-_][a-zA-Z0-9_-]{1,36}$
     #         identifier (str): The ID of the glossary to retrieve
     #             Pattern: ^[a-zA-Z0-9_-]{1,36}$
-        
+
     #     Returns:
     #         Any: The API response containing glossary details including:
     #             - createdAt (number): Timestamp of when the glossary was created
@@ -174,7 +176,7 @@ def register_tools(mcp: FastMCP):
     #             - status (str): The status of the glossary (DISABLED or ENABLED)
     #             - updatedAt (number): Timestamp of when the glossary was updated
     #             - updatedBy (str): The user who updated the glossary
-            
+
     #     Example:
     #         ```python
     #         response = await get_glossary(
@@ -199,13 +201,13 @@ def register_tools(mcp: FastMCP):
     # ) -> Any:
     #     """
     #     Retrieves detailed information about a specific business glossary term in Amazon DataZone.
-        
+
     #     Args:
     #         domain_identifier (str): The ID of the domain where the glossary term exists
     #             Pattern: ^dzd[-_][a-zA-Z0-9_-]{1,36}$
     #         identifier (str): The ID of the glossary term to retrieve
     #             Pattern: ^[a-zA-Z0-9_-]{1,36}$
-        
+
     #     Returns:
     #         Any: The API response containing glossary term details including:
     #             - createdAt (number): Timestamp of when the term was created
@@ -224,7 +226,7 @@ def register_tools(mcp: FastMCP):
     #                 }
     #             - updatedAt (number): Timestamp of when the term was updated
     #             - updatedBy (str): The user who updated the term
-            
+
     #     Example:
     #         ```python
     #         response = await get_glossary_term(
@@ -248,4 +250,4 @@ def register_tools(mcp: FastMCP):
         # "create_glossary_term": create_glossary_term,
         # "get_glossary": get_glossary,
         # "get_glossary_term": get_glossary_term
-    } 
+    }

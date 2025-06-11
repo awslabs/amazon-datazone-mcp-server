@@ -1,6 +1,7 @@
 """
 Tests for the main MCP server functionality.
 """
+
 import pytest
 import json
 from unittest.mock import patch, Mock, MagicMock
@@ -12,37 +13,39 @@ class TestMCPServer:
     def test_server_imports_successfully(self):
         """Test that server imports without errors."""
         from datazone_mcp_server import server
-        assert hasattr(server, 'mcp')
-        assert hasattr(server, 'main')
+
+        assert hasattr(server, "mcp")
+        assert hasattr(server, "main")
 
     def test_server_has_fastmcp_instance(self):
         """Test that server has FastMCP instance."""
         from datazone_mcp_server import server
+
         assert server.mcp is not None
         # Verify it's a FastMCP instance (name property is available)
-        assert hasattr(server.mcp, 'name')
+        assert hasattr(server.mcp, "name")
 
-    @patch('mcp.server.fastmcp.FastMCP.run')
+    @patch("mcp.server.fastmcp.FastMCP.run")
     def test_main_function_normal_operation(self, mock_run):
         """Test main function under normal operation."""
         from datazone_mcp_server.server import main
-        
+
         # Arrange
         mock_run.return_value = None
 
         # Act & Assert (should not raise)
         main()
-        
-        # Verify MCP was called with correct transport
-        mock_run.assert_called_once_with(transport='stdio')
 
-    @patch('mcp.server.fastmcp.FastMCP.run')
-    @patch('sys.exit')
-    @patch('builtins.print')
+        # Verify MCP was called with correct transport
+        mock_run.assert_called_once_with(transport="stdio")
+
+    @patch("mcp.server.fastmcp.FastMCP.run")
+    @patch("sys.exit")
+    @patch("builtins.print")
     def test_main_function_error_handling(self, mock_print, mock_exit, mock_run):
         """Test main function error handling."""
         from datazone_mcp_server.server import main
-        
+
         # Arrange
         mock_run.side_effect = Exception("Test error")
 
@@ -57,13 +60,13 @@ class TestMCPServer:
         assert "Test error" in printed_arg
         assert "error" in printed_arg
 
-    @patch('mcp.server.fastmcp.FastMCP.run')
-    @patch('sys.exit')
-    @patch('builtins.print')
+    @patch("mcp.server.fastmcp.FastMCP.run")
+    @patch("sys.exit")
+    @patch("builtins.print")
     def test_runtime_error_handling(self, mock_print, mock_exit, mock_run):
         """Test handling of runtime errors."""
         from datazone_mcp_server.server import main
-        
+
         # Arrange
         mock_run.side_effect = RuntimeError("Runtime error occurred")
 
@@ -76,13 +79,13 @@ class TestMCPServer:
         assert "RuntimeError" in printed_output
         assert "Runtime error occurred" in printed_output
 
-    @patch('mcp.server.fastmcp.FastMCP.run')
-    @patch('sys.exit')
-    @patch('builtins.print')
+    @patch("mcp.server.fastmcp.FastMCP.run")
+    @patch("sys.exit")
+    @patch("builtins.print")
     def test_keyboard_interrupt_handling(self, mock_print, mock_exit, mock_run):
         """Test handling of keyboard interrupts."""
         from datazone_mcp_server.server import main
-        
+
         # Arrange
         mock_run.side_effect = KeyboardInterrupt()
 
@@ -94,13 +97,13 @@ class TestMCPServer:
         printed_output = mock_print.call_args[0][0]
         assert "KeyboardInterrupt" in printed_output
 
-    @patch('mcp.server.fastmcp.FastMCP.run')
-    @patch('sys.exit')
-    @patch('builtins.print')
+    @patch("mcp.server.fastmcp.FastMCP.run")
+    @patch("sys.exit")
+    @patch("builtins.print")
     def test_json_error_response_format(self, mock_print, mock_exit, mock_run):
         """Test that error responses are valid JSON."""
         from datazone_mcp_server.server import main
-        
+
         # Arrange
         mock_run.side_effect = ValueError("Test value error")
 
@@ -109,7 +112,7 @@ class TestMCPServer:
 
         # Assert
         printed_output = mock_print.call_args[0][0]
-        
+
         # Should be valid JSON
         try:
             error_data = json.loads(printed_output)
@@ -129,7 +132,7 @@ class TestServerConfiguration:
         """Test that logger is properly configured."""
         import logging
         from datazone_mcp_server import server
-        
+
         # Check that the logger exists and has the right level
         logger = logging.getLogger(server.__name__)
         assert logger.level == logging.INFO
@@ -137,8 +140,9 @@ class TestServerConfiguration:
     def test_server_name(self):
         """Test that server is initialized with correct name."""
         from datazone_mcp_server import server
+
         # This verifies the MCP server is named 'datazone'
-        assert server.mcp.name == 'datazone'
+        assert server.mcp.name == "datazone"
 
 
 class TestToolRegistration:
@@ -147,17 +151,17 @@ class TestToolRegistration:
     def test_server_initialization_registers_tools(self):
         """Test that server initializes and has tools registered."""
         from datazone_mcp_server import server
-        
+
         # The server should have been initialized with tools
         assert server.mcp is not None
         # FastMCP should have tools registered (tools are registered at module import)
         # We can't directly inspect registered tools without accessing private members,
         # but we can verify the registration calls would have succeeded by checking imports
-        assert hasattr(server, 'domain_management')
-        assert hasattr(server, 'project_management')
-        assert hasattr(server, 'data_management')
-        assert hasattr(server, 'glossary')
-        assert hasattr(server, 'environment')
+        assert hasattr(server, "domain_management")
+        assert hasattr(server, "project_management")
+        assert hasattr(server, "data_management")
+        assert hasattr(server, "glossary")
+        assert hasattr(server, "environment")
 
     def test_tool_modules_have_register_functions(self):
         """Test that all tool modules have register_tools functions."""
@@ -166,16 +170,16 @@ class TestToolRegistration:
             project_management,
             data_management,
             glossary,
-            environment
+            environment,
         )
-        
+
         # Verify all modules have register_tools function
-        assert hasattr(domain_management, 'register_tools')
-        assert hasattr(project_management, 'register_tools')
-        assert hasattr(data_management, 'register_tools')
-        assert hasattr(glossary, 'register_tools')
-        assert hasattr(environment, 'register_tools')
-        
+        assert hasattr(domain_management, "register_tools")
+        assert hasattr(project_management, "register_tools")
+        assert hasattr(data_management, "register_tools")
+        assert hasattr(glossary, "register_tools")
+        assert hasattr(environment, "register_tools")
+
         # Verify they are callable
         assert callable(domain_management.register_tools)
         assert callable(project_management.register_tools)
@@ -190,6 +194,7 @@ class TestModuleImports:
     def test_fastmcp_import(self):
         """Test that FastMCP can be imported."""
         from mcp.server.fastmcp import FastMCP
+
         assert FastMCP is not None
 
     def test_tool_modules_import(self):
@@ -199,9 +204,9 @@ class TestModuleImports:
             project_management,
             data_management,
             glossary,
-            environment
+            environment,
         )
-        
+
         # Verify modules are not None
         assert domain_management is not None
         assert project_management is not None
@@ -214,7 +219,7 @@ class TestModuleImports:
         import json
         import sys
         import logging
-        
+
         # Basic functionality test
         test_data = {"test": "value"}
         json_str = json.dumps(test_data)
@@ -225,21 +230,22 @@ class TestModuleImports:
 class TestCommandLineInterface:
     """Test command line interface functionality."""
 
-    @patch('mcp.server.fastmcp.FastMCP.run')
+    @patch("mcp.server.fastmcp.FastMCP.run")
     def test_main_if_name_main_execution(self, mock_run):
         """Test that __main__ execution works."""
         # This test verifies that the if __name__ == "__main__" block can execute
         # We can't easily test this directly, but we can test the main() function
         from datazone_mcp_server.server import main
-        
+
         main()
-        mock_run.assert_called_once_with(transport='stdio')
+        mock_run.assert_called_once_with(transport="stdio")
 
     def test_console_script_entry_point(self):
         """Test that the entry point exists in setup."""
         # This would normally check setup.py or pyproject.toml
         # For now, just verify the main function exists and is callable
         from datazone_mcp_server.server import main
+
         assert callable(main)
 
 
@@ -250,17 +256,18 @@ class TestServerIntegration:
     def test_server_initialization_performance(self):
         """Test that server initialization is reasonably fast."""
         import time
-        
+
         start_time = time.time()
-        
+
         # Re-import to test initialization time
         import importlib
         from datazone_mcp_server import server
+
         importlib.reload(server)
-        
+
         end_time = time.time()
         initialization_time = end_time - start_time
-        
+
         # Should initialize in less than 5 seconds
         assert initialization_time < 5.0, f"Server took {initialization_time}s to initialize"
 
@@ -268,16 +275,18 @@ class TestServerIntegration:
         """Test that memory usage is reasonable after import."""
         import psutil
         import os
-        
+
         process = psutil.Process(os.getpid())
         memory_before = process.memory_info().rss
-        
+
         # Import server
         from datazone_mcp_server import server
-        
+
         memory_after = process.memory_info().rss
         memory_increase = memory_after - memory_before
-        
+
         # Memory increase should be less than 50MB (50 * 1024 * 1024 bytes)
         max_memory_increase = 50 * 1024 * 1024
-        assert memory_increase < max_memory_increase, f"Memory increased by {memory_increase / 1024 / 1024:.1f}MB" 
+        assert (
+            memory_increase < max_memory_increase
+        ), f"Memory increased by {memory_increase / 1024 / 1024:.1f}MB"

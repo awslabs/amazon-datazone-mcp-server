@@ -1,27 +1,25 @@
 """
 Data management tools for AWS DataZone.
 """
+
 from typing import Any, Dict, List
 from mcp.server.fastmcp import FastMCP
 from .common import datazone_client, logger, ClientError
 
+
 def register_tools(mcp: FastMCP):
     """Register data management tools with the MCP server."""
-    
+
     @mcp.tool()
-    async def get_asset(
-        domain_identifier: str,
-        asset_identifier: str,
-        revision: str = None
-    ) -> Any:
+    async def get_asset(domain_identifier: str, asset_identifier: str, revision: str = None) -> Any:
         """
         Retrieves detailed information about a specific asset in Amazon DataZone.
-        
+
         Args:
             domain_identifier (str): The ID of the domain containing the asset
             asset_identifier (str): The ID of the asset to retrieve
             revision (str, optional): The specific revision of the asset to retrieve
-        
+
         Returns:
             Any: The API response containing asset details including:
                 - Basic info (name, description, ID)
@@ -35,11 +33,8 @@ def register_tools(mcp: FastMCP):
         """
         try:
             # Prepare the request parameters
-            params = {
-                "domainIdentifier": domain_identifier,
-                "identifier": asset_identifier
-            }
-            
+            params = {"domainIdentifier": domain_identifier, "identifier": asset_identifier}
+
             # Add optional revision if provided
             if revision:
                 params["revision"] = revision
@@ -47,29 +42,57 @@ def register_tools(mcp: FastMCP):
             response = datazone_client.get_asset(**params)
             return response
         except ClientError as e:
-            error_code = e.response['Error']['Code']
-            if error_code == 'AccessDeniedException':
-                logger.error(f"Access denied while getting asset {asset_identifier} in domain {domain_identifier}")
-                raise Exception(f"Access denied while getting asset {asset_identifier} in domain {domain_identifier}")
-            elif error_code == 'InternalServerException':
-                logger.error(f"Unknown error, exception or failure while getting asset {asset_identifier} in domain {domain_identifier}")
-                raise Exception(f"Unknown error, exception or failure while getting asset {asset_identifier} in domain {domain_identifier}")
-            elif error_code == 'ResourceNotFoundException':
-                logger.error(f"Data asset {asset_identifier} not found in domain {domain_identifier}")
-                raise Exception(f"Data asset {asset_identifier} or domain {domain_identifier} not found")
-            elif error_code == 'ThrottlingException':
-                logger.error(f"Request throttled while getting asset {asset_identifier} in domain {domain_identifier}")
-                raise Exception(f"Request throttled while getting asset {asset_identifier} in domain {domain_identifier}")
-            elif error_code == 'UnauthorizedException':
-                logger.error(f"Unauthorized to get asset {asset_identifier} in domain {domain_identifier}")
-                raise Exception(f"Unauthorized to get asset {asset_identifier} in domain {domain_identifier}")
-            elif error_code == 'ValidationException':
-                logger.error(f"Invalid input while getting asset {asset_identifier} in domain {domain_identifier}")
-                raise Exception(f"Invalid input while getting asset {asset_identifier} in domain {domain_identifier}")
+            error_code = e.response["Error"]["Code"]
+            if error_code == "AccessDeniedException":
+                logger.error(
+                    f"Access denied while getting asset {asset_identifier} in domain {domain_identifier}"
+                )
+                raise Exception(
+                    f"Access denied while getting asset {asset_identifier} in domain {domain_identifier}"
+                )
+            elif error_code == "InternalServerException":
+                logger.error(
+                    f"Unknown error, exception or failure while getting asset {asset_identifier} in domain {domain_identifier}"
+                )
+                raise Exception(
+                    f"Unknown error, exception or failure while getting asset {asset_identifier} in domain {domain_identifier}"
+                )
+            elif error_code == "ResourceNotFoundException":
+                logger.error(
+                    f"Data asset {asset_identifier} not found in domain {domain_identifier}"
+                )
+                raise Exception(
+                    f"Data asset {asset_identifier} or domain {domain_identifier} not found"
+                )
+            elif error_code == "ThrottlingException":
+                logger.error(
+                    f"Request throttled while getting asset {asset_identifier} in domain {domain_identifier}"
+                )
+                raise Exception(
+                    f"Request throttled while getting asset {asset_identifier} in domain {domain_identifier}"
+                )
+            elif error_code == "UnauthorizedException":
+                logger.error(
+                    f"Unauthorized to get asset {asset_identifier} in domain {domain_identifier}"
+                )
+                raise Exception(
+                    f"Unauthorized to get asset {asset_identifier} in domain {domain_identifier}"
+                )
+            elif error_code == "ValidationException":
+                logger.error(
+                    f"Invalid input while getting asset {asset_identifier} in domain {domain_identifier}"
+                )
+                raise Exception(
+                    f"Invalid input while getting asset {asset_identifier} in domain {domain_identifier}"
+                )
             else:
-                raise Exception(f"Error getting asset {asset_identifier} in domain {domain_identifier}")
+                raise Exception(
+                    f"Error getting asset {asset_identifier} in domain {domain_identifier}"
+                )
         except Exception as e:
-            raise Exception(f"Unexpected error getting asset {asset_identifier} in domain {domain_identifier}")
+            raise Exception(
+                f"Unexpected error getting asset {asset_identifier} in domain {domain_identifier}"
+            )
 
     @mcp.tool()
     async def create_asset(
@@ -83,11 +106,11 @@ def register_tools(mcp: FastMCP):
         glossary_terms: List[str] = None,
         prediction_configuration: Dict[str, Dict[str, bool]] = None,
         type_revision: str = None,
-        client_token: str = None
+        client_token: str = None,
     ) -> Any:
         """
         Creates an asset in the Amazon DataZone catalog.
-        
+
         Args:
             domain_identifier (str): The ID of the domain where the asset is created
             name (str): The name of the asset (1-256 characters)
@@ -108,7 +131,7 @@ def register_tools(mcp: FastMCP):
                 Example: {"businessNameGeneration": {"enabled": True}}
             type_revision (str, optional): The revision of the asset type
             client_token (str, optional): Token for idempotency
-        
+
         Returns:
             Any: The API response containing:
                 - Asset ID and revision
@@ -125,9 +148,9 @@ def register_tools(mcp: FastMCP):
                 "domainIdentifier": domain_identifier,
                 "name": name,
                 "typeIdentifier": type_identifier,
-                "owningProjectIdentifier": owning_project_identifier
+                "owningProjectIdentifier": owning_project_identifier,
             }
-            
+
             # Add optional parameters if provided
             if description:
                 params["description"] = description
@@ -147,28 +170,40 @@ def register_tools(mcp: FastMCP):
             response = datazone_client.create_asset(**params)
             return response
         except ClientError as e:
-            error_code = e.response['Error']['Code']
-            if error_code == 'AccessDeniedException':
+            error_code = e.response["Error"]["Code"]
+            if error_code == "AccessDeniedException":
                 logger.error(f"Access denied while creating asset in domain {domain_identifier}")
                 raise Exception(f"Access denied while creating asset in domain {domain_identifier}")
-            elif error_code == 'InternalServerException':
-                logger.error(f"Unknown error, exception or failure while creating asset in domain {domain_identifier}")
-                raise Exception(f"Unknown error, exception or failure while creating asset in domain {domain_identifier}")
-            elif error_code == 'ResourceNotFoundException':
+            elif error_code == "InternalServerException":
+                logger.error(
+                    f"Unknown error, exception or failure while creating asset in domain {domain_identifier}"
+                )
+                raise Exception(
+                    f"Unknown error, exception or failure while creating asset in domain {domain_identifier}"
+                )
+            elif error_code == "ResourceNotFoundException":
                 logger.error(f"Domain {domain_identifier} not found")
                 raise Exception(f"Domain {domain_identifier} not found")
-            elif error_code == 'ThrottlingException':
-                logger.error(f"Request throttled while creating asset in domain {domain_identifier}")
-                raise Exception(f"Request throttled while creating asset in domain {domain_identifier}")
-            elif error_code == 'UnauthorizedException':
+            elif error_code == "ThrottlingException":
+                logger.error(
+                    f"Request throttled while creating asset in domain {domain_identifier}"
+                )
+                raise Exception(
+                    f"Request throttled while creating asset in domain {domain_identifier}"
+                )
+            elif error_code == "UnauthorizedException":
                 logger.error(f"Unauthorized to create asset in domain {domain_identifier}")
                 raise Exception(f"Unauthorized to create asset in domain {domain_identifier}")
-            elif error_code == 'ValidationException':
+            elif error_code == "ValidationException":
                 logger.error(f"Invalid input while creating asset in domain {domain_identifier}")
                 raise Exception(f"Invalid input while creating asset in domain {domain_identifier}")
-            elif error_code == 'ConflictException':
-                logger.error(f"There is a conflict while creating asset in domain {domain_identifier}")
-                raise Exception(f"There is a conflict while creating asset in domain {domain_identifier}")
+            elif error_code == "ConflictException":
+                logger.error(
+                    f"There is a conflict while creating asset in domain {domain_identifier}"
+                )
+                raise Exception(
+                    f"There is a conflict while creating asset in domain {domain_identifier}"
+                )
             else:
                 raise Exception(f"Error creating asset in domain {domain_identifier}")
         except Exception as e:
@@ -239,14 +274,14 @@ def register_tools(mcp: FastMCP):
     # ) -> Any:
     #     """
     #     Publishes an asset to the Amazon DataZone catalog.
-        
+
     #     Args:
     #         domain_identifier (str): The ID of the domain containing the asset
     #         asset_identifier (str): The ID of the asset to publish
 
     #         revision (str, optional): The specific revision of the asset to publish
     #         client_token (str, optional): Token for idempotency
-        
+
     #     Returns:
     #         Any: The API response containing:
     #             - Published asset ID and revision
@@ -262,7 +297,7 @@ def register_tools(mcp: FastMCP):
     #             "domainIdentifier": domain_identifier,
     #             "identifier": asset_identifier
     #         }
-            
+
     #         # Add optional parameters if provided
     #         if revision:
     #             params["revision"] = revision
@@ -286,11 +321,11 @@ def register_tools(mcp: FastMCP):
     #     This operation uses URI parameters to identify the domain, asset, and asset filter. It returns metadata and configuration of the specified asset filter. The request does not contain a body.
 
     #     Args:
-    #         asset_identifier (str): The ID of the data asset.  
+    #         asset_identifier (str): The ID of the data asset.
     #             Pattern: ^[a-zA-Z0-9_-]{1,36}$
-    #         domain_identifier (str): The ID of the domain where the asset filter exists.  
+    #         domain_identifier (str): The ID of the domain where the asset filter exists.
     #             Pattern: ^dzd[-_][a-zA-Z0-9_-]{1,36}$
-    #         identifier (str): The ID of the asset filter.  
+    #         identifier (str): The ID of the asset filter.
     #             Pattern: ^[a-zA-Z0-9_-]{1,36}$
 
     #     Returns:
@@ -304,8 +339,8 @@ def register_tools(mcp: FastMCP):
     #             - effectiveRowFilter (str): Row filter expression
     #             - errorMessage (str): Error message if applicable
     #             - id (str): ID of the asset filter
-    #             - name (str): Name of the asset filter  
-    #                 Pattern: ^[\w -]+$  
+    #             - name (str): Name of the asset filter
+    #                 Pattern: ^[\w -]+$
     #                 Length: 1–64 characters
     #             - status (str): Status of the filter (VALID | INVALID)
     #     """
@@ -358,11 +393,11 @@ def register_tools(mcp: FastMCP):
     #     This operation uses URI parameters to identify the domain, asset, and asset filter. It returns metadata and configuration of the specified asset filter. The request does not contain a body.
 
     #     Args:
-    #         asset_identifier (str): The ID of the data asset.  
+    #         asset_identifier (str): The ID of the data asset.
     #             Pattern: ^[a-zA-Z0-9_-]{1,36}$
-    #         domain_identifier (str): The ID of the domain where the asset filter exists.  
+    #         domain_identifier (str): The ID of the domain where the asset filter exists.
     #             Pattern: ^dzd[-_][a-zA-Z0-9_-]{1,36}$
-    #         identifier (str): The ID of the asset filter.  
+    #         identifier (str): The ID of the asset filter.
     #             Pattern: ^[a-zA-Z0-9_-]{1,36}$
 
     #     Returns:
@@ -376,8 +411,8 @@ def register_tools(mcp: FastMCP):
     #             - effectiveRowFilter (str): Row filter expression
     #             - errorMessage (str): Error message if applicable
     #             - id (str): ID of the asset filter
-    #             - name (str): Name of the asset filter  
-    #                 Pattern: ^[\w -]+$  
+    #             - name (str): Name of the asset filter
+    #                 Pattern: ^[\w -]+$
     #                 Length: 1–64 characters
     #             - status (str): Status of the filter (VALID | INVALID)
     #     """
@@ -434,14 +469,14 @@ def register_tools(mcp: FastMCP):
     #     This operation identifies the asset type by its domain, identifier, and optional revision. It returns metadata including creation and update details, ownership, and form configurations.
 
     #     Args:
-    #         domain_identifier (str): The ID of the Amazon DataZone domain containing the asset type.  
-    #             Pattern: ^dzd[-_][a-zA-Z0-9_-]{1,36}$  
+    #         domain_identifier (str): The ID of the Amazon DataZone domain containing the asset type.
+    #             Pattern: ^dzd[-_][a-zA-Z0-9_-]{1,36}$
     #             Required: Yes
-    #         identifier (str): The unique identifier of the asset type.  
-    #             Length: 1–513 characters  
-    #             Pattern: ^(?!\.)[\w\.]*\w$  
+    #         identifier (str): The unique identifier of the asset type.
+    #             Length: 1–513 characters
+    #             Pattern: ^(?!\.)[\w\.]*\w$
     #             Required: Yes
-    #         revision (str, optional): The revision of the asset type.  
+    #         revision (str, optional): The revision of the asset type.
     #             Length: 1–64 characters
 
     #     Returns:
@@ -468,7 +503,7 @@ def register_tools(mcp: FastMCP):
     #             "domainIdentifier": domain_identifier,
     #             "identifier": identifier
     #         }
-            
+
     #         # Add optional revision if provided
     #         if revision:
     #             params["revision"] = revision
@@ -509,7 +544,7 @@ def register_tools(mcp: FastMCP):
     #     """
     #     Gets a listing (a record of an asset at a given time) in Amazon DataZone.
     #     If a listing version is specified, only details specific to that version are returned.
-        
+
     #     Args:
     #         domain_identifier (str): The ID of the Amazon DataZone domain
     #             Pattern: ^dzd[-_][a-zA-Z0-9_-]{1,36}$
@@ -517,7 +552,7 @@ def register_tools(mcp: FastMCP):
     #             Pattern: ^[a-zA-Z0-9_-]{1,36}$
     #         listing_revision (str, optional): The revision of the listing
     #             Length: 1-64 characters
-        
+
     #     Returns:
     #         Any: The API response containing:
     #             - Listing ID and revision
@@ -534,7 +569,7 @@ def register_tools(mcp: FastMCP):
     #             "domainIdentifier": domain_identifier,
     #             "identifier": identifier
     #         }
-            
+
     #         # Add optional parameters if provided
     #         if listing_revision:
     #             params["listingRevision"] = listing_revision
@@ -552,11 +587,11 @@ def register_tools(mcp: FastMCP):
         next_token: str = None,
         additional_attributes: List[str] = None,
         search_in: List[Dict[str, str]] = None,
-        sort: Dict[str, str] = None
+        sort: Dict[str, str] = None,
     ) -> Any:
         """
         Searches listings (records of assets) in Amazon DataZone with various filtering and sorting options.
-        
+
         Args:
             domain_identifier (str): The ID of the domain to search in
             search_text (str, optional): Text to search for
@@ -568,7 +603,7 @@ def register_tools(mcp: FastMCP):
                 Example: [{"attribute": "name"}, {"attribute": "description"}]
             sort (Dict[str, str], optional): Sorting criteria
                 Example: {"attribute": "name", "order": "ASCENDING"}
-        
+
         Returns:
             Any: The API response containing search results
         """
@@ -576,9 +611,9 @@ def register_tools(mcp: FastMCP):
             # Prepare the request parameters
             params = {
                 "domainIdentifier": domain_identifier,
-                "maxResults": min(max_results, 50)  # Ensure maxResults is within valid range
+                "maxResults": min(max_results, 50),  # Ensure maxResults is within valid range
             }
-            
+
             # Add optional parameters if provided
             if search_text:
                 params["searchText"] = search_text
@@ -615,7 +650,7 @@ def register_tools(mcp: FastMCP):
     # ) -> Any:
     #     """
     #     Creates a data source in Amazon DataZone and associates it with a project.
-        
+
     #     Args:
     #         domain_identifier (str): The ID of the domain where the data source is created
     #         project_identifier (str): The ID of the project to associate the data source with
@@ -648,7 +683,7 @@ def register_tools(mcp: FastMCP):
     #                 "timezone": "UTC"
     #             }
     #         client_token (str, optional): Token for idempotency
-        
+
     #     Returns:
     #         Any: The API response containing:
     #             - Data source ID and status
@@ -668,7 +703,7 @@ def register_tools(mcp: FastMCP):
     #             "enableSetting": enable_setting,
     #             "publishOnImport": publish_on_import
     #         }
-            
+
     #         # Add optional parameters if provided
     #         if description:
     #             params["description"] = description
@@ -693,24 +728,20 @@ def register_tools(mcp: FastMCP):
     #         raise Exception(f"Error creating data source in domain {domain_identifier}: {e}")
 
     @mcp.tool()
-    async def get_data_source(
-        domain_identifier: str,
-        identifier: str
-    ) -> Any:
+    async def get_data_source(domain_identifier: str, identifier: str) -> Any:
         """
         Retrieves detailed information about a specific data source in Amazon DataZone.
-        
+
         Args:
             domain_identifier (str): The ID of the domain where the data source exists
             identifier (str): The ID of the data source to retrieve
-            
+
         Returns:
             Any: The API response containing data source details
         """
         try:
             response = datazone_client.get_data_source(
-                domainIdentifier=domain_identifier,
-                identifier=identifier
+                domainIdentifier=domain_identifier, identifier=identifier
             )
             return response
         except ClientError as e:
@@ -726,11 +757,11 @@ def register_tools(mcp: FastMCP):
     # ) -> Any:
     #     """
     #     Retrieves detailed information about a specific data source in Amazon DataZone.
-        
+
     #     Args:
     #         domain_identifier (str): The ID of the domain where the data source exists
     #         identifier (str): The ID of the data source to retrieve
-            
+
     #     Returns:
     #         Any: The API response containing data source details
     #     """
@@ -816,7 +847,7 @@ def register_tools(mcp: FastMCP):
     #         return response
     #     except ClientError as e:
     #         raise Exception(f"Error listing time series data points: {e}")
-    
+
     # @mcp.tool()
     # async def get_data_product(
     #     domain_identifier: str,
@@ -828,13 +859,13 @@ def register_tools(mcp: FastMCP):
     #     This request identifies the data product by domain, identifier, and optional revision. It returns metadata including creation information, form outputs, glossary terms, and associated data assets. No request body is required.
 
     #     Args:
-    #         domain_identifier (str): The ID of the domain where the data product resides.  
-    #             Pattern: ^dzd[-_][a-zA-Z0-9_-]{1,36}$  
+    #         domain_identifier (str): The ID of the domain where the data product resides.
+    #             Pattern: ^dzd[-_][a-zA-Z0-9_-]{1,36}$
     #             Required: Yes
-    #         identifier (str): The unique identifier of the data product.  
-    #             Pattern: ^[a-zA-Z0-9_-]{1,36}$  
+    #         identifier (str): The unique identifier of the data product.
+    #             Pattern: ^[a-zA-Z0-9_-]{1,36}$
     #             Required: Yes
-    #         revision (str, optional): The specific revision of the data product.  
+    #         revision (str, optional): The specific revision of the data product.
     #             Length: 1–64 characters
 
     #     Returns:
@@ -850,10 +881,10 @@ def register_tools(mcp: FastMCP):
     #                 - formName (str): Name of the form
     #                 - typeName (str): Name of the form type
     #                 - typeRevision (str): Revision of the form type
-    #             - glossaryTerms (List[str]): Associated glossary terms  
-    #                 Pattern: ^[a-zA-Z0-9_-]{1,36}$  
+    #             - glossaryTerms (List[str]): Associated glossary terms
+    #                 Pattern: ^[a-zA-Z0-9_-]{1,36}$
     #                 Min: 1, Max: 20 items
-    #             - id (str): ID of the data product  
+    #             - id (str): ID of the data product
     #                 Pattern: ^[a-zA-Z0-9_-]{1,36}$
     #             - items (List[dict]): List of data assets in the product, each with:
     #                 - glossaryTerms (List[str]): Glossary terms for the asset
@@ -861,10 +892,10 @@ def register_tools(mcp: FastMCP):
     #                 - itemType (str): Type of the item
     #                 - revision (str): Revision of the item
     #             - name (str): Name of the data product (1–64 characters)
-    #             - owningProjectId (str): ID of the owning project  
+    #             - owningProjectId (str): ID of the owning project
     #                 Pattern: ^[a-zA-Z0-9_-]{1,36}$
     #             - revision (str): Revision string of the data product
-    #             - status (str): Status of the data product  
+    #             - status (str): Status of the data product
     #                 Valid values: "CREATED", "CREATING", "CREATE_FAILED"
 
     #     """
@@ -877,7 +908,7 @@ def register_tools(mcp: FastMCP):
     #         return response
     #     except ClientError as e:
     #         raise Exception(f"Error getting data product {identifier} in domain {domain_identifier}: {e}")
-    
+
     # @mcp.tool()
     # async def get_lineage_node(
     #     domain_identifier: str,
@@ -922,7 +953,7 @@ def register_tools(mcp: FastMCP):
     # ) -> Any:
     #     """
     #     Starts a data source run in Amazon DataZone.
-        
+
     #     Args:
     #         domain_identifier (str): The identifier of the Amazon DataZone domain in which to start a data source run
     #             Pattern: ^dzd[-_][a-zA-Z0-9_-]{1,36}$
@@ -930,7 +961,7 @@ def register_tools(mcp: FastMCP):
     #             Pattern: ^[a-zA-Z0-9_-]{1,36}$
     #         client_token (str, optional): A unique, case-sensitive identifier that is provided to ensure the idempotency of the request
     #             Length: 1-128 characters
-        
+
     #     Returns:
     #         Any: The API response containing:
     #             - createdAt: Timestamp when the data source run was created
@@ -951,7 +982,7 @@ def register_tools(mcp: FastMCP):
     #             - stoppedAt: Timestamp when the run stopped
     #             - type: Type of the run (PRIORITIZED, SCHEDULED)
     #             - updatedAt: Timestamp when the run was last updated
-        
+
     #     Example:
     #         ```python
     #         response = await start_data_source_run(
@@ -967,7 +998,7 @@ def register_tools(mcp: FastMCP):
     #             "domainIdentifier": domain_identifier,
     #             "dataSourceIdentifier": data_source_identifier
     #         }
-            
+
     #         # Add optional client_token if provided
     #         if client_token:
     #             params["clientToken"] = client_token
@@ -1004,7 +1035,7 @@ def register_tools(mcp: FastMCP):
     # ) -> Any:
     #     """
     #     Starts a data source run in Amazon DataZone.
-        
+
     #     Args:
     #         domain_identifier (str): The identifier of the Amazon DataZone domain in which to start a data source run
     #             Pattern: ^dzd[-_][a-zA-Z0-9_-]{1,36}$
@@ -1012,7 +1043,7 @@ def register_tools(mcp: FastMCP):
     #             Pattern: ^[a-zA-Z0-9_-]{1,36}$
     #         client_token (str, optional): A unique, case-sensitive identifier that is provided to ensure the idempotency of the request
     #             Length: 1-128 characters
-        
+
     #     Returns:
     #         Any: The API response containing:
     #             - createdAt: Timestamp when the data source run was created
@@ -1033,7 +1064,7 @@ def register_tools(mcp: FastMCP):
     #             - stoppedAt: Timestamp when the run stopped
     #             - type: Type of the run (PRIORITIZED, SCHEDULED)
     #             - updatedAt: Timestamp when the run was last updated
-        
+
     #     Example:
     #         ```python
     #         response = await start_data_source_run(
@@ -1080,11 +1111,11 @@ def register_tools(mcp: FastMCP):
     #     domain_identifier: str,
     #     job_identifier: str,
     #     max_results: int = 50,
-    #     next_token: str = None, 
+    #     next_token: str = None,
     #     sort_order: str = None,
     #     status: str = None
     # ) -> Any:
-        
+
     #     """
     #     Lists the job runs for a specified job in an Amazon DataZone domain.
 
@@ -1153,7 +1184,6 @@ def register_tools(mcp: FastMCP):
     #     except Exception as e:
     #         raise Exception(f"Unexpected error listing job runs for {job_identifier} in domain {domain_identifier}: {str(e)}")
 
-
     # @mcp.tool()
     # async def create_subscription_request(
     #     domain_identifier: str,
@@ -1165,7 +1195,7 @@ def register_tools(mcp: FastMCP):
     # ) -> Any:
     #     """
     #     Creates a subscription request in Amazon DataZone.
-        
+
     #     Args:
     #         domain_identifier (str): The ID of the domain where the subscription request is created
     #         request_reason (str): The reason for the subscription request (1-4096 characters)
@@ -1182,7 +1212,7 @@ def register_tools(mcp: FastMCP):
     #                 "typeRevision": "type-rev"
     #             }]
     #         client_token (str, optional): A unique token to ensure idempotency
-        
+
     #     Returns:
     #         Any: The API response containing:
     #             - Subscription request ID and status
@@ -1201,7 +1231,7 @@ def register_tools(mcp: FastMCP):
     #             "subscribedListings": subscribed_listings,
     #             "subscribedPrincipals": subscribed_principals
     #         }
-            
+
     #         # Add optional parameters if provided
     #         if metadata_forms:
     #             params["metadataForms"] = metadata_forms
@@ -1222,7 +1252,7 @@ def register_tools(mcp: FastMCP):
     # ) -> Any:
     #     """
     #     Accepts a subscription request to a specific asset in Amazon DataZone.
-        
+
     #     Args:
     #         domain_identifier (str): The ID of the domain where the subscription request exists
     #         identifier (str): The unique identifier of the subscription request to accept
@@ -1230,7 +1260,7 @@ def register_tools(mcp: FastMCP):
     #             Example: [{"assetId": "asset-id", "filterIds": ["filter-id"]}]
     #         decision_comment (str, optional): A description that specifies the reason for accepting the request
     #             Length: 1-4096 characters
-        
+
     #     Returns:
     #         Any: The API response containing:
     #             - Subscription request ID and status
@@ -1247,7 +1277,7 @@ def register_tools(mcp: FastMCP):
     #             "domainIdentifier": domain_identifier,
     #             "identifier": identifier
     #         }
-            
+
     #         # Add optional parameters if provided
     #         if asset_scopes:
     #             params["assetScopes"] = asset_scopes
@@ -1260,19 +1290,16 @@ def register_tools(mcp: FastMCP):
     #         raise Exception(f"Error accepting subscription request {identifier} in domain {domain_identifier}: {e}")
 
     @mcp.tool()
-    async def get_subscription(
-        domain_identifier: str,
-        identifier: str
-    ) -> Any:
+    async def get_subscription(domain_identifier: str, identifier: str) -> Any:
         """
         Gets a subscription in Amazon DataZone.
-        
+
         Args:
             domain_identifier (str): The ID of the Amazon DataZone domain in which the subscription exists
                 Pattern: ^dzd[-_][a-zA-Z0-9_-]{1,36}$
             identifier (str): The ID of the subscription
                 Pattern: ^[a-zA-Z0-9_-]{1,36}$
-        
+
         Returns:
             Any: The API response containing:
                 - Subscription ID and status (APPROVED | REVOKED | CANCELLED)
@@ -1286,12 +1313,13 @@ def register_tools(mcp: FastMCP):
         """
         try:
             response = datazone_client.get_subscription(
-                domainIdentifier=domain_identifier,
-                identifier=identifier
+                domainIdentifier=domain_identifier, identifier=identifier
             )
             return response
         except ClientError as e:
-            raise Exception(f"Error getting subscription {identifier} in domain {domain_identifier}: {e}")
+            raise Exception(
+                f"Error getting subscription {identifier} in domain {domain_identifier}: {e}"
+            )
 
     # @mcp.tool()
     # async def get_form_type(
@@ -1301,7 +1329,7 @@ def register_tools(mcp: FastMCP):
     # ) -> Any:
     #     """
     #     Retrieves detailed information about a specific metadata form type in Amazon DataZone.
-        
+
     #     Args:
     #         domain_identifier (str): The ID of the domain where the form type exists
     #             Pattern: ^dzd[-_][a-zA-Z0-9_-]{1,36}$
@@ -1309,7 +1337,7 @@ def register_tools(mcp: FastMCP):
     #             Length: 1-385 characters
     #         revision (str, optional): The revision of the form type to retrieve
     #             Length: 1-64 characters
-        
+
     #     Returns:
     #         Any: The API response containing form type details including:
     #             - createdAt (number): Timestamp of when the form type was created
@@ -1327,7 +1355,7 @@ def register_tools(mcp: FastMCP):
     #             - owningProjectId (str): The ID of the project that owns the form type
     #             - revision (str): The revision of the form type (1-64 characters)
     #             - status (str): The status of the form type (ENABLED or DISABLED)
-            
+
     #     Example:
     #         ```python
     #         response = await get_form_type(
@@ -1343,7 +1371,7 @@ def register_tools(mcp: FastMCP):
     #             "domainIdentifier": domain_identifier,
     #             "formTypeIdentifier": form_type_identifier
     #         }
-            
+
     #         # Add optional revision if provided
     #         if revision:
     #             params["revision"] = revision
@@ -1362,13 +1390,13 @@ def register_tools(mcp: FastMCP):
     # ) -> Any:
     #     """
     #     Lists all form types available in an Amazon DataZone domain.
-        
+
     #     Args:
     #         domain_identifier (str): The ID of the domain
     #         max_results (int, optional): Maximum number of form types to return (1-50, default: 50)
     #         next_token (str, optional): Token for pagination
     #         status (str, optional): Filter form types by status (ENABLED/DISABLED)
-        
+
     #     Returns:
     #         Any: The API response containing:
     #             - List of form types with their details
@@ -1381,7 +1409,7 @@ def register_tools(mcp: FastMCP):
     #             "domainIdentifier": domain_identifier,
     #             "maxResults": min(max_results, 50)  # Ensure maxResults is within valid range
     #         }
-            
+
     #         # Add optional parameters if provided
     #         if next_token:
     #             params["nextToken"] = next_token
@@ -1404,7 +1432,7 @@ def register_tools(mcp: FastMCP):
     # ) -> Any:
     #     """
     #     Creates a new metadata form type in Amazon DataZone.
-        
+
     #     Args:
     #         domain_identifier (str): The ID of the domain where the form type will be created
     #             Pattern: ^dzd[-_][a-zA-Z0-9_-]{1,36}$
@@ -1415,7 +1443,7 @@ def register_tools(mcp: FastMCP):
     #             Pattern: ^[a-zA-Z0-9_-]{1,36}$
     #         description (str, optional): The description of the form type (0-2048 characters)
     #         status (str, optional): The status of the form type (ENABLED or DISABLED, default: ENABLED)
-        
+
     #     Returns:
     #         Any: The API response containing:
     #             - description (str): The description of the form type
@@ -1425,7 +1453,7 @@ def register_tools(mcp: FastMCP):
     #             - originProjectId (str): The ID of the project where the form type was originally created
     #             - owningProjectId (str): The ID of the project that owns the form type
     #             - revision (str): The revision of the form type (1-64 characters)
-            
+
     #     Example:
     #         ```python
     #         response = await create_form_type(
@@ -1452,7 +1480,7 @@ def register_tools(mcp: FastMCP):
     #         # Validate status
     #         if status not in ["ENABLED", "DISABLED"]:
     #             raise ValueError("status must be either 'ENABLED' or 'DISABLED'")
-            
+
     #         # Prepare the request parameters
     #         params = {
     #             "name": name,
@@ -1460,7 +1488,7 @@ def register_tools(mcp: FastMCP):
     #             "owningProjectIdentifier": owning_project_identifier,
     #             "status": status
     #         }
-            
+
     #         # Add optional parameters if provided
     #         if description:
     #             params["description"] = description
@@ -1480,14 +1508,14 @@ def register_tools(mcp: FastMCP):
         connection_identifier: str = None,
         environment_identifier: str = None,
         max_results: int = 50,
-        name: str = None, 
+        name: str = None,
         next_token: str = None,
         status: str = None,
-        data_source_type: str = None
+        data_source_type: str = None,
     ) -> Any:
         """
         Lists all form types available in an Amazon DataZone domain.
-        
+
         Args:
             domainIdentifier (str): The identifier of the Amazon DataZone domain in which to list the data sources.
                 Pattern: ^dzd[-_][a-zA-Z0-9_-]{1,36}$
@@ -1542,9 +1570,9 @@ def register_tools(mcp: FastMCP):
             params = {
                 "domainIdentifier": domain_identifier,
                 "maxResults": min(max_results, 50),  # Ensure maxResults is within valid range
-                "projectIdentifier" : project_identifier
+                "projectIdentifier": project_identifier,
             }
-            
+
             # Add optional parameters if provided
             if next_token:
                 params["nextToken"] = next_token
@@ -1562,7 +1590,9 @@ def register_tools(mcp: FastMCP):
             response = datazone_client.list_data_sources(**params)
             return response
         except ClientError as e:
-            raise Exception(f"Error listing data sources in project {project_identifier} in domain {domain_identifier}: {e}")
+            raise Exception(
+                f"Error listing data sources in project {project_identifier} in domain {domain_identifier}: {e}"
+            )
 
     # Return the decorated functions for testing purposes
     return {
@@ -1590,5 +1620,5 @@ def register_tools(mcp: FastMCP):
         # "get_form_type": get_form_type,
         # "list_form_types": list_form_types,
         # "create_form_type": create_form_type,
-        "list_data_sources": list_data_sources
-    } 
+        "list_data_sources": list_data_sources,
+    }

@@ -1,9 +1,11 @@
 """
 Environment management tools for AWS DataZone.
 """
+
 from typing import Any, Dict, List
 from mcp.server.fastmcp import FastMCP
 from .common import datazone_client, logger, ClientError
+
 
 def register_tools(mcp: FastMCP):
     """Register environment management tools with the MCP server."""
@@ -103,7 +105,7 @@ def register_tools(mcp: FastMCP):
     #             "environmentProfileIdentifier": environment_profile_identifier,
     #             "projectIdentifier": project_identifier
     #         }
-            
+
     #         # Add optional parameters if provided
     #         if deployment_order:
     #             params["deploymentOrder"] = deployment_order
@@ -121,7 +123,7 @@ def register_tools(mcp: FastMCP):
     #             params["glossaryTerms"] = glossary_terms
     #         if user_parameters:
     #             params["userParameters"] = user_parameters
-            
+
     #         response = datazone_client.create_environment(**params)
     #         return response
     #     except ClientError as e:
@@ -143,7 +145,7 @@ def register_tools(mcp: FastMCP):
     #                 f"Invalid parameters while creating environment in domain {domain_identifier}: {error_message}")
     #         else:
     #             raise Exception(f"Unexpected error creating environment in domain {domain_identifier}: {error_message}")
-    
+
     @mcp.tool()
     async def list_environments(
         domain_identifier: str,
@@ -156,11 +158,11 @@ def register_tools(mcp: FastMCP):
         environment_profile_identifier: str = None,
         name: str = None,
         provider: str = None,
-        status: str = None
+        status: str = None,
     ) -> Any:
         """
         Lists environments in Amazon DataZone.
-        
+
         Args:
             domain_identifier (str): The identifier of the Amazon DataZone domain.
             project_identifier (str): The identifier of the Amazon DataZone project.
@@ -175,10 +177,10 @@ def register_tools(mcp: FastMCP):
             status (str, optional): The status of the environments to list.
                 Valid values: ACTIVE, CREATING, UPDATING, DELETING, CREATE_FAILED, UPDATE_FAILED,
                 DELETE_FAILED, VALIDATION_FAILED, SUSPENDED, DISABLED, EXPIRED, DELETED, INACCESSIBLE
-        
+
         Returns:
             Any: The API response containing environment details or None if an error occurs
-        
+
         Example:
             >>> list_environments(
             ...     domain_identifier="dzd_4p9n6sw4qt9xgn",
@@ -190,9 +192,9 @@ def register_tools(mcp: FastMCP):
             params = {
                 "domainIdentifier": domain_identifier,
                 "projectIdentifier": project_identifier,
-                "maxResults": max_results
+                "maxResults": max_results,
             }
-            
+
             # Add optional parameters if provided
             if next_token:
                 params["nextToken"] = next_token
@@ -210,7 +212,7 @@ def register_tools(mcp: FastMCP):
                 params["provider"] = provider
             if status:
                 params["status"] = status
-            
+
             response = datazone_client.list_environments(**params)
             return response
         except ClientError as e:
@@ -231,7 +233,7 @@ def register_tools(mcp: FastMCP):
     #     (domains, projects, and environments) to external resources and services.
 
     #     This is specifically for creating DataZone connections and should be used in the DataZone MCP server.
-        
+
     #     Args:
     #         domain_identifier (str): The ID of the domain where the connection is created.
     #             Pattern: ^dzd[-_][a-zA-Z0-9_-]{1,36}$
@@ -250,7 +252,7 @@ def register_tools(mcp: FastMCP):
     #         client_token (str, optional): A unique, case-sensitive identifier to ensure idempotency.
     #         props (Dict[str, Any], optional): The connection properties.
     #             Type: ConnectionPropertiesInput object (Union type)
-        
+
     #     Returns:
     #         Any: The API response containing:
     #             - connectionId (str): The ID of the created connection
@@ -263,7 +265,7 @@ def register_tools(mcp: FastMCP):
     #             - projectId (str): The project ID
     #             - props (dict): The connection properties
     #             - type (str): The connection type
-        
+
     #     Example:
     #         >>> create_connection(
     #         ...     domain_identifier="dzd_4p9n6sw4qt9xgn",
@@ -284,7 +286,7 @@ def register_tools(mcp: FastMCP):
     #             "domainIdentifier": domain_identifier,
     #             "name": name
     #         }
-            
+
     #         # Add optional parameters if provided
     #         if environment_identifier:
     #             params["environmentIdentifier"] = environment_identifier
@@ -296,7 +298,7 @@ def register_tools(mcp: FastMCP):
     #             params["clientToken"] = client_token
     #         if props:
     #             params["props"] = props
-            
+
     #         response = datazone_client.create_connection(**params)
     #         return response
     #     except ClientError as e:
@@ -350,13 +352,13 @@ def register_tools(mcp: FastMCP):
     #             "domainIdentifier": domain_identifier,
     #             "identifier": identifier
     #         }
-            
+
     #         response = datazone_client.delete_connection(**params)
     #         return response
     #     except ClientError as e:
     #         error_code = e.response.get("Error", {}).get("Code", "")
     #         error_message = e.response.get("Error", {}).get("Message", str(e))
-            
+
     #         if error_code == "AccessDeniedException":
     #             raise Exception(f"Access denied while deleting connection {identifier} in domain {domain_identifier}: {error_message}")
     #         elif error_code == "ResourceNotFoundException":
@@ -368,16 +370,14 @@ def register_tools(mcp: FastMCP):
 
     @mcp.tool()
     async def get_connection(
-        domain_identifier: str,
-        identifier: str,
-        with_secret: bool = False
+        domain_identifier: str, identifier: str, with_secret: bool = False
     ) -> Any:
         """
         Gets a connection in Amazon DataZone. A connection enables you to connect your resources
         (domains, projects, and environments) to external resources and services.
-        
+
         This is specifically for retrieving DataZone connections and should be used in the DataZone MCP server.
-        
+
         Args:
             domain_identifier (str): The ID of the domain where the connection exists.
                 Pattern: ^dzd[-_][a-zA-Z0-9_-]{1,36}$
@@ -385,7 +385,7 @@ def register_tools(mcp: FastMCP):
                 Length Constraints: Minimum length of 0. Maximum length of 128.
             with_secret (bool, optional): Specifies whether to include connection secrets.
                 Defaults to False.
-        
+
         Returns:
             Any: The API response containing:
                 - connectionId (str): The ID of the connection
@@ -404,7 +404,7 @@ def register_tools(mcp: FastMCP):
                     - expiration (str)
                     - secretAccessKey (str)
                     - sessionToken (str)
-        
+
         Example:
             >>> get_connection(
             ...     domain_identifier="dzd_4p9n6sw4qt9xgn",
@@ -414,44 +414,46 @@ def register_tools(mcp: FastMCP):
         """
         try:
             # Prepare the request parameters
-            params = {
-                "domainIdentifier": domain_identifier,
-                "identifier": identifier
-            }
-            
+            params = {"domainIdentifier": domain_identifier, "identifier": identifier}
+
             # Add with_secret parameter if True
             if with_secret:
                 params["withSecret"] = with_secret
-            
+
             response = datazone_client.get_connection(**params)
             return response
         except ClientError as e:
             error_code = e.response.get("Error", {}).get("Code", "")
             error_message = e.response.get("Error", {}).get("Message", str(e))
-            
+
             if error_code == "AccessDeniedException":
-                raise Exception(f"Access denied while getting connection {identifier} in domain {domain_identifier}: {error_message}")
+                raise Exception(
+                    f"Access denied while getting connection {identifier} in domain {domain_identifier}: {error_message}"
+                )
             elif error_code == "ResourceNotFoundException":
-                raise Exception(f"Connection {identifier} not found in domain {domain_identifier}: {error_message}")
+                raise Exception(
+                    f"Connection {identifier} not found in domain {domain_identifier}: {error_message}"
+                )
             elif error_code == "ValidationException":
-                raise Exception(f"Invalid parameters while getting connection {identifier} in domain {domain_identifier}: {error_message}")
+                raise Exception(
+                    f"Invalid parameters while getting connection {identifier} in domain {domain_identifier}: {error_message}"
+                )
             else:
-                raise Exception(f"Error getting connection {identifier} in domain {domain_identifier}: {error_message}")
+                raise Exception(
+                    f"Error getting connection {identifier} in domain {domain_identifier}: {error_message}"
+                )
 
     @mcp.tool()
-    async def get_environment(
-        domain_identifier: str,
-        identifier: str
-    ) -> Any:
+    async def get_environment(domain_identifier: str, identifier: str) -> Any:
         """
         Gets an Amazon DataZone environment.
-                
+
         Args:
             domain_identifier (str): The ID of the domain where the environment exists.
                 Pattern: ^dzd[-_][a-zA-Z0-9_-]{1,36}$
             identifier (str): The ID of the environment to retrieve.
                 Length Constraints: Minimum length of 0. Maximum length of 128.
-        
+
         Returns:
             Any: The API response containing:
                 - awsAccountId (str): The AWS account ID associated with the environment.
@@ -501,7 +503,7 @@ def register_tools(mcp: FastMCP):
                     - isEditable (bool): Whether the parameter is editable.
                     - isOptional (bool): Whether the parameter is optional.
                     - keyName (str): Key name for the parameter.
-        
+
         Example:
             >>> get_environment(
             ...     domain_identifier="dzd_4p9n6sw4qt9xgn",
@@ -510,40 +512,42 @@ def register_tools(mcp: FastMCP):
         """
         try:
             # Prepare the request parameters
-            params = {
-                "domainIdentifier": domain_identifier,
-                "identifier": identifier
-            }
-            
+            params = {"domainIdentifier": domain_identifier, "identifier": identifier}
+
             response = datazone_client.get_environment(**params)
             return response
         except ClientError as e:
             error_code = e.response.get("Error", {}).get("Code", "")
             error_message = e.response.get("Error", {}).get("Message", str(e))
-            
+
             if error_code == "AccessDeniedException":
-                raise Exception(f"Access denied while getting environment {identifier} in domain {domain_identifier}: {error_message}")
+                raise Exception(
+                    f"Access denied while getting environment {identifier} in domain {domain_identifier}: {error_message}"
+                )
             elif error_code == "ResourceNotFoundException":
-                raise Exception(f"Environment {identifier} not found in domain {domain_identifier}: {error_message}")
+                raise Exception(
+                    f"Environment {identifier} not found in domain {domain_identifier}: {error_message}"
+                )
             elif error_code == "ValidationException":
-                raise Exception(f"Invalid parameters while getting environment {identifier} in domain {domain_identifier}: {error_message}")
+                raise Exception(
+                    f"Invalid parameters while getting environment {identifier} in domain {domain_identifier}: {error_message}"
+                )
             else:
-                raise Exception(f"Error getting environment {identifier} in domain {domain_identifier}: {error_message}")
+                raise Exception(
+                    f"Error getting environment {identifier} in domain {domain_identifier}: {error_message}"
+                )
 
     @mcp.tool()
-    async def get_environment_blueprint(
-        domain_identifier: str,
-        identifier: str
-    ) -> Any:
+    async def get_environment_blueprint(domain_identifier: str, identifier: str) -> Any:
         """
         Gets an Amazon DataZone environment blueprint.
-                
+
         Args:
             domain_identifier (str): The ID of the domain in which this blueprint exists.
                 Pattern: ^dzd[-_][a-zA-Z0-9_-]{1,36}$
             identifier (str): The ID of the environment to retrieve.
                 Length Constraints: Minimum length of 0. Maximum length of 128.
-        
+
         Returns:
             Any: The API response containing the Amazon DataZone blueprint metadata:
 
@@ -575,40 +579,44 @@ def register_tools(mcp: FastMCP):
         """
         try:
             # Prepare the request parameters
-            params = {
-                "domainIdentifier": domain_identifier,
-                "identifier": identifier
-            }
-            
+            params = {"domainIdentifier": domain_identifier, "identifier": identifier}
+
             response = datazone_client.get_environment_blueprint(**params)
             return response
         except ClientError as e:
             error_code = e.response.get("Error", {}).get("Code", "")
             error_message = e.response.get("Error", {}).get("Message", str(e))
-            
+
             if error_code == "AccessDeniedException":
-                raise Exception(f"Access denied while getting environment {identifier} blueprint in domain {domain_identifier}: {error_message}")
+                raise Exception(
+                    f"Access denied while getting environment {identifier} blueprint in domain {domain_identifier}: {error_message}"
+                )
             elif error_code == "ResourceNotFoundException":
-                raise Exception(f"Environment {identifier} not found in domain {domain_identifier}: {error_message}")
+                raise Exception(
+                    f"Environment {identifier} not found in domain {domain_identifier}: {error_message}"
+                )
             elif error_code == "ValidationException":
-                raise Exception(f"Invalid parameters while getting environment {identifier} blueprint in domain {domain_identifier}: {error_message}")
+                raise Exception(
+                    f"Invalid parameters while getting environment {identifier} blueprint in domain {domain_identifier}: {error_message}"
+                )
             else:
-                raise Exception(f"Error getting environment {identifier} blueprint in domain {domain_identifier}: {error_message}")
+                raise Exception(
+                    f"Error getting environment {identifier} blueprint in domain {domain_identifier}: {error_message}"
+                )
 
     @mcp.tool()
     async def get_environment_blueprint_configuration(
-        domain_identifier: str,
-        identifier: str
+        domain_identifier: str, identifier: str
     ) -> Any:
         """
         Gets an Amazon DataZone environment blueprint configuration.
-                
+
         Args:
             domain_identifier (str): The ID of the domain where where this blueprint exists.
                 Pattern: ^dzd[-_][a-zA-Z0-9_-]{1,36}$
             identifier (str): The ID of the environment blueprint.
                 Pattern: ^[a-zA-Z0-9_-]{1,36}$
-        
+
         Returns:
             Any: The API response containing information about the Amazon DataZone environment blueprint configuration:
 
@@ -638,22 +646,30 @@ def register_tools(mcp: FastMCP):
             # Prepare the request parameters
             params = {
                 "domainIdentifier": domain_identifier,
-                "environmentBlueprintIdentifier": identifier
+                "environmentBlueprintIdentifier": identifier,
             }
             response = datazone_client.get_environment_blueprint_configuration(**params)
             return response
         except ClientError as e:
             error_code = e.response.get("Error", {}).get("Code", "")
             error_message = e.response.get("Error", {}).get("Message", str(e))
-            
+
             if error_code == "AccessDeniedException":
-                raise Exception(f"Access denied while getting environment blueprint {identifier}  configuration in domain {domain_identifier}: {error_message}")
+                raise Exception(
+                    f"Access denied while getting environment blueprint {identifier}  configuration in domain {domain_identifier}: {error_message}"
+                )
             elif error_code == "ResourceNotFoundException":
-                raise Exception(f"Environment blueprint {identifier} not found in domain {domain_identifier}: {error_message}")
+                raise Exception(
+                    f"Environment blueprint {identifier} not found in domain {domain_identifier}: {error_message}"
+                )
             elif error_code == "ValidationException":
-                raise Exception(f"Invalid parameters while getting environment blueprint {identifier} configuration in domain {domain_identifier}: {error_message}")
+                raise Exception(
+                    f"Invalid parameters while getting environment blueprint {identifier} configuration in domain {domain_identifier}: {error_message}"
+                )
             else:
-                raise Exception(f"Error getting environment blueprint {identifier} configuration in domain {domain_identifier}: {error_message}")
+                raise Exception(
+                    f"Error getting environment blueprint {identifier} configuration in domain {domain_identifier}: {error_message}"
+                )
 
     # @mcp.tool()
     # async def get_environment_credentials(
@@ -666,11 +682,11 @@ def register_tools(mcp: FastMCP):
     #     This request uses URI parameters to specify the target domain and environment. No request body is required. The operation returns temporary AWS credentials associated with the environment, including access keys and a session token.
 
     #     Args:
-    #         domain_identifier (str): The ID of the Amazon DataZone domain where the environment exists.  
-    #             Pattern: ^dzd[-_][a-zA-Z0-9_-]{1,36}$  
+    #         domain_identifier (str): The ID of the Amazon DataZone domain where the environment exists.
+    #             Pattern: ^dzd[-_][a-zA-Z0-9_-]{1,36}$
     #             Required: Yes
-    #         environment_identifier (str): The ID of the environment for which credentials are being retrieved.  
-    #             Pattern: ^[a-zA-Z0-9_-]{1,36}$  
+    #         environment_identifier (str): The ID of the environment for which credentials are being retrieved.
+    #             Pattern: ^[a-zA-Z0-9_-]{1,36}$
     #             Required: Yes
 
     #     Returns:
@@ -688,13 +704,13 @@ def register_tools(mcp: FastMCP):
     #             "domainIdentifier": domain_identifier,
     #             "environmentIdentifier": environment_identifier
     #         }
-            
+
     #         response = datazone_client.get_environment_credentials(**params)
     #         return response
     #     except ClientError as e:
     #         error_code = e.response.get("Error", {}).get("Code", "")
     #         error_message = e.response.get("Error", {}).get("Message", str(e))
-            
+
     #         if error_code == "AccessDeniedException":
     #             raise Exception(f"Access denied while getting environment {environment_identifier} credentials in domain {domain_identifier}: {error_message}")
     #         elif error_code == "ResourceNotFoundException":
@@ -714,13 +730,13 @@ def register_tools(mcp: FastMCP):
         name: str = None,
         sort_by: str = None,
         sort_order: str = None,
-        type: str = None
+        type: str = None,
     ) -> Dict[str, Any]:
         """
         Lists connections in Amazon DataZone.
-        
+
         This is specifically for listing DataZone connections and should be used in the DataZone MCP server.
-        
+
         Args:
             domain_identifier (str): The ID of the domain where you want to list connections
             project_identifier (str): The ID of the project where you want to list connections
@@ -731,7 +747,7 @@ def register_tools(mcp: FastMCP):
             sort_by (str, optional): How to sort the listed connections (valid: "NAME")
             sort_order (str, optional): Sort order (valid: "ASCENDING" or "DESCENDING")
             type (str, optional): The type of connection to filter by (valid: ATHENA, BIGQUERY, DATABRICKS, etc.)
-        
+
         Returns:
             Dict[str, Any]: The list of connections including:
                 - items: Array of connection summaries
@@ -742,9 +758,9 @@ def register_tools(mcp: FastMCP):
             params = {
                 "domainIdentifier": domain_identifier,
                 "projectIdentifier": project_identifier,
-                "maxResults": min(max_results, 50)  # Ensure maxResults is within valid range
+                "maxResults": min(max_results, 50),  # Ensure maxResults is within valid range
             }
-            
+
             # Add optional parameters if provided
             if next_token:
                 params["nextToken"] = next_token
@@ -758,19 +774,25 @@ def register_tools(mcp: FastMCP):
                 params["sortOrder"] = sort_order
             if type:
                 params["type"] = type
-            
+
             response = datazone_client.list_connections(**params)
             return response
         except ClientError as e:
             error_code = e.response["Error"]["Code"]
             error_message = e.response["Error"]["Message"]
-            
+
             if error_code == "AccessDeniedException":
-                raise Exception(f"Access denied while listing connections in domain {domain_identifier}: {error_message}")
+                raise Exception(
+                    f"Access denied while listing connections in domain {domain_identifier}: {error_message}"
+                )
             elif error_code == "ValidationException":
-                raise Exception(f"Invalid parameters while listing connections in domain {domain_identifier}: {error_message}")
+                raise Exception(
+                    f"Invalid parameters while listing connections in domain {domain_identifier}: {error_message}"
+                )
             else:
-                raise Exception(f"Unexpected error listing connections in domain {domain_identifier}: {error_message}")
+                raise Exception(
+                    f"Unexpected error listing connections in domain {domain_identifier}: {error_message}"
+                )
 
     # @mcp.tool()
     # async def list_environment_blueprints(
@@ -782,7 +804,7 @@ def register_tools(mcp: FastMCP):
     # ) -> Dict[str, Any]:
     #     """
     #     Lists environment blueprints in an Amazon DataZone domain.
-        
+
     #     Args:
     #         domain_identifier (str): The ID of the domain where the blueprints are listed
     #             Pattern: ^dzd[-_][a-zA-Z0-9_-]{1,36}$
@@ -791,7 +813,7 @@ def register_tools(mcp: FastMCP):
     #         name (str, optional): Filter blueprints by name (1-64 characters)
     #             Pattern: ^[\\w -]+$
     #         next_token (str, optional): Token for pagination (1-8192 characters)
-        
+
     #     Returns:
     #         Dict containing:
     #             - items: List of environment blueprints, each containing:
@@ -806,13 +828,13 @@ def register_tools(mcp: FastMCP):
     #     """
     #     try:
     #         logger.info(f"Listing environment blueprints in domain {domain_identifier}")
-            
+
     #         # Prepare request parameters
     #         params = {
     #             'domainIdentifier': domain_identifier,
     #             'maxResults': min(max_results, 50)  # Ensure maxResults is within valid range
     #         }
-            
+
     #         # Add optional parameters
     #         if managed is not None:
     #             params['managed'] = managed
@@ -820,16 +842,16 @@ def register_tools(mcp: FastMCP):
     #             params['name'] = name
     #         if next_token:
     #             params['nextToken'] = next_token
-            
+
     #         # List the environment blueprints
     #         response = datazone_client.list_environment_blueprints(**params)
-            
+
     #         # Format the response
     #         result = {
     #             'items': [],
     #             'next_token': response.get('nextToken')
     #         }
-            
+
     #         # Format each blueprint
     #         for blueprint in response.get('items', []):
     #             formatted_blueprint = {
@@ -842,10 +864,10 @@ def register_tools(mcp: FastMCP):
     #                 'updated_at': blueprint.get('updatedAt')
     #             }
     #             result['items'].append(formatted_blueprint)
-            
+
     #         logger.info(f"Successfully listed {len(result['items'])} environment blueprints in domain {domain_identifier}")
     #         return result
-            
+
     #     except ClientError as e:
     #         error_code = e.response['Error']['Code']
     #         if error_code == 'AccessDeniedException':
@@ -866,19 +888,17 @@ def register_tools(mcp: FastMCP):
 
     @mcp.tool()
     async def list_environment_blueprint_configurations(
-        domain_identifier: str,
-        max_results: int = 50,
-        next_token: str = None
+        domain_identifier: str, max_results: int = 50, next_token: str = None
     ) -> Dict[str, Any]:
         """
         Lists environment blueprints in an Amazon DataZone domain.
-        
+
         Args:
             domain_identifier (str): The ID of the domain where the blueprint configurations are listed
                 Pattern: ^dzd[-_][a-zA-Z0-9_-]{1,36}$
             max_results (int, optional): Maximum number of blueprint configurations to return (1-50, default: 50)
             next_token (str, optional): Token for pagination (1-8192 characters)
-        
+
         Returns:
             dict: A dictionary with the following structure:
 
@@ -900,62 +920,85 @@ def register_tools(mcp: FastMCP):
                 nextToken (str): Token for paginated results. Use in subsequent requests to retrieve the next set of environment blueprints.
         """
         try:
-            logger.info(f"Listing environment blueprint configurations in domain {domain_identifier}")
-            
+            logger.info(
+                f"Listing environment blueprint configurations in domain {domain_identifier}"
+            )
+
             # Prepare request parameters
             params = {
-                'domainIdentifier': domain_identifier,
-                'maxResults': min(max_results, 50)  # Ensure maxResults is within valid range
+                "domainIdentifier": domain_identifier,
+                "maxResults": min(max_results, 50),  # Ensure maxResults is within valid range
             }
-            
+
             if next_token:
-                params['nextToken'] = next_token
-            
+                params["nextToken"] = next_token
+
             # List the environment blueprint configurations
             response = datazone_client.list_environment_blueprint_configurations(**params)
-            
+
             # Format the response
-            result = {
-                'items': [],
-                'next_token': response.get('nextToken')
-            }
-            
+            result = {"items": [], "next_token": response.get("nextToken")}
+
             # Format each blueprint
-            for configuration in response.get('items', []):
+            for configuration in response.get("items", []):
                 formatted_configuration = {
-                    'createdAt': configuration.get('createdAt'),
-                    'domainId': configuration.get('domainId'),
-                    'enabledRegions': configuration.get('enabledRegions'),
-                    'environmentBlueprintId': configuration.get('environmentBlueprintId'),
-                    'environmentRolePermissionBoundary': configuration.get('environmentRolePermissionBoundary'),
-                    'manageAccessRoleArn': configuration.get('manageAccessRoleArn'),
-                    'provisioningConfigurations': configuration.get('provisioningConfigurations'),
-                    'provisioningRoleArn': configuration.get('provisioningRoleArn'),
-                    'regionalParameters': configuration.get('regionalParameters'),
-                    'updatedAt': configuration.get('updatedAt'),
+                    "createdAt": configuration.get("createdAt"),
+                    "domainId": configuration.get("domainId"),
+                    "enabledRegions": configuration.get("enabledRegions"),
+                    "environmentBlueprintId": configuration.get("environmentBlueprintId"),
+                    "environmentRolePermissionBoundary": configuration.get(
+                        "environmentRolePermissionBoundary"
+                    ),
+                    "manageAccessRoleArn": configuration.get("manageAccessRoleArn"),
+                    "provisioningConfigurations": configuration.get("provisioningConfigurations"),
+                    "provisioningRoleArn": configuration.get("provisioningRoleArn"),
+                    "regionalParameters": configuration.get("regionalParameters"),
+                    "updatedAt": configuration.get("updatedAt"),
                 }
-                result['items'].append(formatted_configuration)
-            
-            logger.info(f"Successfully listed {len(result['items'])} environment blueprint configurations in domain {domain_identifier}")
+                result["items"].append(formatted_configuration)
+
+            logger.info(
+                f"Successfully listed {len(result['items'])} environment blueprint configurations in domain {domain_identifier}"
+            )
             return result
-            
+
         except ClientError as e:
-            error_code = e.response['Error']['Code']
-            if error_code == 'AccessDeniedException':
-                logger.error(f"Access denied while listing environment blueprint configurations in domain {domain_identifier}")
-                raise Exception(f"Access denied while listing environment blueprint configurations in domain {domain_identifier}")
-            elif error_code == 'ResourceNotFoundException':
-                logger.error(f"Domain {domain_identifier} not found while listing environment blueprint configurations")
-                raise Exception(f"Domain {domain_identifier} not found while listing environment blueprint configurations")
-            elif error_code == 'ValidationException':
-                logger.error(f"Invalid parameters for listing environment blueprint configurations in domain {domain_identifier}")
-                raise Exception(f"Invalid parameters for listing environment blueprint configurations in domain {domain_identifier}")
+            error_code = e.response["Error"]["Code"]
+            if error_code == "AccessDeniedException":
+                logger.error(
+                    f"Access denied while listing environment blueprint configurations in domain {domain_identifier}"
+                )
+                raise Exception(
+                    f"Access denied while listing environment blueprint configurations in domain {domain_identifier}"
+                )
+            elif error_code == "ResourceNotFoundException":
+                logger.error(
+                    f"Domain {domain_identifier} not found while listing environment blueprint configurations"
+                )
+                raise Exception(
+                    f"Domain {domain_identifier} not found while listing environment blueprint configurations"
+                )
+            elif error_code == "ValidationException":
+                logger.error(
+                    f"Invalid parameters for listing environment blueprint configurations in domain {domain_identifier}"
+                )
+                raise Exception(
+                    f"Invalid parameters for listing environment blueprint configurations in domain {domain_identifier}"
+                )
             else:
-                logger.error(f"Error listing environment blueprint configurations in domain {domain_identifier}: {str(e)}")
-                raise Exception(f"Error listing environment blueprint configurations in domain {domain_identifier}: {str(e)}")
+                logger.error(
+                    f"Error listing environment blueprint configurations in domain {domain_identifier}: {str(e)}"
+                )
+                raise Exception(
+                    f"Error listing environment blueprint configurations in domain {domain_identifier}: {str(e)}"
+                )
         except Exception as e:
-            logger.error(f"Unexpected error listing environment blueprint configurations in domain {domain_identifier}: {str(e)}")
-            raise Exception(f"Unexpected error listing environment blueprint configurations in domain {domain_identifier}: {str(e)}")
+            logger.error(
+                f"Unexpected error listing environment blueprint configurations in domain {domain_identifier}: {str(e)}"
+            )
+            raise Exception(
+                f"Unexpected error listing environment blueprint configurations in domain {domain_identifier}: {str(e)}"
+            )
 
     @mcp.tool()
     async def list_environment_profiles(
@@ -966,7 +1009,7 @@ def register_tools(mcp: FastMCP):
         max_results: int = 50,
         name: str = None,
         next_token: str = None,
-        project_identifier: str = None
+        project_identifier: str = None,
     ) -> Dict[str, Any]:
         """
         Lists environment profiles within a specified Amazon DataZone domain, optionally filtered by AWS account, region, blueprint, and project.
@@ -1013,78 +1056,96 @@ def register_tools(mcp: FastMCP):
                     - updatedAt (str): Timestamp of last update.
 
                 - nextToken (str): Token for retrieving the next page of results, if any.
-"""
+        """
         try:
             logger.info(f"Listing environment profiles in domain {domain_identifier}")
-            
+
             # Prepare request parameters
             params = {
-                'domainIdentifier': domain_identifier,
-                'maxResults': min(max_results, 50)  # Ensure maxResults is within valid range
+                "domainIdentifier": domain_identifier,
+                "maxResults": min(max_results, 50),  # Ensure maxResults is within valid range
             }
-            
+
             # Add optional parameters
             if aws_account_id:
-                params['awsAccountId'] = aws_account_id
+                params["awsAccountId"] = aws_account_id
             if aws_account_region:
-                params['awsAccountRegion'] = aws_account_region
+                params["awsAccountRegion"] = aws_account_region
             if environment_blueprint_identifier:
-                params['environmentBlueprintIdentifier'] = environment_blueprint_identifier
+                params["environmentBlueprintIdentifier"] = environment_blueprint_identifier
             if name:
-                params['name'] = name
+                params["name"] = name
             if next_token:
-                params['nextToken'] = next_token
+                params["nextToken"] = next_token
             if project_identifier:
-                params['projectIdentifier'] = project_identifier
-            
+                params["projectIdentifier"] = project_identifier
+
             # List the environment profiles
             response = datazone_client.list_environment_profiles(**params)
-            
-            # Format the response
-            result = {
-                'items': [],
-                'next_token': response.get('nextToken')
-            }
-            
-            # Format each profile
-            for profile in response.get('items', []):
-                formatted_profile = {
-                    'aws_account_id': profile.get('awsAccountId'),
-                    'aws_account_region': profile.get('awsAccountRegion'),
-                    'created_at': profile.get('createdAt'),
-                    'created_by': profile.get('createdBy'),
-                    'description': profile.get('description'),
-                    'domain_id': profile.get('domain_id'),
-                    'environment_blueprint_id': profile.get('environmentBlueprintId'),
-                    'id': profile.get('id'),
-                    'name': profile.get('name'),
-                    'description': profile.get('description'),
-                    'project_id': profile.get('projectId'),
-                    'updated_at': profile.get('updatedAt')
-                }
-                result['items'].append(formatted_profile)
-            
-            logger.info(f"Successfully listed {len(result['items'])} environment profiles in domain {domain_identifier}")
-            return result
-            
-        except ClientError as e:
-            error_code = e.response['Error']['Code']
-            if error_code == 'AccessDeniedException':
-                logger.error(f"Access denied while listing environment profiles in domain {domain_identifier}")
-                raise Exception(f"Access denied while listing environment profiles in domain {domain_identifier}")
-            elif error_code == 'ResourceNotFoundException':
-                logger.error(f"Domain {domain_identifier} not found while listing environment profiles")
-                raise Exception(f"Domain {domain_identifier} not found while listing environment profiles")
-            elif error_code == 'ValidationException':
-                logger.error(f"Invalid parameters for listing environment profiles in domain {domain_identifier}")
-                raise Exception(f"Invalid parameters for listing environment profiles in domain {domain_identifier}")
-            else:
-                logger.error(f"Error listing environment profiles in domain {domain_identifier}: {str(e)}")
-                raise Exception(f"Error listing environment profiles in domain {domain_identifier}: {str(e)}")
-        except Exception as e:
-            logger.error(f"Unexpected error listing environment profiles in domain {domain_identifier}: {str(e)}")
-            raise Exception(f"Unexpected error listing environment profiles in domain {domain_identifier}: {str(e)}")
 
+            # Format the response
+            result = {"items": [], "next_token": response.get("nextToken")}
+
+            # Format each profile
+            for profile in response.get("items", []):
+                formatted_profile = {
+                    "aws_account_id": profile.get("awsAccountId"),
+                    "aws_account_region": profile.get("awsAccountRegion"),
+                    "created_at": profile.get("createdAt"),
+                    "created_by": profile.get("createdBy"),
+                    "description": profile.get("description"),
+                    "domain_id": profile.get("domain_id"),
+                    "environment_blueprint_id": profile.get("environmentBlueprintId"),
+                    "id": profile.get("id"),
+                    "name": profile.get("name"),
+                    "description": profile.get("description"),
+                    "project_id": profile.get("projectId"),
+                    "updated_at": profile.get("updatedAt"),
+                }
+                result["items"].append(formatted_profile)
+
+            logger.info(
+                f"Successfully listed {len(result['items'])} environment profiles in domain {domain_identifier}"
+            )
+            return result
+
+        except ClientError as e:
+            error_code = e.response["Error"]["Code"]
+            if error_code == "AccessDeniedException":
+                logger.error(
+                    f"Access denied while listing environment profiles in domain {domain_identifier}"
+                )
+                raise Exception(
+                    f"Access denied while listing environment profiles in domain {domain_identifier}"
+                )
+            elif error_code == "ResourceNotFoundException":
+                logger.error(
+                    f"Domain {domain_identifier} not found while listing environment profiles"
+                )
+                raise Exception(
+                    f"Domain {domain_identifier} not found while listing environment profiles"
+                )
+            elif error_code == "ValidationException":
+                logger.error(
+                    f"Invalid parameters for listing environment profiles in domain {domain_identifier}"
+                )
+                raise Exception(
+                    f"Invalid parameters for listing environment profiles in domain {domain_identifier}"
+                )
+            else:
+                logger.error(
+                    f"Error listing environment profiles in domain {domain_identifier}: {str(e)}"
+                )
+                raise Exception(
+                    f"Error listing environment profiles in domain {domain_identifier}: {str(e)}"
+                )
+        except Exception as e:
+            logger.error(
+                f"Unexpected error listing environment profiles in domain {domain_identifier}: {str(e)}"
+            )
+            raise Exception(
+                f"Unexpected error listing environment profiles in domain {domain_identifier}: {str(e)}"
+            )
 
     # Return the decorated functions for testing purposes
     return {
@@ -1099,6 +1160,6 @@ def register_tools(mcp: FastMCP):
         # "get_environment_credentials": get_environment_credentials,
         "list_connections": list_connections,
         # "list_environment_blueprints": list_environment_blueprints,
-        "list_environment_blueprint_configurations" : list_environment_blueprint_configurations,
-        "list_environment_profiles": list_environment_profiles
-    } 
+        "list_environment_blueprint_configurations": list_environment_blueprint_configurations,
+        "list_environment_profiles": list_environment_profiles,
+    }
