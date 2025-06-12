@@ -207,7 +207,11 @@ The AWS DataZone MCP server provides **38 tools** organized into 5 categories:
 ### Domain Management
 - `get_domain` - Retrieve domain information
 - `create_domain` - Create a new domain
-- `list_domain` - List domains
+- `list_domain_units` - List domain units
+- `create_domain_unit` - Create domain unit
+- `list_domains` - List domains
+- `add_entity_owner` - Add entity ownership
+- `add_policy_grant` - Grant policies
 - `search` - Search across DataZone
 - `search_types` - Search typs across DataZone
 - `get_user_profile` - Get user profile
@@ -215,27 +219,47 @@ The AWS DataZone MCP server provides **38 tools** organized into 5 categories:
 - `search_group_profiles` - Search group profiles
 
 ### Project Management
+- `create_project` - Create new project
 - `get_project` - Get project details
 - `list_projects` - List all projects
+- `create_project_membership` - Add project members
 - `list_project_profiles` - List project profiles
+- `create_project_profile` - Create project profile
 - `get_project_profile` - Get project profile
 - `list_project_memberships` - List project memberships
+
+### Glossary Management
+- `create_glossary` - Create business glossary
+- `create_glossary_term` - Create glossary term
+- `get_glossary` - Get glossary details
+- `get_glossary_term` - Get term details
 
 ### Data Management
 - `get_asset` - Retrieve asset information
 - `create_asset` - Create new asset
+- `publish_asset` - Publish asset to catalog
+- `get_listing` - Get asset listing
 - `search_listings` - Search published assets
+- `create_data_source` - Create data source
 - `get_data_source` - Get data source
+- `start_data_source_run` - Start data source run
+- `create_subscription_request` - Request data subscription
+- `accept_subscription_request` - Accept subscription
+- `get_form_type` - Get metadata form type
+- `create_form_type` - Create metadata form type
 - `get_subscription` - Get subscription
 - `list_data_sources` - List data sources
 
+
 ### Environment Management
 - `list_environments` - List environments
+- `create_connection` - Create environment connection
 - `get_connection` - Get connection details
 - `get_environment` - Get environment details
 - `get_environment_blueprint` - Get environment blueprint
 - `get_environment_blueprint_configuration` - Get environment blueprint configuration
 - `list_connections` - List all connections
+- `list_environment_blueprints` - List available blueprints
 - `list_environment_blueprint_configurations` - List available blueprint configurations
 - `list_environment_profiles` - List environment profiles
 
