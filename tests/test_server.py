@@ -3,6 +3,7 @@ Tests for the main MCP server functionality.
 """
 
 import json
+import sys
 from unittest.mock import MagicMock, Mock, patch
 
 import pytest
@@ -94,9 +95,10 @@ class TestMCPServer:
         main()
 
         # Assert
-        mock_exit.assert_called_once_with(1)
-        printed_output = mock_print.call_args[0][0]
-        assert "KeyboardInterrupt" in printed_output
+        mock_print.assert_called_with(
+            "KeyboardInterrupt received. Shutting down gracefully.", file=sys.stderr
+        )
+        mock_exit.assert_called_once_with(0)
 
     @patch("mcp.server.fastmcp.FastMCP.run")
     @patch("sys.exit")

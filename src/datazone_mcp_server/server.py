@@ -106,6 +106,9 @@ def main():
         mcp.run(transport="stdio")
 
         print("DEBUG: Server completed", file=sys.stderr)
+    except KeyboardInterrupt:
+        print("KeyboardInterrupt received. Shutting down gracefully.", file=sys.stderr)
+        sys.exit(0)
     except Exception as e:
         # Ensure we return a proper JSON response even in case of errors
         error_response = {
