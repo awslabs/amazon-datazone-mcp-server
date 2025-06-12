@@ -2,7 +2,7 @@
 Domain management tools for AWS DataZone.
 """
 
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 from mcp.server.fastmcp import FastMCP
 
@@ -35,10 +35,10 @@ def register_tools(mcp: FastMCP):
         domain_execution_role: str,
         service_role: str,
         domain_version: str = "V2",
-        description: str = None,
-        kms_key_identifier: str = None,
-        tags: Dict[str, str] = None,
-        single_sign_on: Dict[str, str] = None,
+        description: Optional[str] = None,
+        kms_key_identifier: Optional[str] = None,
+        tags: Optional[Dict[str, str]] = None,
+        single_sign_on: Optional[Dict[str, str]] = None,
     ) -> Dict[str, Any]:
         """
         Creates a new Amazon DataZone domain.
@@ -68,7 +68,7 @@ def register_tools(mcp: FastMCP):
             logger.info(f"Creating {domain_version} domain: {name}")
 
             # Prepare request parameters
-            params = {
+            params: Dict[str, Any] = {
                 "name": name,
                 "domainExecutionRole": domain_execution_role,
                 "domainVersion": domain_version,
@@ -123,8 +123,29 @@ def register_tools(mcp: FastMCP):
             raise Exception(f"Unexpected error creating domain {name}: {str(e)}")
 
     @mcp.tool()
+    async def list_domain_units(domain_identifier: str, parent_domain_unit_identifier: str) -> Any:
+        """
+        Lists child domain units for the specified parent domain unit in an AWS DataZone domain.
+
+        Args:
+            domain_identifier (str): The identifier of the domain (e.g., "dzd_4p9n6sw4qt9xgn")
+            parent_domain_unit_identifier (str): The identifier of the parent domain unit (e.g., "3thjq258ficc2v")
+
+        Returns:
+            Any: The API response containing the list of domain units
+        """
+        try:
+            response = datazone_client.list_domain_units_for_parent(
+                domainIdentifier=domain_identifier,
+                parentDomainUnitIdentifier=parent_domain_unit_identifier,
+            )
+            return response
+        except ClientError as e:
+            raise Exception(f"Error listing domain units for domain {domain_identifier}: {e}")
+
+    @mcp.tool()
     async def list_domains(
-        max_results: int = 25, next_token: str = None, status: str = None
+        max_results: int = 25, next_token: Optional[str] = None, status: Optional[str] = None
     ) -> Any:
         """
         Lists AWS DataZone domains.
@@ -141,7 +162,9 @@ def register_tools(mcp: FastMCP):
         """
         try:
             logger.info(f"Listing domains")
-            params = {"maxResults": min(max_results, 25)}  # Ensure maxResults is within valid range
+            params: Dict[str, Any] = {
+                "maxResults": min(max_results, 25)
+            }  # Ensure maxResults is within valid range
             if next_token:
                 params["nextToken"] = next_token  # Fixed: AWS API expects 'nextToken', not 'next_token'
             if status:
@@ -203,163 +226,195 @@ def register_tools(mcp: FastMCP):
             logger.error(f"Unexpected error listing domains")
             raise Exception(f"Unexpected error listing domains")
 
-    # @mcp.tool()
-    # async def create_domain_unit(
-    #     domain_identifier: str,
-    #     name: str,
-    #     parent_domain_unit_identifier: str,
-    #     description: str = None,
-    #     client_token: str = None
-    # ) -> Dict[str, Any]:
-    #     """
-    #     Creates a new domain unit in Amazon DataZone.
+    @mcp.tool()
+    async def create_domain_unit(
+        domain_identifier: str,
+        name: str,
+        parent_domain_unit_identifier: str,
+        description: Optional[str] = None,
+        client_token: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        """
+        Creates a new domain unit in Amazon DataZone.
 
-    #     Args:
-    #         domain_identifier (str): The ID of the domain where the domain unit will be created
-    #             Pattern: ^dzd[-_][a-zA-Z0-9_-]{1,36}$
-    #         name (str): The name of the domain unit (1-128 characters)
-    #             Pattern: ^[\\w -]+$
-    #         parent_domain_unit_identifier (str): The ID of the parent domain unit
-    #             Pattern: ^[a-z0-9_-]+$
-    #         description (str, optional): Description of the domain unit (0-2048 characters)
-    #         client_token (str, optional): A unique token to ensure idempotency (1-128 characters)
-    #             Pattern: ^[\\x21-\\x7E]+$
+        Args:
+            domain_identifier (str): The ID of the domain where the domain unit will be created
+                Pattern: ^dzd[-_][a-zA-Z0-9_-]{1,36}$
+            name (str): The name of the domain unit (1-128 characters)
+                Pattern: ^[\\w -]+$
+            parent_domain_unit_identifier (str): The ID of the parent domain unit
+                Pattern: ^[a-z0-9_-]+$
+            description (str, optional): Description of the domain unit (0-2048 characters)
+            client_token (str, optional): A unique token to ensure idempotency (1-128 characters)
+                Pattern: ^[\\x21-\\x7E]+$
 
-    #     Returns:
-    #         Dict containing:
-    #             - id: Domain unit identifier
-    #             - name: Domain unit name
-    #             - description: Domain unit description
-    #             - domain_id: Domain ID
-    #             - parent_domain_unit_id: Parent domain unit ID
-    #             - ancestor_domain_unit_ids: List of ancestor domain unit IDs
-    #             - created_at: Creation timestamp
-    #             - created_by: Creator information
-    #             - owners: List of domain unit owners
-    #     """
-    #     try:
-    #         logger.info(f"Creating domain unit '{name}' in domain {domain_identifier}")
+        Returns:
+            Dict containing:
+                - id: Domain unit identifier
+                - name: Domain unit name
+                - description: Domain unit description
+                - domain_id: Domain ID
+                - parent_domain_unit_id: Parent domain unit ID
+                - ancestor_domain_unit_ids: List of ancestor domain unit IDs
+                - created_at: Creation timestamp
+                - created_by: Creator information
+                - owners: List of domain unit owners
+        """
+        try:
+            logger.info(f"Creating domain unit '{name}' in domain {domain_identifier}")
 
-    #         # Prepare request parameters
-    #         params = {
-    #             'domainIdentifier': domain_identifier,
-    #             'name': name,
-    #             'parentDomainUnitIdentifier': parent_domain_unit_identifier
-    #         }
+            # Prepare request parameters
+            params = {
+                "domainIdentifier": domain_identifier,
+                "name": name,
+                "parentDomainUnitIdentifier": parent_domain_unit_identifier,
+            }
 
-    #         # Add optional parameters
-    #         if description:
-    #             params['description'] = description
-    #         if client_token:
-    #             params['clientToken'] = client_token
+            # Add optional parameters
+            if description:
+                params["description"] = description
+            if client_token:
+                params["clientToken"] = client_token
 
-    #         # Create the domain unit
-    #         response = datazone_client.create_domain_unit(**params)
+            # Create the domain unit
+            response = datazone_client.create_domain_unit(**params)
 
-    #         # Format the response
-    #         result = {
-    #             'id': response.get('id'),
-    #             'name': response.get('name'),
-    #             'description': response.get('description'),
-    #             'domain_id': response.get('domainId'),
-    #             'parent_domain_unit_id': response.get('parentDomainUnitId'),
-    #             'ancestor_domain_unit_ids': response.get('ancestorDomainUnitIds', []),
-    #             'created_at': response.get('createdAt'),
-    #             'created_by': response.get('createdBy'),
-    #             'owners': response.get('owners', [])
-    #         }
+            # Format the response
+            result = {
+                "id": response.get("id"),
+                "name": response.get("name"),
+                "description": response.get("description"),
+                "domain_id": response.get("domainId"),
+                "parent_domain_unit_id": response.get("parentDomainUnitId"),
+                "ancestor_domain_unit_ids": response.get("ancestorDomainUnitIds", []),
+                "created_at": response.get("createdAt"),
+                "created_by": response.get("createdBy"),
+                "owners": response.get("owners", []),
+            }
 
-    #         logger.info(f"Successfully created domain unit '{name}' in domain {domain_identifier}")
-    #         return result
+            logger.info(f"Successfully created domain unit '{name}' in domain {domain_identifier}")
+            return result
 
-    #     except ClientError as e:
-    #         error_code = e.response['Error']['Code']
-    #         if error_code == 'AccessDeniedException':
-    #             logger.error(f"Access denied while creating domain unit '{name}' in domain {domain_identifier}")
-    #             raise Exception(f"Access denied while creating domain unit '{name}' in domain {domain_identifier}")
-    #         elif error_code == 'ConflictException':
-    #             logger.error(f"Domain unit '{name}' already exists in domain {domain_identifier}")
-    #             raise Exception(f"Domain unit '{name}' already exists in domain {domain_identifier}")
-    #         elif error_code == 'ServiceQuotaExceededException':
-    #             logger.error(f"Service quota exceeded while creating domain unit '{name}' in domain {domain_identifier}")
-    #             raise Exception(f"Service quota exceeded while creating domain unit '{name}' in domain {domain_identifier}")
-    #         elif error_code == 'ValidationException':
-    #             logger.error(f"Invalid parameters for creating domain unit '{name}' in domain {domain_identifier}")
-    #             raise Exception(f"Invalid parameters for creating domain unit '{name}' in domain {domain_identifier}")
-    #         else:
-    #             logger.error(f"Error creating domain unit '{name}' in domain {domain_identifier}: {str(e)}")
-    #             raise Exception(f"Error creating domain unit '{name}' in domain {domain_identifier}: {str(e)}")
-    #     except Exception as e:
-    #         logger.error(f"Unexpected error creating domain unit '{name}' in domain {domain_identifier}: {str(e)}")
-    #         raise Exception(f"Unexpected error creating domain unit '{name}' in domain {domain_identifier}: {str(e)}")
+        except ClientError as e:
+            error_code = e.response["Error"]["Code"]
+            if error_code == "AccessDeniedException":
+                logger.error(
+                    f"Access denied while creating domain unit '{name}' in domain {domain_identifier}"
+                )
+                raise Exception(
+                    f"Access denied while creating domain unit '{name}' in domain {domain_identifier}"
+                )
+            elif error_code == "ConflictException":
+                logger.error(f"Domain unit '{name}' already exists in domain {domain_identifier}")
+                raise Exception(
+                    f"Domain unit '{name}' already exists in domain {domain_identifier}"
+                )
+            elif error_code == "ServiceQuotaExceededException":
+                logger.error(
+                    f"Service quota exceeded while creating domain unit '{name}' in domain {domain_identifier}"
+                )
+                raise Exception(
+                    f"Service quota exceeded while creating domain unit '{name}' in domain {domain_identifier}"
+                )
+            elif error_code == "ValidationException":
+                logger.error(
+                    f"Invalid parameters for creating domain unit '{name}' in domain {domain_identifier}"
+                )
+                raise Exception(
+                    f"Invalid parameters for creating domain unit '{name}' in domain {domain_identifier}"
+                )
+            else:
+                logger.error(
+                    f"Error creating domain unit '{name}' in domain {domain_identifier}: {str(e)}"
+                )
+                raise Exception(
+                    f"Error creating domain unit '{name}' in domain {domain_identifier}: {str(e)}"
+                )
+        except Exception as e:
+            logger.error(
+                f"Unexpected error creating domain unit '{name}' in domain {domain_identifier}: {str(e)}"
+            )
+            raise Exception(
+                f"Unexpected error creating domain unit '{name}' in domain {domain_identifier}: {str(e)}"
+            )
 
-    # @mcp.tool()
-    # async def get_domain_unit(
-    #     domain_identifier: str,
-    #     identifier: str
-    # ) -> Dict[str, Any]:
-    #     """
-    #     Retrieves detailed information about a specific domain unit in Amazon DataZone.
+    @mcp.tool()
+    async def get_domain_unit(domain_identifier: str, identifier: str) -> Dict[str, Any]:
+        """
+        Retrieves detailed information about a specific domain unit in Amazon DataZone.
 
-    #     Args:
-    #         domain_identifier (str): The ID of the domain where the domain unit exists
-    #             Pattern: ^dzd[-_][a-zA-Z0-9_-]{1,36}$
-    #         identifier (str): The ID of the domain unit to retrieve
-    #             Pattern: ^[a-z0-9_-]+$
+        Args:
+            domain_identifier (str): The ID of the domain where the domain unit exists
+                Pattern: ^dzd[-_][a-zA-Z0-9_-]{1,36}$
+            identifier (str): The ID of the domain unit to retrieve
+                Pattern: ^[a-z0-9_-]+$
 
-    #     Returns:
-    #         Dict containing:
-    #             - id: Domain unit identifier
-    #             - name: Domain unit name
-    #             - description: Domain unit description
-    #             - domain_id: Domain ID
-    #             - parent_domain_unit_id: Parent domain unit ID
-    #             - created_at: Creation timestamp
-    #             - created_by: Creator information
-    #             - owners: List of domain unit owners
-    #             - lastUpdatedAt: The timestamp at which the domain unit was last updated
-    #             - lastUpdatedBy: The user who last updated the domain unit
-    #     """
-    #     try:
-    #         logger.info(f"Getting domain unit {identifier} in domain {domain_identifier}")
+        Returns:
+            Dict containing:
+                - id: Domain unit identifier
+                - name: Domain unit name
+                - description: Domain unit description
+                - domain_id: Domain ID
+                - parent_domain_unit_id: Parent domain unit ID
+                - created_at: Creation timestamp
+                - created_by: Creator information
+                - owners: List of domain unit owners
+                - lastUpdatedAt: The timestamp at which the domain unit was last updated
+                - lastUpdatedBy: The user who last updated the domain unit
+        """
+        try:
+            logger.info(f"Getting domain unit {identifier} in domain {domain_identifier}")
 
-    #         # Get the domain unit
-    #         response = datazone_client.get_domain_unit(
-    #             domainIdentifier=domain_identifier,
-    #             identifier=identifier
-    #         )
+            # Get the domain unit
+            response = datazone_client.get_domain_unit(
+                domainIdentifier=domain_identifier, identifier=identifier
+            )
 
-    #         # Format the response
-    #         result = {
-    #             'id': response.get('id'),
-    #             'name': response.get('name'),
-    #             'description': response.get('description'),
-    #             'domain_id': response.get('domainId'),
-    #             'parent_domain_unit_id': response.get('parentDomainUnitId'),
-    #             'created_at': response.get('createdAt'),
-    #             'created_by': response.get('createdBy'),
-    #             'owners': response.get('owners', []),
-    #             'lastUpdatedAt': response.get('lastUpdatedAt'),
-    #             'lastUpdatedBy': response.get('lastUpdatedBy')
-    #         }
+            # Format the response
+            result = {
+                "id": response.get("id"),
+                "name": response.get("name"),
+                "description": response.get("description"),
+                "domain_id": response.get("domainId"),
+                "parent_domain_unit_id": response.get("parentDomainUnitId"),
+                "created_at": response.get("createdAt"),
+                "created_by": response.get("createdBy"),
+                "owners": response.get("owners", []),
+                "lastUpdatedAt": response.get("lastUpdatedAt"),
+                "lastUpdatedBy": response.get("lastUpdatedBy"),
+            }
 
-    #         logger.info(f"Successfully retrieved domain unit {identifier} in domain {domain_identifier}")
-    #         return result
+            logger.info(
+                f"Successfully retrieved domain unit {identifier} in domain {domain_identifier}"
+            )
+            return result
 
-    #     except ClientError as e:
-    #         error_code = e.response['Error']['Code']
-    #         if error_code == 'AccessDeniedException':
-    #             logger.error(f"Access denied while getting domain unit {identifier} in domain {domain_identifier}")
-    #             raise Exception(f"Access denied while getting domain unit {identifier} in domain {domain_identifier}")
-    #         elif error_code == 'ResourceNotFoundException':
-    #             logger.error(f"Domain unit {identifier} not found in domain {domain_identifier}")
-    #             raise Exception(f"Domain unit {identifier} not found in domain {domain_identifier}")
-    #         else:
-    #             logger.error(f"Error getting domain unit {identifier} in domain {domain_identifier}: {str(e)}")
-    #             raise Exception(f"Error getting domain unit {identifier} in domain {domain_identifier}: {str(e)}")
-    #     except Exception as e:
-    #         logger.error(f"Unexpected error getting domain unit {identifier} in domain {domain_identifier}: {str(e)}")
-    #         raise Exception(f"Unexpected error getting domain unit {identifier} in domain {domain_identifier}: {str(e)}")
+        except ClientError as e:
+            error_code = e.response["Error"]["Code"]
+            if error_code == "AccessDeniedException":
+                logger.error(
+                    f"Access denied while getting domain unit {identifier} in domain {domain_identifier}"
+                )
+                raise Exception(
+                    f"Access denied while getting domain unit {identifier} in domain {domain_identifier}"
+                )
+            elif error_code == "ResourceNotFoundException":
+                logger.error(f"Domain unit {identifier} not found in domain {domain_identifier}")
+                raise Exception(f"Domain unit {identifier} not found in domain {domain_identifier}")
+            else:
+                logger.error(
+                    f"Error getting domain unit {identifier} in domain {domain_identifier}: {str(e)}"
+                )
+                raise Exception(
+                    f"Error getting domain unit {identifier} in domain {domain_identifier}: {str(e)}"
+                )
+        except Exception as e:
+            logger.error(
+                f"Unexpected error getting domain unit {identifier} in domain {domain_identifier}: {str(e)}"
+            )
+            raise Exception(
+                f"Unexpected error getting domain unit {identifier} in domain {domain_identifier}: {str(e)}"
+            )
 
     # @mcp.tool()
     # async def list_domain_units_for_parent(
@@ -522,68 +577,67 @@ def register_tools(mcp: FastMCP):
     #         logger.error(f"Unexpected error updating domain unit {identifier} in domain {domain_identifier}: {str(e)}")
     #         raise Exception(f"Unexpected error updating domain unit {identifier} in domain {domain_identifier}: {str(e)}")
 
-    # @mcp.tool()
-    # async def add_entity_owner(
-    #     domain_identifier: str,
-    #     entity_identifier: str,
-    #     owner_identifier: str,
-    #     entity_type: str = "DOMAIN_UNIT",
-    #     owner_type: str = "USER",
-    #     client_token: str = None
-    # ) -> Any:
-    #     """
-    #     Adds an owner to an entity (domain unit or project) in AWS DataZone.
+    @mcp.tool()
+    async def add_entity_owner(
+        domain_identifier: str,
+        entity_identifier: str,
+        owner_identifier: str,
+        entity_type: str = "DOMAIN_UNIT",
+        owner_type: str = "USER",
+        client_token: Optional[str] = None,
+    ) -> Any:
+        """
+        Adds an owner to an entity (domain unit or project) in AWS DataZone.
 
-    #     Args:
-    #         domain_identifier (str): The ID of the domain
-    #         entity_identifier (str): The ID or name of the entity (domain unit or project) to add the owner to
-    #         owner_identifier (str): The identifier of the owner to add (can be IAM ARN for users)
-    #         entity_type (str, optional): The type of entity (DOMAIN_UNIT or PROJECT, default: DOMAIN_UNIT)
-    #         owner_type (str, optional): The type of owner (default: "USER")
-    #         client_token (str, optional): A unique token to ensure idempotency
+        Args:
+            domain_identifier (str): The ID of the domain
+            entity_identifier (str): The ID or name of the entity (domain unit or project) to add the owner to
+            owner_identifier (str): The identifier of the owner to add (can be IAM ARN for users)
+            entity_type (str, optional): The type of entity (DOMAIN_UNIT or PROJECT, default: DOMAIN_UNIT)
+            owner_type (str, optional): The type of owner (default: "USER")
+            client_token (str, optional): A unique token to ensure idempotency
 
-    #     Returns:
-    #         Any: The API response
-    #     """
-    #     try:
-    #         logger.info(f"Adding owner {owner_identifier} to {entity_type.lower()} {entity_identifier} in domain {domain_identifier}")
-    #         # Validate entity type
-    #         if entity_type not in ["DOMAIN_UNIT", "PROJECT"]:
-    #             raise ValueError("entity_type must be either 'DOMAIN_UNIT' or 'PROJECT'")
+        Returns:
+            Any: The API response
+        """
+        try:
+            logger.info(
+                f"Adding owner {owner_identifier} to {entity_type.lower()} {entity_identifier} in domain {domain_identifier}"
+            )
+            # Validate entity type
+            if entity_type not in ["DOMAIN_UNIT", "PROJECT"]:
+                raise ValueError("entity_type must be either 'DOMAIN_UNIT' or 'PROJECT'")
 
-    #         # Prepare the owner object
-    #         owner = {
-    #             "type": owner_type
-    #         }
+            # Prepare the owner object
+            owner = {"type": owner_type}
 
-    #         # Handle IAM ARN format
-    #         #TODO
-    #         if owner_identifier.startswith("arn:aws:iam::"):
-    #             # Extract the username from the ARN
-    #             username = owner_identifier.split("/")[-1]
-    #             owner["identifier"] = username
-    #         else:
-    #             owner["identifier"] = owner_identifier
+            # Handle IAM ARN format
+            # TODO
+            if owner_identifier.startswith("arn:aws:iam::"):
+                # Extract the username from the ARN
+                username = owner_identifier.split("/")[-1]
+                owner["identifier"] = username
+            else:
+                owner["identifier"] = owner_identifier
 
-    #         # Prepare the request parameters
-    #         params = {
-    #             "entityType": entity_type,
-    #             "owner": owner
-    #         }
+            # Prepare the request parameters
+            params = {"entityType": entity_type, "owner": owner}
 
-    #         # Add optional client token if provided
-    #         if client_token:
-    #             params["clientToken"] = client_token
+            # Add optional client token if provided
+            if client_token:
+                params["clientToken"] = client_token
 
-    #         response = datazone_client.add_entity_owner(
-    #             domainIdentifier=domain_identifier,
-    #             entityIdentifier=entity_identifier,
-    #             **params
-    #         )
-    #         logger.info(f"Successfully added owner {owner_identifier} to {entity_type.lower()} {entity_identifier} in domain {domain_identifier}")
-    #         return response
-    #     except ClientError as e:
-    #         raise Exception(f"Error adding owner to {entity_type.lower()} {entity_identifier} in domain {domain_identifier}: {e}")
+            response = datazone_client.add_entity_owner(
+                domainIdentifier=domain_identifier, entityIdentifier=entity_identifier, **params
+            )
+            logger.info(
+                f"Successfully added owner {owner_identifier} to {entity_type.lower()} {entity_identifier} in domain {domain_identifier}"
+            )
+            return response
+        except ClientError as e:
+            raise Exception(
+                f"Error adding owner to {entity_type.lower()} {entity_identifier} in domain {domain_identifier}: {e}"
+            )
 
     # @mcp.tool()
     # async def list_entity_owners(
@@ -632,60 +686,63 @@ def register_tools(mcp: FastMCP):
     #     except ClientError as e:
     #         raise Exception(f"Error listing owners of {entity_type.lower()} {entity_identifier} in domain {domain_identifier}: {e}")
 
-    # @mcp.tool()
-    # async def add_policy_grant(
-    #     domain_identifier: str,
-    #     entity_identifier: str,
-    #     entity_type: str,
-    #     policy_type: str,
-    #     principal_identifier: str,
-    #     principal_type: str = "USER",
-    #     client_token: str = None,
-    #     detail: dict = None
-    # ) -> Any:
-    #     """
-    #     Adds a policy grant to a specified entity in AWS DataZone.
+    @mcp.tool()
+    async def add_policy_grant(
+        domain_identifier: str,
+        entity_identifier: str,
+        entity_type: str,
+        policy_type: str,
+        principal_identifier: str,
+        principal_type: str = "USER",
+        client_token: Optional[str] = None,
+        detail: Optional[dict] = None,
+    ) -> Any:
+        """
+        Adds a policy grant to a specified entity in AWS DataZone.
 
-    #     Args:
-    #         domain_identifier (str): The ID of the domain
-    #         entity_identifier (str): The ID of the entity to add the policy grant to
-    #         entity_type (str): The type of entity (DOMAIN_UNIT, ENVIRONMENT_BLUEPRINT_CONFIGURATION, or ENVIRONMENT_PROFILE)
-    #         policy_type (str): The type of policy to grant (e.g., CREATE_DOMAIN_UNIT, OVERRIDE_DOMAIN_UNIT_OWNERS, etc.)
-    #         principal_identifier (str): The identifier of the principal to grant permissions to
-    #         principal_type (str, optional): The type of principal (default: "USER")
-    #         client_token (str, optional): A unique token to ensure idempotency
-    #         detail (dict, optional): Additional details for the policy grant
+        Args:
+            domain_identifier (str): The ID of the domain
+            entity_identifier (str): The ID of the entity to add the policy grant to
+            entity_type (str): The type of entity (DOMAIN_UNIT, ENVIRONMENT_BLUEPRINT_CONFIGURATION, or ENVIRONMENT_PROFILE)
+            policy_type (str): The type of policy to grant (e.g., CREATE_DOMAIN_UNIT, OVERRIDE_DOMAIN_UNIT_OWNERS, etc.)
+            principal_identifier (str): The identifier of the principal to grant permissions to
+            principal_type (str, optional): The type of principal (default: "USER")
+            client_token (str, optional): A unique token to ensure idempotency
+            detail (dict, optional): Additional details for the policy grant
 
-    #     Returns:
-    #         Any: The API response
-    #     """
-    #     try:
-    #         logger.info(f"Adding policy {policy_type.lower()} to {principal_type.lower()} {principal_identifier} for {entity_type.lower()} {entity_identifier} in domain {domain_identifier}")
-    #         # Prepare the request parameters
-    #         params = {
-    #             "policyType": policy_type,
-    #             "principal": {
-    #                 "identifier": principal_identifier,
-    #                 "type": principal_type
-    #             }
-    #         }
+        Returns:
+            Any: The API response
+        """
+        try:
+            logger.info(
+                f"Adding policy {policy_type.lower()} to {principal_type.lower()} {principal_identifier} for {entity_type.lower()} {entity_identifier} in domain {domain_identifier}"
+            )
+            # Prepare the request parameters
+            params = {
+                "policyType": policy_type,
+                "principal": {"identifier": principal_identifier, "type": principal_type},
+            }
 
-    #         # Add optional parameters if provided
-    #         if client_token:
-    #             params["clientToken"] = client_token
-    #         if detail:
-    #             params["detail"] = detail
+            # Add optional parameters if provided
+            if client_token:
+                params["clientToken"] = client_token
+            if detail:
+                params["detail"] = detail
 
-    #         response = datazone_client.add_policy_grant(
-    #             domainIdentifier=domain_identifier,
-    #             entityIdentifier=entity_identifier,
-    #             entityType=entity_type,
-    #             **params
-    #         )
-    #         logger.info(f"Successfully added policy {policy_type.lower()} to {principal_type.lower()} {principal_identifier} for {entity_type.lower()} {entity_identifier} in domain {domain_identifier}")
-    #         return response
-    #     except ClientError as e:
-    #         raise Exception(f"Error adding policy grant to entity {entity_identifier} in domain {domain_identifier}: {e}")
+            response = datazone_client.add_policy_grant(
+                domainIdentifier=domain_identifier,
+                entityIdentifier=entity_identifier,
+                entityType=entity_type,
+                **params,
+            )
+            logger.info(
+                f"Successfully added policy {policy_type.lower()} to {principal_type.lower()} {principal_identifier} for {entity_type.lower()} {entity_identifier} in domain {domain_identifier}"
+            )
+            return response
+        except ClientError as e:
+            raise Exception(
+                f"Error adding policy grant to entity {entity_identifier} in domain {domain_identifier}: {e}"
+            )
 
     # @mcp.tool()
     # async def list_policy_grants(
@@ -824,14 +881,14 @@ def register_tools(mcp: FastMCP):
     async def search(
         domain_identifier: str,
         search_scope: str,
-        additional_attributes: List[str] = None,
-        filters: Dict[str, Any] = None,
+        additional_attributes: Optional[List[str]] = None,
+        filters: Optional[Dict[str, Any]] = None,
         max_results: int = 50,
-        next_token: str = None,
-        owning_project_identifier: str = None,
-        search_in: List[Dict[str, str]] = None,
-        search_text: str = None,
-        sort: Dict[str, str] = None,
+        next_token: Optional[str] = None,
+        owning_project_identifier: Optional[str] = None,
+        search_in: Optional[List[Dict[str, str]]] = None,
+        search_text: Optional[str] = None,
+        sort: Optional[Dict[str, str]] = None,
     ) -> Any:
         """
         Searches for assets in Amazon DataZone.
@@ -936,13 +993,13 @@ def register_tools(mcp: FastMCP):
         domain_identifier: str,
         managed: bool,
         search_scope: str,
-        filters: Dict[str, Any] = None,
+        filters: Optional[Dict[str, Any]] = None,
         max_results: int = 50,
-        next_token: str = None,
-        search_in: List[Dict[str, str]] = None,
-        owning_project_identifier: str = None,
-        search_text: str = None,
-        sort: Dict[str, str] = None,
+        next_token: Optional[str] = None,
+        search_in: Optional[List[Dict[str, str]]] = None,
+        owning_project_identifier: Optional[str] = None,
+        search_text: Optional[str] = None,
+        sort: Optional[Dict[str, str]] = None,
     ) -> Any:
         """
         Invokes the SearchTypes action in a specified Amazon DataZone domain to retrieve type definitions
@@ -1042,7 +1099,7 @@ def register_tools(mcp: FastMCP):
 
     @mcp.tool()
     async def get_user_profile(
-        domain_identifier: str, user_identifier: str, user_type: str = None
+        domain_identifier: str, user_identifier: str, user_type: Optional[str] = None
     ) -> Any:
         """
         Retrieves the user profile in a specified Amazon DataZone domain for a given user.
@@ -1132,8 +1189,8 @@ def register_tools(mcp: FastMCP):
         domain_identifier: str,
         user_type: str,
         max_results: int = 50,
-        next_token: str = None,
-        search_text: str = None,
+        next_token: Optional[str] = None,
+        search_text: Optional[str] = None,
     ) -> Any:
         """
         Searches for user profiles within a specified Amazon DataZone domain.
@@ -1237,8 +1294,8 @@ def register_tools(mcp: FastMCP):
         domain_identifier: str,
         group_type: str,
         max_results: int = 50,
-        next_token: str = None,
-        search_text: str = None,
+        next_token: Optional[str] = None,
+        search_text: Optional[str] = None,
     ) -> Any:
         """
         Searches for group profiles within a specified Amazon DataZone domain.
@@ -1531,14 +1588,15 @@ def register_tools(mcp: FastMCP):
     return {
         "get_domain": get_domain,
         "create_domain": create_domain,
+        "list_domain_units": list_domain_units,
         "list_domains": list_domains,
-        # "create_domain_unit": create_domain_unit,
-        # "get_domain_unit": get_domain_unit,
+        "create_domain_unit": create_domain_unit,
+        "get_domain_unit": get_domain_unit,
         # "list_domain_units_for_parent": list_domain_units_for_parent,
         # "update_domain_unit": update_domain_unit,
-        # "add_entity_owner": add_entity_owner,
+        "add_entity_owner": add_entity_owner,
         # "list_entity_owners": list_entity_owners,
-        # "add_policy_grant": add_policy_grant,
+        "add_policy_grant": add_policy_grant,
         # "list_policy_grants": list_policy_grants,
         # "remove_policy_grant": remove_policy_grant,
         # "get_iam_portal_login_url": get_iam_portal_login_url,

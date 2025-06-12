@@ -192,7 +192,7 @@ class TestDataManagement:
             project_identifier=project_id,
             name=source_name,
             environment_identifier=env_id,
-            type=source_type,
+            data_src_type=source_type,
         )
 
         # Assert
@@ -201,7 +201,7 @@ class TestDataManagement:
             domainIdentifier=domain_id,
             projectIdentifier=project_id,
             name=source_name,
-            type=source_type,
+            data_src_type=source_type,
             enableSetting="ENABLED",
             publishOnImport=False,
             environmentIdentifier=env_id,
