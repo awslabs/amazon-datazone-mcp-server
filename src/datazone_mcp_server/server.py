@@ -25,16 +25,7 @@ mcp = FastMCP("datazone")
 
 # configure logger
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
-
-# Add a handler to write to stderr
-handler = logging.StreamHandler(sys.stderr)
-handler.setLevel(logging.DEBUG)
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-handler.setFormatter(formatter)
-logger.addHandler(handler)
-
-logger.debug("DataZone MCP Server initializing...")
+logger.setLevel(logging.INFO)
 
 # bedrock_config = Config(
 #     region_name="us-east-2",  # or your preferred region
