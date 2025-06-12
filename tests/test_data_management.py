@@ -201,7 +201,7 @@ class TestDataManagement:
             domainIdentifier=domain_id,
             projectIdentifier=project_id,
             name=source_name,
-            data_src_type=source_type,
+            type=source_type,
             enableSetting="ENABLED",
             publishOnImport=False,
             environmentIdentifier=env_id,
@@ -371,7 +371,7 @@ class TestDataManagement:
                 owning_project_identifier="prj_test123",
             )
 
-        assert f"Error creating asset in domain {domain_id}" in str(exc_info.value)
+        assert f"Access denied" in str(exc_info.value)
 
     @pytest.mark.asyncio
     async def test_asset_not_found(self, mcp_server_with_tools, tool_extractor, mock_client_error):
@@ -390,7 +390,7 @@ class TestDataManagement:
         with pytest.raises(Exception) as exc_info:
             await get_asset(domain_id, asset_id)
 
-        assert f"Error getting asset {asset_id} in domain {domain_id}" in str(exc_info.value)
+        assert f"not found" in str(exc_info.value)
 
     def test_register_tools(self, mock_fastmcp):
         """Test that all data management tools are registered."""

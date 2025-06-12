@@ -84,7 +84,7 @@ def register_tools(mcp: FastMCP):
             if single_sign_on:
                 params["singleSignOn"] = single_sign_on
             if service_role:
-                params["serviceRole"] = (service_role,)
+                params["serviceRole"] = service_role
 
             # Create the domain
             response = datazone_client.create_domain(**params)
@@ -166,7 +166,9 @@ def register_tools(mcp: FastMCP):
                 "maxResults": min(max_results, 25)
             }  # Ensure maxResults is within valid range
             if next_token:
-                params["nextToken"] = next_token  # Fixed: AWS API expects 'nextToken', not 'next_token'
+                params["nextToken"] = (
+                    next_token  # Fixed: AWS API expects 'nextToken', not 'next_token'
+                )
             if status:
                 params["status"] = status
 
@@ -1101,7 +1103,7 @@ def register_tools(mcp: FastMCP):
     async def get_user_profile(
         domain_identifier: str, user_identifier: str, user_type: Optional[str] = None
     ) -> Any:
-        """
+        r"""
         Retrieves the user profile in a specified Amazon DataZone domain for a given user.
 
         Args:
@@ -1114,8 +1116,8 @@ def register_tools(mcp: FastMCP):
                 Required: Yes
 
             user_identifier (str): The identifier of the user for whom to retrieve the profile.
-                Pattern: (^([0-9a-f]{10}-|)[A-Fa-f0-9]{8}-[A-Fa-f0-9]{4}-[A-Fa-f0-9]{4}-[A-Fa-f0-9]{4}-[A-Fa-f0-9]{12}$|
-                        ^[a-zA-Z_0-9+=,.@-]+$|^arn:aws:iam::\d{12}:.+$)
+                Pattern: r"(^([0-9a-f]{10}-|)[A-Fa-f0-9]{8}-[A-Fa-f0-9]{4}-[A-Fa-f0-9]{4}-[A-Fa-f0-9]
+                {4}-[A-Fa-f0-9]{12}$|^[a-zA-Z_0-9+=,.@-]+$|^arn:aws:iam::\d{12}:.+$)"
                 Required: Yes
 
         Returns:

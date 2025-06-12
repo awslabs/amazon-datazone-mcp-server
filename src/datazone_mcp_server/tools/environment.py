@@ -550,7 +550,7 @@ def register_tools(mcp: FastMCP):
 
     @mcp.tool()
     async def get_environment_blueprint(domain_identifier: str, identifier: str) -> Any:
-        """
+        r"""
         Gets an Amazon DataZone environment blueprint.
 
         Args:
@@ -575,7 +575,7 @@ def register_tools(mcp: FastMCP):
                     - Pattern: ^[a-zA-Z0-9_-]{1,36}$
                 - name (str): Name of the blueprint.
                     - Constraints: 1–64 characters.
-                    - Pattern: ^[\w -]+$
+                    - Pattern: r"^[\w -]+$"
                 - provider (str): The provider of the blueprint.
                 - provisioningProperties (dict): Provisioning configuration for the blueprint.
                     - Note: This is a union object—only one configuration type may be present.
@@ -619,7 +619,7 @@ def register_tools(mcp: FastMCP):
     async def get_environment_blueprint_configuration(
         domain_identifier: str, identifier: str
     ) -> Any:
-        """
+        r"""
         Gets an Amazon DataZone environment blueprint configuration.
 
         Args:
@@ -640,7 +640,7 @@ def register_tools(mcp: FastMCP):
                 - environmentBlueprintId (str): Unique ID of the blueprint.
                     - Pattern: ^[a-zA-Z0-9_-]{1,36}$
                 - environmentRolePermissionBoundary (str): ARN of the IAM policy that defines the permission boundary for environment roles.
-                    - Pattern: ^arn:aws[^:]*:iam::(aws|\d{12}):policy/[\w+=,.@-]*$
+                    - Pattern: r"^arn:aws[^:]*:iam::(aws|\d{12}):policy/[\w+=,.@-]*$"
                 - manageAccessRoleArn (str): ARN of the IAM role used to manage access to the blueprint.
                     - Pattern: ^arn:aws[^:]*:iam::\d{12}:(role|role/service-role)/[\w+=,.@-]*$
                 - provisioningConfigurations (list of dict): Provisioning configurations associated with the blueprint.
@@ -1041,7 +1041,7 @@ def register_tools(mcp: FastMCP):
         next_token: Optional[str] = None,
         project_identifier: Optional[str] = None,
     ) -> Dict[str, Any]:
-        """
+        r"""
         Lists environment profiles within a specified Amazon DataZone domain, optionally filtered by AWS account, region, blueprint, and project.
 
         Args:
@@ -1050,7 +1050,7 @@ def register_tools(mcp: FastMCP):
                 Required: Yes
 
             awsAccountId (str, optional): The AWS account ID to filter results.
-                Pattern: ^\d{12}$
+                Pattern: r"^\d{12}$"
 
             awsAccountRegion (str, optional): The AWS region to filter results.
                 Pattern: ^[a-z]{2}-[a-z]{4,10}-\d$

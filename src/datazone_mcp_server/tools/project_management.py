@@ -332,7 +332,7 @@ def register_tools(mcp: FastMCP):
 
     @mcp.tool()
     async def get_project_profile(domain_identifier: str, identifier: str) -> Any:
-        """
+        r"""
         Get the details of the project profile in an AWS DataZone domain.
 
         Args:
@@ -349,7 +349,7 @@ def register_tools(mcp: FastMCP):
                 domainId (str): The identifier of the domain the project profile belongs to.
                     Pattern: ^dzd[-_][a-zA-Z0-9_-]{1,36}$
                 domainUnitId (str): The identifier of the domain unit within the domain.
-                    Pattern: ^[a-z0-9_\-]+$, length 1–256
+                    Pattern: r"^[a-z0-9_\-]+$", length 1–256
                 environmentConfigurations (List[dict]): A list of environment configurations. Each item includes:
                     - awsAccount (dict): AWS account details.
                     - awsRegion (dict): AWS region.

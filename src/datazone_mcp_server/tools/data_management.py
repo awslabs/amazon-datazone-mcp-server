@@ -655,7 +655,7 @@ def register_tools(mcp: FastMCP):
             domain_identifier (str): The ID of the domain where the data source is created
             project_identifier (str): The ID of the project to associate the data source with
             name (str): The name of the data source (1-256 characters)
-            type (str): The type of data source (e.g., "S3", "GLUE", "REDSHIFT")
+            data_src_type (str): The type of data source (e.g., "S3", "GLUE", "REDSHIFT")
             description (str, optional): Description of the data source (0-2048 characters)
             enable_setting (str, optional): Whether the data source is enabled (ENABLED/DISABLED)
             environment_identifier (str, optional): ID of the environment to publish assets to
