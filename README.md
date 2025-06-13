@@ -42,7 +42,7 @@ pip install datazone-mcp-server
 ### Install from Source
 
 ```bash
-git clone https://github.com/wangtianren/datazone-mcp-server.git
+git clone https://github.com/awslabs/amazon-datazone-mcp-server.git
 cd datazone-mcp-server
 pip install -e .
 ```
@@ -163,7 +163,7 @@ datazone-mcp-server/
 
 ```bash
 # Clone the repository
-git clone https://github.com/wangtianren/datazone-mcp-server.git
+git clone https://github.com/awslabs/amazon-datazone-mcp-server.git
 cd datazone-mcp-server
 
 # Install with development dependencies
