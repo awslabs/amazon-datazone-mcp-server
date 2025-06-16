@@ -1,5 +1,5 @@
 """
-Environment management tools for AWS DataZone.
+Environment management tools for Amazon DataZone.
 """
 
 from typing import Any, Dict, List, Optional

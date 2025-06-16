@@ -1,5 +1,5 @@
 """
-Domain management tools for AWS DataZone.
+Domain management tools for Amazon DataZone.
 """
 
 from typing import Any, Dict, List, Optional
@@ -15,7 +15,7 @@ def register_tools(mcp: FastMCP):
     @mcp.tool()
     async def get_domain(identifier: str) -> Any:
         """
-        Calls the AWS DataZone GetDomain API for a given domain identifier.
+        Calls the Amazon DataZone GetDomain API for a given domain identifier.
 
         Args:
             identifier (str): The domain identifier (e.g., "dzd_4p9n6sw4qt9xgn")
@@ -125,7 +125,7 @@ def register_tools(mcp: FastMCP):
     @mcp.tool()
     async def list_domain_units(domain_identifier: str, parent_domain_unit_identifier: str) -> Any:
         """
-        Lists child domain units for the specified parent domain unit in an AWS DataZone domain.
+        Lists child domain units for the specified parent domain unit in an Amazon DataZone domain.
 
         Args:
             domain_identifier (str): The identifier of the domain (e.g., "dzd_4p9n6sw4qt9xgn")
@@ -148,7 +148,7 @@ def register_tools(mcp: FastMCP):
         max_results: int = 25, next_token: Optional[str] = None, status: Optional[str] = None
     ) -> Any:
         """
-        Lists AWS DataZone domains.
+        Lists Amazon DataZone domains.
 
         Args:
             max_results (int, optional): Maximum number of results to return (default: 25, max: 25)
@@ -167,7 +167,7 @@ def register_tools(mcp: FastMCP):
             }  # Ensure maxResults is within valid range
             if next_token:
                 params["nextToken"] = (
-                    next_token  # Fixed: AWS API expects 'nextToken', not 'next_token'
+                    next_token  # Fixed: Amazon API expects 'nextToken', not 'next_token'
                 )
             if status:
                 params["status"] = status
@@ -215,14 +215,18 @@ def register_tools(mcp: FastMCP):
                 logger.error(f"Insufficient permission to list domains")
                 raise Exception(f"Insufficient permission to list domains")
             elif error_code == "ValidationException":
-                logger.error(f"input fails to satisfy the constraints specified by the AWS service")
+                logger.error(
+                    f"input fails to satisfy the constraints specified by the Amazon service"
+                )
                 raise Exception(
-                    f"input fails to satisfy the constraints specified by the AWS service"
+                    f"input fails to satisfy the constraints specified by the Amazon service"
                 )
             elif error_code == "ResourceNotFoundException":
-                logger.error(f"input fails to satisfy the constraints specified by the AWS service")
+                logger.error(
+                    f"input fails to satisfy the constraints specified by the Amazon service"
+                )
                 raise Exception(
-                    f"input fails to satisfy the constraints specified by the AWS service"
+                    f"input fails to satisfy the constraints specified by the Amazon service"
                 )
         except Exception as e:
             logger.error(f"Unexpected error listing domains")
@@ -589,7 +593,7 @@ def register_tools(mcp: FastMCP):
         client_token: Optional[str] = None,
     ) -> Any:
         """
-        Adds an owner to an entity (domain unit or project) in AWS DataZone.
+        Adds an owner to an entity (domain unit or project) in Amazon DataZone.
 
         Args:
             domain_identifier (str): The ID of the domain
@@ -700,7 +704,7 @@ def register_tools(mcp: FastMCP):
         detail: Optional[dict] = None,
     ) -> Any:
         """
-        Adds a policy grant to a specified entity in AWS DataZone.
+        Adds a policy grant to a specified entity in Amazon DataZone.
 
         Args:
             domain_identifier (str): The ID of the domain
@@ -756,7 +760,7 @@ def register_tools(mcp: FastMCP):
     #     next_token: str = None
     # ) -> Any:
     #     """
-    #     Lists policy grants for a specified entity in AWS DataZone.
+    #     Lists policy grants for a specified entity in Amazon DataZone.
 
     #     Args:
     #         domain_identifier (str): The ID of the domain
@@ -801,7 +805,7 @@ def register_tools(mcp: FastMCP):
     #     client_token: str = None
     # ) -> Dict[str, Any]:
     #     """
-    #     Removes a policy grant from a specified entity in AWS DataZone.
+    #     Removes a policy grant from a specified entity in Amazon DataZone.
 
     #     Args:
     #         domain_identifier (str): The ID of the domain

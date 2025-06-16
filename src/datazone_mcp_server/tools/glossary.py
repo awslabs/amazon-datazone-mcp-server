@@ -1,5 +1,5 @@
 """
-Glossary management tools for AWS DataZone.
+Glossary management tools for Amazon DataZone.
 """
 
 from typing import Any, Dict, List, Optional

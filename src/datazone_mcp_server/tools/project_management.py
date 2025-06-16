@@ -1,5 +1,5 @@
 """
-Project management tools for AWS DataZone.
+Project management tools for Amazon DataZone.
 """
 
 from typing import Any, Dict, List, Optional
@@ -23,7 +23,7 @@ def register_tools(mcp: FastMCP):
         user_parameters: Optional[List[Dict[str, Any]]] = None,
     ) -> Any:
         """
-        Creates a new project in an AWS DataZone domain.
+        Creates a new project in an Amazon DataZone domain.
 
         Args:
             domain_identifier (str): The ID of the domain where the project will be created
@@ -96,7 +96,7 @@ def register_tools(mcp: FastMCP):
         group_identifier: Optional[str] = None,
     ) -> Any:
         """
-        Lists projects in an AWS DataZone domain with optional filtering and pagination.
+        Lists projects in an Amazon DataZone domain with optional filtering and pagination.
 
         Args:
             domain_identifier (str): The identifier of the domain
@@ -136,7 +136,7 @@ def register_tools(mcp: FastMCP):
         domainIdentifier: str, projectIdentifier: str, designation: str, memberIdentifier: str
     ) -> Any:
         """
-        Make a request to the AWS DataZone CreateProjectMembership API.
+        Make a request to the Amazon DataZone CreateProjectMembership API.
 
         Args:
             domainIdentifier (str): The identifier of the domain.
@@ -166,7 +166,7 @@ def register_tools(mcp: FastMCP):
         domain_identifier: str, max_results: int = 50, next_token: Optional[str] = None
     ) -> Any:
         """
-        Lists all project profiles available in an AWS DataZone domain.
+        Lists all project profiles available in an Amazon DataZone domain.
 
         Args:
             domain_identifier (str): The ID of the domain
@@ -333,7 +333,7 @@ def register_tools(mcp: FastMCP):
     @mcp.tool()
     async def get_project_profile(domain_identifier: str, identifier: str) -> Any:
         r"""
-        Get the details of the project profile in an AWS DataZone domain.
+        Get the details of the project profile in an Amazon DataZone domain.
 
         Args:
             domain_identifier (str): The ID of the domain

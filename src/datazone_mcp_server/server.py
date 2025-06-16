@@ -11,7 +11,7 @@ from .tools import (  # bedrock
     domain_management,
     environment,
     glossary,
-    project_management
+    project_management,
 )
 
 # initialize FastMCP server
@@ -27,6 +27,7 @@ project_management.register_tools(mcp)
 data_management.register_tools(mcp)
 glossary.register_tools(mcp)
 environment.register_tools(mcp)
+
 
 def main():
     """Entry point for console script."""
