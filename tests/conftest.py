@@ -1,5 +1,5 @@
 """
-Test configuration and fixtures for AWS DataZone MCP Server tests.
+Test configuration and fixtures for Amazon DataZone MCP Server tests.
 """
 
 import asyncio
@@ -22,7 +22,7 @@ def event_loop():
 
 @pytest.fixture
 def mock_datazone_client():
-    """Mock AWS DataZone client with pre-configured responses."""
+    """Mock Amazon DataZone client with pre-configured responses."""
     mock_client = Mock()
 
     # Domain responses

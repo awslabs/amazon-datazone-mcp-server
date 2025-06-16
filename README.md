@@ -1,15 +1,15 @@
-# AWS DataZone MCP Server
+# Amazon DataZone MCP Server
 
 [![Python](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![Version](https://img.shields.io/badge/version-0.1.0-green.svg)](https://github.com/wangtianren/datazone-mcp-server/releases)
 [![License](https://img.shields.io/badge/license-Apache%202.0-green.svg)](LICENSE)
 [![MCP](https://img.shields.io/badge/MCP-compatible-purple.svg)](https://modelcontextprotocol.io/)
 
-A high-performance Model Context Protocol (MCP) server that provides seamless integration with AWS DataZone services. This server enables AI assistants and applications to interact with AWS DataZone APIs through a standardized interface.
+A high-performance Model Context Protocol (MCP) server that provides seamless integration with Amazon DataZone services. This server enables AI assistants and applications to interact with Amazon DataZone APIs through a standardized interface.
 
 ## Features
 
-- **Complete AWS DataZone API Coverage**: Access all major DataZone operations
+- **Complete Amazon DataZone API Coverage**: Access all major DataZone operations
 - **Modular Architecture**: Well-organized, maintainable code structure
 - **Type Safety**: Full TypeScript-style type hints for Python
 - **Comprehensive Error Handling**: Detailed error messages and proper exception handling
@@ -31,7 +31,7 @@ A high-performance Model Context Protocol (MCP) server that provides seamless in
 
 - Python 3.10 or higher
 - AWS credentials configured
-- An active AWS DataZone domain
+- An active Amazon DataZone domain
 
 ### Install from PyPI
 
@@ -202,7 +202,7 @@ flake8 src tests
 
 ## Available Tools
 
-The AWS DataZone MCP server provides **38 tools** organized into 5 categories:
+The Amazon DataZone MCP server provides **38 tools** organized into 5 categories:
 
 ### Domain Management
 - `get_domain` - Retrieve domain information
@@ -284,12 +284,12 @@ This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENS
 **This is an unofficial, community-developed project and is not affiliated with, endorsed by, or supported by Amazon Web Services, Inc.**
 
 - AWS and DataZone are trademarks of Amazon.com, Inc. or its affiliates
-- This project provides a community-built interface to AWS DataZone APIs
+- This project provides a community-built interface to Amazon DataZone APIs
 - Users are responsible for their own AWS credentials, costs, and compliance
 - No warranty or support is provided - use at your own risk
 - Always follow AWS security best practices when using this tool
 
-For official AWS DataZone documentation and support, visit [AWS DataZone Documentation](https://docs.aws.amazon.com/datazone/).
+For official Amazon DataZone documentation and support, visit [Amazon DataZone Documentation](https://docs.aws.amazon.com/datazone/).
 
 ## Support
 
@@ -300,5 +300,5 @@ For official AWS DataZone documentation and support, visit [AWS DataZone Documen
 ## Acknowledgments
 
 - [Model Context Protocol](https://modelcontextprotocol.io/) for the protocol specification
-- [AWS DataZone](https://aws.amazon.com/datazone/) for the data governance platform
+- [Amazon DataZone](https://aws.amazon.com/datazone/) for the data governance platform
 - The open-source community for inspiration and contributions

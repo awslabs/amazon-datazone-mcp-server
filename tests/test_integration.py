@@ -1,5 +1,5 @@
 # """
-# Integration tests for AWS DataZone MCP Server.
+# Integration tests for Amazon DataZone MCP Server.
 
 # These tests require real AWS credentials and an active DataZone domain.
 # Run with: pytest tests/test_integration.py -m integration
@@ -49,7 +49,7 @@
 
 # @pytest.fixture(scope="session")
 # def real_datazone_client(check_aws_credentials, aws_region):
-#     """Create a real AWS DataZone client for integration tests."""
+#     """Create a real Amazon DataZone client for integration tests."""
 #     if os.getenv("SKIP_AWS_TESTS", "false").lower() == "true":
 #         pytest.skip("AWS integration tests disabled via SKIP_AWS_TESTS")
 
@@ -59,7 +59,7 @@
 #         client.list_domains(maxResults=1)
 #         return client
 #     except Exception as e:
-#         pytest.skip(f"Cannot connect to AWS DataZone: {e}")
+#         pytest.skip(f"Cannot connect to Amazon DataZone: {e}")
 
 
 # @pytest.fixture(scope="session")
