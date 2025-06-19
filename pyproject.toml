@@ -29,6 +29,8 @@ dependencies = [
     "boto3",
     "httpx",
     "mcp[cli]>=1.9.2",
+    "fastapi>=0.104.1",
+    "uvicorn>=0.24.0",
 ]
 
 [project.optional-dependencies]
