@@ -1,0 +1,113 @@
+version: '3.8'
+
+services:
+  # DataZone MCP Server
+  datazone-mcp:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.datazone
+    container_name: datazone-mcp-server
+    ports:
+      - "8080:8080"
+    environment:
+      - MCP_TRANSPORT=http
+      - HOST=0.0.0.0
+      - PORT=8080
+      - AWS_DEFAULT_REGION=us-east-1
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - AWS_SESSION_TOKEN=${AWS_SESSION_TOKEN}
+    networks:
+      - mcp-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Athena MCP Server
+  athena-mcp:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.athena
+    container_name: athena-mcp-server
+    ports:
+      - "8082:8082"
+    environment:
+      - MCP_TRANSPORT=http
+      - HOST=0.0.0.0
+      - PORT=8082
+      - AWS_DEFAULT_REGION=us-east-1
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - AWS_SESSION_TOKEN=${AWS_SESSION_TOKEN}
+    networks:
+      - mcp-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8082/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Glue MCP Server
+  glue-mcp:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.glue
+    container_name: glue-mcp-server
+    ports:
+      - "8081:8081"
+    environment:
+      - MCP_TRANSPORT=http
+      - HOST=0.0.0.0
+      - PORT=8081
+      - AWS_DEFAULT_REGION=us-east-1
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - AWS_SESSION_TOKEN=${AWS_SESSION_TOKEN}
+    networks:
+      - mcp-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8081/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # S3 MCP Server
+  s3-mcp:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.s3
+    container_name: s3-mcp-server
+    ports:
+      - "8083:8083"
+    environment:
+      - MCP_TRANSPORT=http
+      - HOST=0.0.0.0
+      - PORT=8083
+      - AWS_DEFAULT_REGION=us-east-1
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - AWS_SESSION_TOKEN=${AWS_SESSION_TOKEN}
+    networks:
+      - mcp-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8083/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+networks:
+  mcp-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16 
