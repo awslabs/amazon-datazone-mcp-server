@@ -17,15 +17,18 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY servers/shared/ ./servers/shared/
 COPY servers/athena/ ./servers/athena/
 
-# Set Python path
-ENV PYTHONPATH="/app:$PYTHONPATH"
+# Set Python path and MCP transport configuration
+ENV PYTHONPATH="/app:$PYTHONPATH" \
+    MCP_TRANSPORT=http \
+    HOST=0.0.0.0 \
+    PORT=8083
 
 # Expose port for HTTP MCP
-EXPOSE 8082
+EXPOSE 8083
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost:8082/health || exit 1
+    CMD curl -f http://localhost:8083/health || exit 1
 
 # Run the server
 CMD ["python", "-m", "servers.athena.server"] 

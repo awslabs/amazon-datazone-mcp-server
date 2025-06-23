@@ -49,13 +49,13 @@ dev = [
 ]
 
 [project.scripts]
-datazone-mcp-server = "datazone_mcp_server.server:main"
+datazone-mcp-server = "servers.datazone.server:main"
 
 [tool.black]
 line-length = 100
 
 [tool.isort]
-known_first_party = ["datazone_mcp_server"]
+known_first_party = ["servers"]
 
 # required for compatibility with black:
 profile = "black"
