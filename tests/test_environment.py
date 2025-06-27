@@ -7,7 +7,9 @@ class TestEnvironment:
     """Test cases for environment tools."""
 
     @pytest.mark.asyncio
-    async def test_list_environments_success(self, mcp_server_with_tools, tool_extractor):
+    async def test_list_environments_success(
+        self, mcp_server_with_tools, tool_extractor
+    ):
         """Test successful environments listing."""
         # Get the tool function from the MCP server
         list_environments = tool_extractor(mcp_server_with_tools, "list_environments")
@@ -29,7 +31,9 @@ class TestEnvironment:
             ],
             "nextToken": None,
         }
-        mcp_server_with_tools._mock_client.list_environments.return_value = expected_response
+        mcp_server_with_tools._mock_client.list_environments.return_value = (
+            expected_response
+        )
 
         # Act
         result = await list_environments(domain_id, project_id)
@@ -41,7 +45,9 @@ class TestEnvironment:
         )
 
     @pytest.mark.asyncio
-    async def test_create_connection_success(self, mcp_server_with_tools, tool_extractor):
+    async def test_create_connection_success(
+        self, mcp_server_with_tools, tool_extractor
+    ):
         """Test successful connection creation."""
         # Get the tool function from the MCP server
         create_connection = tool_extractor(mcp_server_with_tools, "create_connection")
@@ -56,13 +62,19 @@ class TestEnvironment:
             "name": name,
             "domainId": domain_id,
             "environmentId": environment_id,
-            "physicalEndpoints": [{"awsAccountId": "123456789012", "region": "us-east-1"}],
+            "physicalEndpoints": [
+                {"awsAccountId": "123456789012", "region": "us-east-1"}
+            ],
         }
-        mcp_server_with_tools._mock_client.create_connection.return_value = expected_response
+        mcp_server_with_tools._mock_client.create_connection.return_value = (
+            expected_response
+        )
 
         # Act
         result = await create_connection(
-            domain_identifier=domain_id, name=name, environment_identifier=environment_id
+            domain_identifier=domain_id,
+            name=name,
+            environment_identifier=environment_id,
         )
 
         # Assert
@@ -86,9 +98,13 @@ class TestEnvironment:
             "name": "Test Connection",
             "type": "AWS_ACCOUNT",
             "domainId": domain_id,
-            "physicalEndpoints": [{"awsAccountId": "123456789012", "region": "us-east-1"}],
+            "physicalEndpoints": [
+                {"awsAccountId": "123456789012", "region": "us-east-1"}
+            ],
         }
-        mcp_server_with_tools._mock_client.get_connection.return_value = expected_response
+        mcp_server_with_tools._mock_client.get_connection.return_value = (
+            expected_response
+        )
 
         # Act
         result = await get_connection(domain_id, connection_id)
@@ -100,7 +116,9 @@ class TestEnvironment:
         )
 
     @pytest.mark.asyncio
-    async def test_list_connections_success(self, mcp_server_with_tools, tool_extractor):
+    async def test_list_connections_success(
+        self, mcp_server_with_tools, tool_extractor
+    ):
         """Test successful connections listing."""
         # Get the tool function from the MCP server
         list_connections = tool_extractor(mcp_server_with_tools, "list_connections")
@@ -115,11 +133,17 @@ class TestEnvironment:
                     "name": "Test Connection 1",
                     "type": "AWS_ACCOUNT",
                 },
-                {"connectionId": "conn_test456", "name": "Test Connection 2", "type": "REDSHIFT"},
+                {
+                    "connectionId": "conn_test456",
+                    "name": "Test Connection 2",
+                    "type": "REDSHIFT",
+                },
             ],
             "nextToken": None,
         }
-        mcp_server_with_tools._mock_client.list_connections.return_value = expected_response
+        mcp_server_with_tools._mock_client.list_connections.return_value = (
+            expected_response
+        )
 
         # Act
         result = await list_connections(domain_id, project_id)
@@ -150,7 +174,9 @@ class TestEnvironment:
                     "description": "Blueprint for AWS account environments",
                     "provider": "aws",
                     "provisioningProperties": {
-                        "cloudFormation": {"templateUrl": "https://example.com/template.json"}
+                        "cloudFormation": {
+                            "templateUrl": "https://example.com/template.json"
+                        }
                     },
                     "createdAt": 1234567890,
                     "updatedAt": 1234567890,
@@ -167,7 +193,9 @@ class TestEnvironment:
                     "description": "Blueprint for AWS account environments",
                     "provider": "aws",
                     "provisioning_properties": {
-                        "cloudFormation": {"templateUrl": "https://example.com/template.json"}
+                        "cloudFormation": {
+                            "templateUrl": "https://example.com/template.json"
+                        }
                     },
                     "created_at": 1234567890,
                     "updated_at": 1234567890,
@@ -176,7 +204,9 @@ class TestEnvironment:
             "next_token": None,
         }
 
-        mcp_server_with_tools._mock_client.list_environment_blueprints.return_value = mock_response
+        mcp_server_with_tools._mock_client.list_environment_blueprints.return_value = (
+            mock_response
+        )
 
         # Act
         result = await list_environment_blueprints(domain_id)
@@ -188,7 +218,9 @@ class TestEnvironment:
         )
 
     @pytest.mark.asyncio
-    async def test_list_environments_with_filters(self, mcp_server_with_tools, tool_extractor):
+    async def test_list_environments_with_filters(
+        self, mcp_server_with_tools, tool_extractor
+    ):
         """Test environments listing with filters."""
         # Get the tool function from the MCP server
         list_environments = tool_extractor(mcp_server_with_tools, "list_environments")
@@ -198,7 +230,9 @@ class TestEnvironment:
         project_id = "prj_test123"
         environment_name = "Production"
         expected_response = {"items": [], "nextToken": None}
-        mcp_server_with_tools._mock_client.list_environments.return_value = expected_response
+        mcp_server_with_tools._mock_client.list_environments.return_value = (
+            expected_response
+        )
 
         # Act
         result = await list_environments(
@@ -232,8 +266,8 @@ class TestEnvironment:
         # Arrange
         domain_id = "dzd_test123"
         connection_name = "Denied Connection"
-        mcp_server_with_tools._mock_client.create_connection.side_effect = mock_client_error(
-            "AccessDeniedException", "Insufficient permissions"
+        mcp_server_with_tools._mock_client.create_connection.side_effect = (
+            mock_client_error("AccessDeniedException", "Insufficient permissions")
         )
 
         # Act & Assert
@@ -255,8 +289,8 @@ class TestEnvironment:
         # Arrange
         domain_id = "dzd_test123"
         project_id = "prj_nonexistent"
-        mcp_server_with_tools._mock_client.list_environments.side_effect = mock_client_error(
-            "ResourceNotFoundException", "Project not found"
+        mcp_server_with_tools._mock_client.list_environments.side_effect = (
+            mock_client_error("ResourceNotFoundException", "Project not found")
         )
 
         # Act & Assert
@@ -276,15 +310,17 @@ class TestEnvironment:
         # Arrange
         domain_id = "dzd_test123"
         connection_id = "conn_nonexistent"
-        mcp_server_with_tools._mock_client.get_connection.side_effect = mock_client_error(
-            "ResourceNotFoundException", "Connection not found"
+        mcp_server_with_tools._mock_client.get_connection.side_effect = (
+            mock_client_error("ResourceNotFoundException", "Connection not found")
         )
 
         # Act & Assert
         with pytest.raises(Exception) as exc_info:
             await get_connection(domain_id, connection_id)
 
-        assert f"Connection {connection_id} not found in domain {domain_id}" in str(exc_info.value)
+        assert f"Connection {connection_id} not found in domain {domain_id}" in str(
+            exc_info.value
+        )
 
     def test_register_tools(self, mock_fastmcp):
         """Test that tools are properly registered with FastMCP."""

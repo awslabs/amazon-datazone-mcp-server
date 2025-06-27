@@ -25,7 +25,9 @@ class TestComprehensiveCoverage:
             "projectId": project_id,
             "status": "CREATING",
         }
-        mcp_server_with_tools._mock_client.create_data_source.return_value = expected_response
+        mcp_server_with_tools._mock_client.create_data_source.return_value = (
+            expected_response
+        )
 
         result = await create_data_source(
             domain_identifier=domain_id,
@@ -36,9 +38,14 @@ class TestComprehensiveCoverage:
             environment_identifier="env_test123",  # covers line 719
             connection_identifier="conn_test123",  # covers line 721
             configuration={"s3": {"bucket": "test-bucket"}},  # covers line 723
-            asset_forms_input=[{"formName": "test", "content": "content"}],  # covers line 725
+            asset_forms_input=[
+                {"formName": "test", "content": "content"}
+            ],  # covers line 725
             recommendation={"enableBusinessNameGeneration": True},  # covers line 727
-            schedule={"schedule": "cron(0 12 * * ? *)", "timezone": "UTC"},  # covers line 729
+            schedule={
+                "schedule": "cron(0 12 * * ? *)",
+                "timezone": "UTC",
+            },  # covers line 729
             client_token="test_token_123",  # covers line 731
         )
 
@@ -55,7 +62,9 @@ class TestComprehensiveCoverage:
         assert "clientToken" in call_args
 
     @pytest.mark.asyncio
-    async def test_publish_asset_with_all_params(self, mcp_server_with_tools, tool_extractor):
+    async def test_publish_asset_with_all_params(
+        self, mcp_server_with_tools, tool_extractor
+    ):
         """Test publish_asset with all parameters to cover lines 314, 316."""
         publish_asset = tool_extractor(mcp_server_with_tools, "publish_asset")
 
@@ -68,7 +77,9 @@ class TestComprehensiveCoverage:
             "assetId": asset_id,
             "status": "PUBLISHED",
         }
-        mcp_server_with_tools._mock_client.publish_asset.return_value = expected_response
+        mcp_server_with_tools._mock_client.publish_asset.return_value = (
+            expected_response
+        )
 
         result = await publish_asset(
             domain_identifier=domain_id,
@@ -86,7 +97,9 @@ class TestComprehensiveCoverage:
         )
 
     @pytest.mark.asyncio
-    async def test_get_listing_with_revision(self, mcp_server_with_tools, tool_extractor):
+    async def test_get_listing_with_revision(
+        self, mcp_server_with_tools, tool_extractor
+    ):
         """Test get_listing with listing_revision parameter to cover line 583."""
         get_listing = tool_extractor(mcp_server_with_tools, "get_listing")
 
@@ -115,7 +128,9 @@ class TestComprehensiveCoverage:
         )
 
     @pytest.mark.asyncio
-    async def test_search_listings_with_all_params(self, mcp_server_with_tools, tool_extractor):
+    async def test_search_listings_with_all_params(
+        self, mcp_server_with_tools, tool_extractor
+    ):
         """Test search_listings with all optional parameters to cover lines 630-636."""
         search_listings = tool_extractor(mcp_server_with_tools, "search_listings")
 
@@ -125,7 +140,9 @@ class TestComprehensiveCoverage:
             "items": [{"id": "listing_123", "name": "Test Listing"}],
             "nextToken": None,
         }
-        mcp_server_with_tools._mock_client.search_listings.return_value = expected_response
+        mcp_server_with_tools._mock_client.search_listings.return_value = (
+            expected_response
+        )
 
         result = await search_listings(
             domain_identifier=domain_id,
@@ -133,7 +150,10 @@ class TestComprehensiveCoverage:
             next_token="next_token_123",  # covers line 632
             additional_attributes=["FORMS"],  # covers line 634
             search_in=[{"attribute": "name"}],  # covers line 636
-            sort={"attribute": "name", "order": "ASCENDING"},  # covers line 638 (if it exists)
+            sort={
+                "attribute": "name",
+                "order": "ASCENDING",
+            },  # covers line 638 (if it exists)
         )
 
         assert result == expected_response
@@ -153,8 +173,8 @@ class TestComprehensiveCoverage:
         domain_id = "dzd_test123"
         ds_id = "ds_test123"
 
-        mcp_server_with_tools._mock_client.get_data_source.side_effect = client_error_helper(
-            "ResourceNotFoundException"
+        mcp_server_with_tools._mock_client.get_data_source.side_effect = (
+            client_error_helper("ResourceNotFoundException")
         )
 
         with pytest.raises(Exception) as exc_info:
@@ -183,8 +203,8 @@ class TestComprehensiveCoverage:
         ]
 
         for error_code in error_codes:
-            mcp_server_with_tools._mock_client.list_data_sources.side_effect = client_error_helper(
-                error_code
+            mcp_server_with_tools._mock_client.list_data_sources.side_effect = (
+                client_error_helper(error_code)
             )
 
             with pytest.raises(Exception) as exc_info:
@@ -195,7 +215,9 @@ class TestComprehensiveCoverage:
             assert project_id in error_message
 
     @pytest.mark.asyncio
-    async def test_list_data_sources_with_all_params(self, mcp_server_with_tools, tool_extractor):
+    async def test_list_data_sources_with_all_params(
+        self, mcp_server_with_tools, tool_extractor
+    ):
         """Test list_data_sources with all optional parameters."""
         list_data_sources = tool_extractor(mcp_server_with_tools, "list_data_sources")
 
@@ -206,7 +228,9 @@ class TestComprehensiveCoverage:
             "items": [{"id": "ds_123", "name": "Test Data Source"}],
             "nextToken": None,
         }
-        mcp_server_with_tools._mock_client.list_data_sources.return_value = expected_response
+        mcp_server_with_tools._mock_client.list_data_sources.return_value = (
+            expected_response
+        )
 
         result = await list_data_sources(
             domain_identifier=domain_id,
@@ -262,7 +286,10 @@ class TestComprehensiveCoverage:
         # Test functions that might have missed error handling
         functions_to_test = [
             ("get_subscription", ["dzd_test123", "sub_test123"]),
-            ("create_form_type", ["dzd_test123", "Test Form", {"smithy": "test"}, "prj_test123"]),
+            (
+                "create_form_type",
+                ["dzd_test123", "Test Form", {"smithy": "test"}, "prj_test123"],
+            ),
         ]
 
         for func_name, args in functions_to_test:

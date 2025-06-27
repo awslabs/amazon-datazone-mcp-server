@@ -131,10 +131,14 @@ class DomainOperationsExample:
 
         try:
             # Try to get domain details
-            result = await self.client.call_tool("get_domain", {"identifier": self.domain_id})
+            result = await self.client.call_tool(
+                "get_domain", {"identifier": self.domain_id}
+            )
 
             domain_data = json.loads(result.content[0].text)
-            print(f"Access confirmed - Domain '{domain_data.get('name')}' is accessible")
+            print(
+                f"Access confirmed - Domain '{domain_data.get('name')}' is accessible"
+            )
             return True
 
         except Exception as e:

@@ -359,7 +359,8 @@ def mock_aws_credentials():
 def pytest_configure(config):
     """Configure pytest with custom markers."""
     config.addinivalue_line(
-        "markers", "integration: marks tests as integration tests (may require AWS credentials)"
+        "markers",
+        "integration: marks tests as integration tests (may require AWS credentials)",
     )
     config.addinivalue_line("markers", "slow: marks tests as slow running")
 
@@ -367,7 +368,9 @@ def pytest_configure(config):
 def pytest_collection_modifyitems(config, items):
     """Automatically skip integration tests if SKIP_AWS_TESTS is set."""
     if os.getenv("SKIP_AWS_TESTS", "false").lower() == "true":
-        skip_integration = pytest.mark.skip(reason="SKIP_AWS_TESTS environment variable is set")
+        skip_integration = pytest.mark.skip(
+            reason="SKIP_AWS_TESTS environment variable is set"
+        )
         for item in items:
             if "integration" in item.keywords:
                 item.add_marker(skip_integration)

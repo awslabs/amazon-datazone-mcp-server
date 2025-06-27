@@ -311,7 +311,9 @@ def register_tools(mcp: FastMCP):
                 "owners": response.get("owners", []),
             }
 
-            logger.info(f"Successfully created domain unit '{name}' in domain {domain_identifier}")
+            logger.info(
+                f"Successfully created domain unit '{name}' in domain {domain_identifier}"
+            )
             return result
 
         except ClientError as e:  # pragma: no cover
@@ -385,7 +387,9 @@ def register_tools(mcp: FastMCP):
                 - lastUpdatedBy: The user who last updated the domain unit
         """
         try:
-            logger.info(f"Getting domain unit {identifier} in domain {domain_identifier}")
+            logger.info(
+                f"Getting domain unit {identifier} in domain {domain_identifier}"
+            )
             response = datazone_client.get_domain_unit(
                 domainIdentifier=domain_identifier, identifier=identifier
             )
@@ -418,7 +422,9 @@ def register_tools(mcp: FastMCP):
                     f"Access denied while getting domain unit {identifier} in domain {domain_identifier}"
                 )
             elif error_code == "ResourceNotFoundException":  # pragma: no cover
-                logger.error(f"Domain unit {identifier} not found in domain {domain_identifier}")
+                logger.error(
+                    f"Domain unit {identifier} not found in domain {domain_identifier}"
+                )
                 raise Exception(
                     f"Domain unit {identifier} not found in domain {domain_identifier}"
                 )
@@ -969,7 +975,9 @@ def register_tools(mcp: FastMCP):
             ```
         """
         try:
-            logger.info(f"Searching {search_scope.lower()} in domain {domain_identifier}")
+            logger.info(
+                f"Searching {search_scope.lower()} in domain {domain_identifier}"
+            )
             # Validate search_scope
             valid_scopes = ["ASSET", "GLOSSARY", "GLOSSARY_TERM", "DATA_PRODUCT"]
             if search_scope not in valid_scopes:
@@ -979,7 +987,9 @@ def register_tools(mcp: FastMCP):
             params = {
                 "domainIdentifier": domain_identifier,
                 "searchScope": search_scope,
-                "maxResults": min(max_results, 50),  # Ensure maxResults is within valid range
+                "maxResults": min(
+                    max_results, 50
+                ),  # Ensure maxResults is within valid range
             }
 
             # Add optional parameters if provided
@@ -1006,21 +1016,31 @@ def register_tools(mcp: FastMCP):
         except ClientError as e:  # pragma: no cover
             error_code = e.response["Error"]["Code"]
             if error_code == "AccessDeniedException":  # pragma: no cover
-                raise Exception(f"Access denied while searching in domain {domain_identifier}")
+                raise Exception(
+                    f"Access denied while searching in domain {domain_identifier}"
+                )
             elif error_code == "InternalServerException":  # pragma: no cover
                 raise Exception(
                     f"Internal server error while searching in domain {domain_identifier}"
                 )
             elif error_code == "ThrottlingException":  # pragma: no cover
-                raise Exception(f"Request throttled while searching in domain {domain_identifier}")
+                raise Exception(
+                    f"Request throttled while searching in domain {domain_identifier}"
+                )
             elif error_code == "UnauthorizedException":  # pragma: no cover
                 raise Exception(f"Unauthorized to search in domain {domain_identifier}")
             elif error_code == "ValidationException":  # pragma: no cover
-                raise Exception(f"Invalid input while searching in domain {domain_identifier}")
+                raise Exception(
+                    f"Invalid input while searching in domain {domain_identifier}"
+                )
             else:  # pragma: no cover
-                raise Exception(f"Error searching in domain {domain_identifier}: {str(e)}")
+                raise Exception(
+                    f"Error searching in domain {domain_identifier}: {str(e)}"
+                )
         except Exception as e:  # pragma: no cover
-            raise Exception(f"Unexpected error searching in domain {domain_identifier}: {str(e)}")
+            raise Exception(
+                f"Unexpected error searching in domain {domain_identifier}: {str(e)}"
+            )
 
     @mcp.tool()
     async def search_types(
@@ -1072,7 +1092,9 @@ def register_tools(mcp: FastMCP):
                 - totalMatchCount (int): Total number of matching items.
         """
         try:
-            logger.info(f"Searching types {search_scope.lower()} in domain {domain_identifier}")
+            logger.info(
+                f"Searching types {search_scope.lower()} in domain {domain_identifier}"
+            )
             # Validate search_scope
             valid_scopes = ["ASSET_TYPE", "FORM_TYPE", "LINEAGE_NODE_TYPE"]
             if search_scope not in valid_scopes:
@@ -1082,7 +1104,9 @@ def register_tools(mcp: FastMCP):
             params = {
                 "domainIdentifier": domain_identifier,
                 "searchScope": search_scope,
-                "maxResults": min(max_results, 50),  # Ensure maxResults is within valid range
+                "maxResults": min(
+                    max_results, 50
+                ),  # Ensure maxResults is within valid range
                 "managed": managed,
             }
 
@@ -1118,13 +1142,17 @@ def register_tools(mcp: FastMCP):
                     f"Request throttled while searching types in domain {domain_identifier}"
                 )
             elif error_code == "UnauthorizedException":  # pragma: no cover
-                raise Exception(f"Unauthorized to search types in domain {domain_identifier}")
+                raise Exception(
+                    f"Unauthorized to search types in domain {domain_identifier}"
+                )
             elif error_code == "ValidationException":  # pragma: no cover
                 raise Exception(
                     f"Invalid input while searching types in domain {domain_identifier}"
                 )
             else:  # pragma: no cover
-                raise Exception(f"Error searching types in domain {domain_identifier}: {str(e)}")
+                raise Exception(
+                    f"Error searching types in domain {domain_identifier}: {str(e)}"
+                )
         except Exception as e:  # pragma: no cover
             raise Exception(
                 f"Unexpected error searching types in domain {domain_identifier}: {str(e)}"
@@ -1271,9 +1299,16 @@ def register_tools(mcp: FastMCP):
                     Min length: 1, Max length: 8192
         """
         try:
-            logger.info(f"Searching {user_type} user profiles in domain {domain_identifier}")
+            logger.info(
+                f"Searching {user_type} user profiles in domain {domain_identifier}"
+            )
             # Validate user_type
-            valid_types = ["SSO_USER", "DATAZONE_USER", "DATAZONE_SSO_USER", "DATAZONE_IAM_USER"]
+            valid_types = [
+                "SSO_USER",
+                "DATAZONE_USER",
+                "DATAZONE_SSO_USER",
+                "DATAZONE_IAM_USER",
+            ]
             if user_type not in valid_types:
                 raise ValueError(f"user_type must be one of {valid_types}")
 
@@ -1375,7 +1410,9 @@ def register_tools(mcp: FastMCP):
             HTTPError: If the API request fails or returns an error.
         """
         try:
-            logger.info(f"Searching {group_type} group profiles in domain {domain_identifier}")
+            logger.info(
+                f"Searching {group_type} group profiles in domain {domain_identifier}"
+            )
             # Validate group_type
             valid_types = ["SSO_GROUP", "DATAZONE_SSO_GROUP"]
             if group_type not in valid_types:

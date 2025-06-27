@@ -250,7 +250,9 @@ def register_tools(mcp: FastMCP):
             else:
                 raise Exception(f"Error creating asset in domain {domain_identifier}")
         except Exception:
-            raise Exception(f'Unexpected error creating asset in domain {domain_identifier}')
+            raise Exception(
+                f"Unexpected error creating asset in domain {domain_identifier}"
+            )
 
     # @mcp.tool()
     # async def delete_asset(
@@ -617,7 +619,7 @@ def register_tools(mcp: FastMCP):
             return response
         except ClientError as e:
             raise Exception(
-                f'Error getting listing {identifier} in domain {domain_identifier}: {e}'
+                f"Error getting listing {identifier} in domain {domain_identifier}: {e}"
             )
 
     @mcp.tool()
@@ -807,7 +809,7 @@ def register_tools(mcp: FastMCP):
             )
             return response
         except ClientError as e:
-            raise Exception(f'Error getting data source {identifier}: {e}')
+            raise Exception(f"Error getting data source {identifier}: {e}")
 
     # @mcp.tool()
     # async def get_time_series_data_point(
@@ -1372,10 +1374,7 @@ def register_tools(mcp: FastMCP):
             )
 
     @mcp.tool()
-    async def get_subscription(
-        domain_identifier: str,
-        identifier: str
-    ) -> Any:
+    async def get_subscription(domain_identifier: str, identifier: str) -> Any:
         """Gets a subscription in Amazon DataZone.
 
         Args:
@@ -1409,7 +1408,7 @@ def register_tools(mcp: FastMCP):
     async def get_form_type(
         domain_identifier: str,
         form_type_identifier: str,
-        revision: Optional[str] = None
+        revision: Optional[str] = None,
     ) -> Any:
         """Retrieves detailed information about a specific metadata form type in Amazon DataZone.
 
@@ -1582,7 +1581,9 @@ def register_tools(mcp: FastMCP):
             )
             return response
         except ClientError as e:  # pragma: no cover
-            raise Exception(f"Error creating form type in domain {domain_identifier}: {e}")
+            raise Exception(
+                f"Error creating form type in domain {domain_identifier}: {e}"
+            )
 
     @mcp.tool()
     async def list_data_sources(
@@ -1657,7 +1658,9 @@ def register_tools(mcp: FastMCP):
             # Prepare the request parameters
             params = {
                 "domainIdentifier": domain_identifier,
-                "maxResults": min(max_results, 50),  # Ensure maxResults is within valid range
+                "maxResults": min(
+                    max_results, 50
+                ),  # Ensure maxResults is within valid range
                 "projectIdentifier": project_identifier,
             }
 
@@ -1679,7 +1682,7 @@ def register_tools(mcp: FastMCP):
             return response
         except ClientError as e:  # pragma: no cover
             raise Exception(
-                f'Error listing data sources in project {project_identifier} in domain {domain_identifier}: {e}'
+                f"Error listing data sources in project {project_identifier} in domain {domain_identifier}: {e}"
             )
 
     # Return the decorated functions for testing purposes

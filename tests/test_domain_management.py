@@ -24,7 +24,9 @@ class TestDomainManagement:
         assert result["status"] == "AVAILABLE"
 
         # Verify the mock was called correctly
-        mcp_server_with_tools._mock_client.get_domain.assert_called_once_with(identifier=domain_id)
+        mcp_server_with_tools._mock_client.get_domain.assert_called_once_with(
+            identifier=domain_id
+        )
 
     @pytest.mark.asyncio
     async def test_get_domain_not_found(
@@ -74,7 +76,11 @@ class TestDomainManagement:
 
     @pytest.mark.asyncio
     async def test_create_domain_conflict(
-        self, mcp_server_with_tools, tool_extractor, sample_domain_data, client_error_helper
+        self,
+        mcp_server_with_tools,
+        tool_extractor,
+        sample_domain_data,
+        client_error_helper,
     ):
         """Test domain creation conflict error."""
         # Configure mock to raise ConflictException
@@ -90,11 +96,17 @@ class TestDomainManagement:
                 service_role=sample_domain_data["service_role"],
             )
 
-        assert f"Domain {sample_domain_data["name"]} already exists" in str(exc_info.value)
+        assert f"Domain {sample_domain_data['name']} already exists" in str(
+            exc_info.value
+        )
 
     @pytest.mark.asyncio
     async def test_create_domain_access_denied(
-        self, mcp_server_with_tools, tool_extractor, sample_domain_data, client_error_helper
+        self,
+        mcp_server_with_tools,
+        tool_extractor,
+        sample_domain_data,
+        client_error_helper,
     ):
         """Test domain creation access denied error."""
         # Configure mock to raise AccessDeniedException
@@ -110,8 +122,9 @@ class TestDomainManagement:
                 service_role=sample_domain_data["service_role"],
             )
 
-        assert f"Access denied while creating domain {sample_domain_data["name"]}" in str(
-            exc_info.value
+        assert (
+            f"Access denied while creating domain {sample_domain_data['name']}"
+            in str(exc_info.value)
         )
 
     @pytest.mark.asyncio
@@ -217,7 +230,9 @@ class TestDomainManagement:
         )
 
     @pytest.mark.asyncio
-    async def test_search_success(self, mcp_server_with_tools, tool_extractor, test_data_helper):
+    async def test_search_success(
+        self, mcp_server_with_tools, tool_extractor, test_data_helper
+    ):
         """Test successful search operation."""
         # Configure mock response
         mcp_server_with_tools._mock_client.search.return_value = {
@@ -239,7 +254,9 @@ class TestDomainManagement:
         search_text = "test"
 
         result = await search(
-            domain_identifier=domain_id, search_scope=search_scope, search_text=search_text
+            domain_identifier=domain_id,
+            search_scope=search_scope,
+            search_text=search_text,
         )
 
         # Verify the result
@@ -287,7 +304,11 @@ class TestDomainManagement:
 
     @pytest.mark.asyncio
     async def test_error_handling_generic_error(
-        self, mcp_server_with_tools, tool_extractor, test_data_helper, client_error_helper
+        self,
+        mcp_server_with_tools,
+        tool_extractor,
+        test_data_helper,
+        client_error_helper,
     ):
         """Test generic error handling."""
         # Configure mock to raise a generic error

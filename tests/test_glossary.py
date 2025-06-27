@@ -23,7 +23,9 @@ class TestGlossary:
             "owningProjectId": sample_glossary_data["owning_project_identifier"],
             "status": "ENABLED",
         }
-        mcp_server_with_tools._mock_client.create_glossary.return_value = expected_response
+        mcp_server_with_tools._mock_client.create_glossary.return_value = (
+            expected_response
+        )
 
         # Act
         result = await create_glossary(
@@ -44,10 +46,14 @@ class TestGlossary:
         )
 
     @pytest.mark.asyncio
-    async def test_create_glossary_term_success(self, mcp_server_with_tools, tool_extractor):
+    async def test_create_glossary_term_success(
+        self, mcp_server_with_tools, tool_extractor
+    ):
         """Test successful glossary term creation."""
         # Get the tool function from the MCP server
-        create_glossary_term = tool_extractor(mcp_server_with_tools, "create_glossary_term")
+        create_glossary_term = tool_extractor(
+            mcp_server_with_tools, "create_glossary_term"
+        )
 
         # Arrange
         domain_id = "dzd_test123"
@@ -65,7 +71,9 @@ class TestGlossary:
             "glossaryId": glossary_id,
             "status": "ENABLED",
         }
-        mcp_server_with_tools._mock_client.create_glossary_term.return_value = expected_response
+        mcp_server_with_tools._mock_client.create_glossary_term.return_value = (
+            expected_response
+        )
 
         # Act
         result = await create_glossary_term(
@@ -116,7 +124,9 @@ class TestGlossary:
         )
 
     @pytest.mark.asyncio
-    async def test_get_glossary_term_success(self, mcp_server_with_tools, tool_extractor):
+    async def test_get_glossary_term_success(
+        self, mcp_server_with_tools, tool_extractor
+    ):
         """Test successful glossary term retrieval."""
         # Get the tool function from the MCP server
         get_glossary_term = tool_extractor(mcp_server_with_tools, "get_glossary_term")
@@ -132,7 +142,9 @@ class TestGlossary:
             "glossaryId": "glossary_test123",
             "status": "ENABLED",
         }
-        mcp_server_with_tools._mock_client.get_glossary_term.return_value = expected_response
+        mcp_server_with_tools._mock_client.get_glossary_term.return_value = (
+            expected_response
+        )
 
         # Act
         result = await get_glossary_term(domain_id, term_id)
@@ -154,8 +166,8 @@ class TestGlossary:
         # Arrange
         domain_id = "dzd_test123"
         glossary_name = "Denied Glossary"
-        mcp_server_with_tools._mock_client.create_glossary.side_effect = mock_client_error(
-            "AccessDeniedException", "Insufficient permissions"
+        mcp_server_with_tools._mock_client.create_glossary.side_effect = (
+            mock_client_error("AccessDeniedException", "Insufficient permissions")
         )
 
         # Act & Assert
@@ -187,7 +199,9 @@ class TestGlossary:
         with pytest.raises(Exception) as exc_info:
             await get_glossary(domain_id, glossary_id)
 
-        assert f"Error getting glossary {glossary_id} in domain {domain_id}" in str(exc_info.value)
+        assert f"Error getting glossary {glossary_id} in domain {domain_id}" in str(
+            exc_info.value
+        )
 
     @pytest.mark.asyncio
     async def test_create_glossary_term_conflict(
@@ -195,14 +209,16 @@ class TestGlossary:
     ):
         """Test glossary term creation when term already exists."""
         # Get the tool function from the MCP server
-        create_glossary_term = tool_extractor(mcp_server_with_tools, "create_glossary_term")
+        create_glossary_term = tool_extractor(
+            mcp_server_with_tools, "create_glossary_term"
+        )
 
         # Arrange
         domain_id = "dzd_test123"
         glossary_id = "glossary_test123"
         term_name = "Existing Term"
-        mcp_server_with_tools._mock_client.create_glossary_term.side_effect = mock_client_error(
-            "ConflictException", "Term already exists"
+        mcp_server_with_tools._mock_client.create_glossary_term.side_effect = (
+            mock_client_error("ConflictException", "Term already exists")
         )
 
         # Act & Assert
@@ -214,7 +230,9 @@ class TestGlossary:
                 short_description="Short desc",
             )
 
-        assert f"Error creating glossary term in domain {domain_id}" in str(exc_info.value)
+        assert f"Error creating glossary term in domain {domain_id}" in str(
+            exc_info.value
+        )
 
     def test_register_tools(self, mock_fastmcp):
         """Test that tools are properly registered with FastMCP."""
@@ -272,7 +290,9 @@ class TestGlossaryParameterValidation:
     ):
         """Test create_glossary_term with optional parameters."""
         # Get the tool function from the MCP server
-        create_glossary_term = tool_extractor(mcp_server_with_tools, "create_glossary_term")
+        create_glossary_term = tool_extractor(
+            mcp_server_with_tools, "create_glossary_term"
+        )
 
         # Arrange
         mcp_server_with_tools._mock_client.create_glossary_term.return_value = {

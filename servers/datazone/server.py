@@ -49,7 +49,7 @@ def get_mcp_credentials():
             and os.environ.get("AWS_SESSION_TOKEN")
         ):
             logger.info(
-                "✅ Using MCP credentials from environment variables (local development)"
+                " Using MCP credentials from environment variables (local development)"
             )
             return {
                 "aws_access_key_id": os.environ.get("AWS_ACCESS_KEY_ID"),
@@ -61,7 +61,7 @@ def get_mcp_credentials():
 
         # For AWS deployment, always retrieve from Secrets Manager
         logger.info(
-            "🔍 Running in AWS environment - retrieving MCP credentials from Secrets Manager..."
+            " Running in AWS environment - retrieving MCP credentials from Secrets Manager..."
         )
         secrets_client = boto3.client("secretsmanager", region_name="us-east-1")
 
@@ -73,7 +73,7 @@ def get_mcp_credentials():
         secret_value = json.loads(response["SecretString"])
 
         logger.info(
-            f"✅ Successfully retrieved MCP credentials from Secrets Manager for account: {secret_value.get('ACCOUNT_ID', 'unknown')}"
+            f" Successfully retrieved MCP credentials from Secrets Manager for account: {secret_value.get('ACCOUNT_ID', 'unknown')}"
         )
         return {
             "aws_access_key_id": secret_value["AWS_ACCESS_KEY_ID"],
@@ -84,9 +84,9 @@ def get_mcp_credentials():
         }
 
     except Exception as e:
-        logger.error(f"❌ Failed to retrieve MCP credentials from Secrets Manager: {e}")
+        logger.error(f" Failed to retrieve MCP credentials from Secrets Manager: {e}")
         # Fall back to default credentials
-        logger.warning("⚠️ Falling back to default AWS credentials")
+        logger.warning(" Falling back to default AWS credentials")
         return None
 
 
@@ -103,7 +103,7 @@ def create_mcp_server():
         # Create a session and DataZone client based on credentials
         if mcp_credentials:
             logger.info(
-                f"📊 DataZone MCP Server connecting to AWS Account: {mcp_credentials.get('account_id', 'N/A')}"
+                f" DataZone MCP Server connecting to AWS Account: {mcp_credentials.get('account_id', 'N/A')}"
             )
             session = boto3.Session(
                 aws_access_key_id=mcp_credentials["aws_access_key_id"],
@@ -123,24 +123,24 @@ def create_mcp_server():
                 actual_account = identity.get("Account", "unknown")
                 user_arn = identity.get("Arn", "unknown")
                 logger.info(
-                    f"🔐 STS VERIFICATION SUCCESS - DataZone MCP connected to AWS Account: {actual_account}"
+                    f" STS VERIFICATION SUCCESS - DataZone MCP connected to AWS Account: {actual_account}"
                 )
-                logger.info(f"🔐 STS Identity ARN: {user_arn}")
+                logger.info(f" STS Identity ARN: {user_arn}")
 
                 # Log warning if account mismatch
                 expected_account = mcp_credentials.get("account_id", "014498655151")
                 if actual_account != expected_account:
                     logger.warning(
-                        f"⚠️ ACCOUNT MISMATCH - Expected: {expected_account}, Actual: {actual_account}"
+                        f" ACCOUNT MISMATCH - Expected: {expected_account}, Actual: {actual_account}"
                     )
                 else:
                     logger.info(
-                        f"✅ ACCOUNT MATCH CONFIRMED - Using correct account: {actual_account}"
+                        f" ACCOUNT MATCH CONFIRMED - Using correct account: {actual_account}"
                     )
 
             except Exception as sts_error:
                 logger.error(
-                    f"❌ STS VERIFICATION FAILED - Cannot verify AWS credentials: {sts_error}"
+                    f" STS VERIFICATION FAILED - Cannot verify AWS credentials: {sts_error}"
                 )
 
         else:
@@ -155,12 +155,12 @@ def create_mcp_server():
                 actual_account = identity.get("Account", "unknown")
                 user_arn = identity.get("Arn", "unknown")
                 logger.info(
-                    f"🔐 STS VERIFICATION (DEFAULT) - DataZone MCP connected to AWS Account: {actual_account}"
+                    f" STS VERIFICATION (DEFAULT) - DataZone MCP connected to AWS Account: {actual_account}"
                 )
-                logger.info(f"🔐 STS Identity ARN: {user_arn}")
+                logger.info(f" STS Identity ARN: {user_arn}")
             except Exception as sts_error:
                 logger.error(
-                    f"❌ STS VERIFICATION FAILED (DEFAULT) - Cannot verify AWS credentials: {sts_error}"
+                    f" STS VERIFICATION FAILED (DEFAULT) - Cannot verify AWS credentials: {sts_error}"
                 )
 
     except Exception as e:

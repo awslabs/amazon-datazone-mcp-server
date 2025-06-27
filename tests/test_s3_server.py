@@ -27,7 +27,8 @@ class TestGetMCPCredentials:
 
         assert result is not None
         assert (
-            result["aws_access_key_id"] == "ASIAQGYBP5OXW5MTKVKQ123456"  # pragma: allowlist secret
+            result["aws_access_key_id"]
+            == "ASIAQGYBP5OXW5MTKVKQ123456"  # pragma: allowlist secret
         )  # pragma: allowlist secret
         assert result["aws_secret_access_key"] == "test-secret"
         assert result["aws_session_token"] == "test-token"
@@ -104,7 +105,7 @@ class TestS3ReadFile:
         # Mock S3 get_object response for text file
         mock_body = Mock()
         mock_body.read.return_value = b"Hello, World!\nThis is a test file."
-        
+
         mock_response = MagicMock()
         mock_response.__getitem__.side_effect = lambda key: {
             "Body": mock_body,
@@ -147,7 +148,7 @@ class TestS3ReadFile:
         binary_content = b"\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR"
         mock_body = Mock()
         mock_body.read.return_value = binary_content
-        
+
         mock_response = MagicMock()
         mock_response.__getitem__.side_effect = lambda key: {
             "Body": mock_body,
@@ -223,7 +224,10 @@ class TestS3ListObjects:
                     "StorageClass": "STANDARD",
                 },
             ],
-            "CommonPrefixes": [{"Prefix": "folder1/subfolder/"}, {"Prefix": "folder1/another/"}],
+            "CommonPrefixes": [
+                {"Prefix": "folder1/subfolder/"},
+                {"Prefix": "folder1/another/"},
+            ],
             "IsTruncated": False,
             "KeyCount": 2,
         }
@@ -237,7 +241,7 @@ class TestS3ListObjects:
         assert "bucket" in result
         assert result["bucket"] == "test-bucket"
         assert result["prefix"] == "folder1/"
-        # Should have only objects in folder1/ 
+        # Should have only objects in folder1/
         assert len(result["objects"]) == 2
         assert result["objects"][0]["key"] == "folder1/file1.txt"
         assert result["objects"][1]["key"] == "folder1/file2.txt"
@@ -360,7 +364,7 @@ class TestS3HeadObject:
             await s3_head_object(
                 bucket_name="test-bucket", object_key="nonexistent/file.txt"
             )
-        
+
         # The actual implementation wraps ClientError in Exception
         assert "not found" in str(exc_info.value).lower()
 
@@ -401,7 +405,7 @@ class TestS3ListBuckets:
         assert result["buckets"][1]["name"] == "bucket2"
         assert result["buckets"][2]["name"] == "bucket3"
         # Note: the actual implementation doesn't return owner info
-        
+
         # Verify S3 client call
         mock_s3_client.list_buckets.assert_called_once()
 
@@ -495,7 +499,7 @@ class TestS3GetObject:
         # Mock S3 get_object response
         mock_body = Mock()
         mock_body.read.return_value = b"Hello, World!"
-        
+
         mock_response = MagicMock()
         mock_response.__getitem__.side_effect = lambda key: {
             "Body": mock_body,
@@ -544,7 +548,7 @@ class TestS3GetObject:
 
         mock_body = Mock()
         mock_body.read.return_value = b"World"
-        
+
         mock_response = MagicMock()
         mock_response.__getitem__.side_effect = lambda key: {
             "Body": mock_body,
@@ -577,7 +581,7 @@ class TestS3GetObject:
 
         mock_body = Mock()
         mock_body.read.return_value = b"Versioned content"
-        
+
         mock_response = MagicMock()
         mock_response.__getitem__.side_effect = lambda key: {
             "Body": mock_body,
@@ -797,7 +801,9 @@ class TestErrorHandling:
             with pytest.raises(Exception) as exc_info:
                 await s3_list_buckets()
 
-            assert "not initialized" in str(exc_info.value).lower() or "NoneType" in str(exc_info.value)
+            assert "not initialized" in str(
+                exc_info.value
+            ).lower() or "NoneType" in str(exc_info.value)
         finally:
             # Restore original client
             servers.s3.server.s3_client = original_client
@@ -838,7 +844,7 @@ class TestIntegration:
         # Mock get object response
         mock_get_body = Mock()
         mock_get_body.read.return_value = b"Test content"
-        
+
         mock_get_response = MagicMock()
         mock_get_response.__getitem__.side_effect = lambda key: {
             "Body": mock_get_body,

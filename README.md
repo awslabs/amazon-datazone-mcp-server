@@ -76,11 +76,11 @@ from mcp import create_client
 async def main():
     # Connect to the DataZone MCP server
     client = await create_client("stdio", ["python", "-m", "datazone_mcp_server.server"])
-    
+
     # List available tools
     tools = await client.list_tools()
     print(f"Available tools: {len(tools.tools)}")
-    
+
     # Call a DataZone operation
     result = await client.call_tool("get_domain", {
         "identifier": "dzd_your_domain_id"

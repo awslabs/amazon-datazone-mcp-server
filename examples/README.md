@@ -100,10 +100,10 @@ async def main():
     """Main example function with clear steps."""
     # Step 1: Setup
     client = await create_client("stdio", ["python", "-m", "datazone_mcp_server.server"])
-    
+
     # Step 2: Core operations
     # ... example code ...
-    
+
     # Step 3: Cleanup (if needed)
     # ... cleanup code ...
 

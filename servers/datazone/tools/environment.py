@@ -13,7 +13,7 @@
 # limitations under the License.
 """Environment management tools for Amazon DataZone."""
 
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, Optional
 
 from botocore.exceptions import ClientError
 
@@ -393,12 +393,10 @@ def register_tools(mcp: FastMCP):
 
     @mcp.tool()
     async def get_connection(
-        domain_identifier: str,
-        identifier: str,
-        with_secret: bool = False
+        domain_identifier: str, identifier: str, with_secret: bool = False
     ) -> Any:
         """Gets a connection in Amazon DataZone. A connection enables you to connect your resources
-        
+
         (domains, projects, and environments) to external resources and services.
 
         Connections are credentials + config for accessing a system, while data source is a specific location where your data resides using a connection.
@@ -475,10 +473,7 @@ def register_tools(mcp: FastMCP):
                 )
 
     @mcp.tool()
-    async def get_environment(
-        domain_identifier: str,
-        identifier: str
-    ) -> Any:
+    async def get_environment(domain_identifier: str, identifier: str) -> Any:
         """Gets an Amazon DataZone environment.
 
         Args:
@@ -570,10 +565,7 @@ def register_tools(mcp: FastMCP):
                 )
 
     @mcp.tool()
-    async def get_environment_blueprint(
-        domain_identifier: str,
-        identifier: str
-    ) -> Any:
+    async def get_environment_blueprint(domain_identifier: str, identifier: str) -> Any:
         r"""Retrieves metadata and definition of an environment blueprint.
 
         related tools:
@@ -643,8 +635,7 @@ def register_tools(mcp: FastMCP):
 
     @mcp.tool()
     async def get_environment_blueprint_configuration(
-        domain_identifier: str,
-        identifier: str
+        domain_identifier: str, identifier: str
     ) -> Any:
         r"""Gets an Amazon DataZone environment blueprint configuration.
 
@@ -796,7 +787,9 @@ def register_tools(mcp: FastMCP):
             params = {
                 "domainIdentifier": domain_identifier,
                 "projectIdentifier": project_identifier,
-                "maxResults": min(max_results, 50),  # Ensure maxResults is within valid range
+                "maxResults": min(
+                    max_results, 50
+                ),  # Ensure maxResults is within valid range
             }
 
             # Add optional parameters if provided
@@ -869,7 +862,9 @@ def register_tools(mcp: FastMCP):
             # Prepare request parameters
             params = {
                 "domainIdentifier": domain_identifier,
-                "maxResults": min(max_results, 50),  # Ensure maxResults is within valid range
+                "maxResults": min(
+                    max_results, 50
+                ),  # Ensure maxResults is within valid range
             }
 
             # Add optional parameters
@@ -900,7 +895,7 @@ def register_tools(mcp: FastMCP):
                 result["items"].append(formatted_blueprint)
 
             logger.info(
-                f"Successfully listed {len(result["items"])} environment blueprints in domain {domain_identifier}"
+                f"Successfully listed {len(result['items'])} environment blueprints in domain {domain_identifier}"
             )
             return result
 
@@ -944,9 +939,7 @@ def register_tools(mcp: FastMCP):
 
     @mcp.tool()
     async def list_environment_blueprint_configurations(
-        domain_identifier: str,
-        max_results: int = 50,
-        next_token: Optional[str] = None
+        domain_identifier: str, max_results: int = 50, next_token: Optional[str] = None
     ) -> Dict[str, Any]:
         """Lists environment blueprints in an Amazon DataZone domain.
 
@@ -984,14 +977,18 @@ def register_tools(mcp: FastMCP):
             # Prepare request parameters
             params = {
                 "domainIdentifier": domain_identifier,
-                "maxResults": min(max_results, 50),  # Ensure maxResults is within valid range
+                "maxResults": min(
+                    max_results, 50
+                ),  # Ensure maxResults is within valid range
             }
 
             if next_token:  # pragma: no cover
                 params["nextToken"] = next_token
 
             # List the environment blueprint configurations
-            response = datazone_client.list_environment_blueprint_configurations(**params)
+            response = datazone_client.list_environment_blueprint_configurations(
+                **params
+            )
 
             # Format the response
             result = {"items": [], "next_token": response.get("nextToken")}
@@ -1002,12 +999,16 @@ def register_tools(mcp: FastMCP):
                     "createdAt": configuration.get("createdAt"),
                     "domainId": configuration.get("domainId"),
                     "enabledRegions": configuration.get("enabledRegions"),
-                    "environmentBlueprintId": configuration.get("environmentBlueprintId"),
+                    "environmentBlueprintId": configuration.get(
+                        "environmentBlueprintId"
+                    ),
                     "environmentRolePermissionBoundary": configuration.get(
                         "environmentRolePermissionBoundary"
                     ),
                     "manageAccessRoleArn": configuration.get("manageAccessRoleArn"),
-                    "provisioningConfigurations": configuration.get("provisioningConfigurations"),
+                    "provisioningConfigurations": configuration.get(
+                        "provisioningConfigurations"
+                    ),
                     "provisioningRoleArn": configuration.get("provisioningRoleArn"),
                     "regionalParameters": configuration.get("regionalParameters"),
                     "updatedAt": configuration.get("updatedAt"),
@@ -1015,7 +1016,7 @@ def register_tools(mcp: FastMCP):
                 result["items"].append(formatted_configuration)
 
             logger.info(
-                f"Successfully listed {len(result["items"])} environment blueprint configurations in domain {domain_identifier}"
+                f"Successfully listed {len(result['items'])} environment blueprint configurations in domain {domain_identifier}"
             )
             return result
 
@@ -1119,7 +1120,9 @@ def register_tools(mcp: FastMCP):
             # Prepare request parameters
             params = {
                 "domainIdentifier": domain_identifier,
-                "maxResults": min(max_results, 50),  # Ensure maxResults is within valid range
+                "maxResults": min(
+                    max_results, 50
+                ),  # Ensure maxResults is within valid range
             }
 
             # Add optional parameters
@@ -1128,7 +1131,9 @@ def register_tools(mcp: FastMCP):
             if aws_account_region:  # pragma: no cover
                 params["awsAccountRegion"] = aws_account_region
             if environment_blueprint_identifier:  # pragma: no cover
-                params["environmentBlueprintIdentifier"] = environment_blueprint_identifier
+                params["environmentBlueprintIdentifier"] = (
+                    environment_blueprint_identifier
+                )
             if name:  # pragma: no cover
                 params["name"] = name
             if next_token:  # pragma: no cover
@@ -1160,7 +1165,7 @@ def register_tools(mcp: FastMCP):
                 result["items"].append(formatted_profile)
 
             logger.info(
-                f"Successfully listed {len(result["items"])} environment profiles in domain {domain_identifier}"
+                f"Successfully listed {len(result['items'])} environment profiles in domain {domain_identifier}"
             )
             return result
 

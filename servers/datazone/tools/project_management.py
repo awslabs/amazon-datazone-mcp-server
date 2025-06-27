@@ -13,7 +13,6 @@
 # limitations under the License.
 """Project management tools for Amazon DataZone."""
 
-
 from typing import Any, Dict, List, Optional
 
 from botocore.exceptions import ClientError
@@ -63,16 +62,17 @@ def register_tools(mcp: FastMCP):
             if user_parameters:  # pragma: no cover
                 params["userParameters"] = user_parameters
 
-            response = datazone_client.create_project(domainIdentifier=domain_identifier, **params)
+            response = datazone_client.create_project(
+                domainIdentifier=domain_identifier, **params
+            )
             return response
         except ClientError as e:  # pragma: no cover
-            raise Exception(f"Error creating project in domain {domain_identifier}: {e}")
+            raise Exception(
+                f"Error creating project in domain {domain_identifier}: {e}"
+            )
 
     @mcp.tool()
-    async def get_project(
-        domain_identifier: str,
-        project_identifier: str
-    ) -> Any:
+    async def get_project(domain_identifier: str, project_identifier: str) -> Any:
         """Retrieves detailed information, metadata and configuration, of a specific project in Amazon DataZone.
 
         Use this API when the user is asking about a **known project by name or context** and wants to:
@@ -126,7 +126,9 @@ def register_tools(mcp: FastMCP):
             # Prepare the request parameters
             params = {
                 "domainIdentifier": domain_identifier,
-                "maxResults": min(max_results, 50),  # Ensure maxResults is within valid range
+                "maxResults": min(
+                    max_results, 50
+                ),  # Ensure maxResults is within valid range
             }
 
             # Add optional parameters if provided
@@ -142,14 +144,16 @@ def register_tools(mcp: FastMCP):
             response = datazone_client.list_projects(**params)
             return response
         except ClientError as e:  # pragma: no cover
-            raise Exception(f"Error listing projects in domain {domain_identifier}: {e}")
+            raise Exception(
+                f"Error listing projects in domain {domain_identifier}: {e}"
+            )
 
     @mcp.tool()
     async def create_project_membership(
         domainIdentifier: str,
         projectIdentifier: str,
         designation: str,
-        memberIdentifier: str
+        memberIdentifier: str,
     ) -> Any:
         """Make a request to the Amazon DataZone CreateProjectMembership API.
 
@@ -169,7 +173,10 @@ def register_tools(mcp: FastMCP):
                 response = await client.post(
                     f"https://{domainIdentifier}.datazone.aws.dev/v2/domains/{domainIdentifier}/projects/{projectIdentifier}/createMembership",
                     headers=headers,
-                    json={"designation": designation, "member": {"identifier": memberIdentifier}},
+                    json={
+                        "designation": designation,
+                        "member": {"identifier": memberIdentifier},
+                    },
                 )
                 response.raise_for_status()
                 return response.json()
@@ -178,9 +185,7 @@ def register_tools(mcp: FastMCP):
 
     @mcp.tool()
     async def list_project_profiles(
-        domain_identifier: str,
-        max_results: int = 50,
-        next_token: Optional[str] = None
+        domain_identifier: str, max_results: int = 50, next_token: Optional[str] = None
     ) -> Any:
         """Lists all project profiles available in an Amazon DataZone domain.
 
@@ -196,7 +201,9 @@ def register_tools(mcp: FastMCP):
             # Prepare the request parameters
             params = {
                 "domainIdentifier": domain_identifier,
-                "maxResults": min(max_results, 50),  # Ensure maxResults is within valid range
+                "maxResults": min(
+                    max_results, 50
+                ),  # Ensure maxResults is within valid range
             }
 
             # Add optional next token if provided
@@ -206,7 +213,9 @@ def register_tools(mcp: FastMCP):
             response = datazone_client.list_project_profiles(**params)
             return response
         except ClientError as e:  # pragma: no cover
-            raise Exception(f"Error listing project profiles in domain {domain_identifier}: {e}")
+            raise Exception(
+                f"Error listing project profiles in domain {domain_identifier}: {e}"
+            )
 
     @mcp.tool()
     async def create_project_profile(
@@ -254,7 +263,9 @@ def register_tools(mcp: FastMCP):
                 - last_updated_at: Last update timestamp
         """
         try:
-            logger.info(f"Creating project profile '{name}' in domain {domain_identifier}")
+            logger.info(
+                f"Creating project profile '{name}' in domain {domain_identifier}"
+            )
 
             # Prepare request parameters
             params: Dict[str, Any] = {
@@ -281,7 +292,9 @@ def register_tools(mcp: FastMCP):
                 "description": response.get("description"),
                 "domain_id": response.get("domainId"),
                 "domain_unit_id": response.get("domainUnitId"),
-                "environment_configurations": response.get("environmentConfigurations", []),
+                "environment_configurations": response.get(
+                    "environmentConfigurations", []
+                ),
                 "status": response.get("status"),
                 "created_at": response.get("createdAt"),
                 "created_by": response.get("createdBy"),
@@ -346,10 +359,7 @@ def register_tools(mcp: FastMCP):
             )
 
     @mcp.tool()
-    async def get_project_profile(
-        domain_identifier: str,
-        identifier: str
-    ) -> Any:
+    async def get_project_profile(domain_identifier: str, identifier: str) -> Any:
         r"""Get the details of the project profile in an Amazon DataZone domain.
 
         Args:
@@ -496,7 +506,9 @@ def register_tools(mcp: FastMCP):
             params = {
                 "domainIdentifier": domain_identifier,
                 "projectIdentifier": project_identifier,
-                "maxResults": min(max_results, 50),  # Ensure maxResults is within valid range
+                "maxResults": min(
+                    max_results, 50
+                ),  # Ensure maxResults is within valid range
             }
 
             # Add optional next token if provided

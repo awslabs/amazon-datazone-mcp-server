@@ -106,7 +106,9 @@ class TestDataManagement:
             "listingId": "listing_test123",
             "status": "ACTIVE",
         }
-        mcp_server_with_tools._mock_client.publish_asset.return_value = expected_response
+        mcp_server_with_tools._mock_client.publish_asset.return_value = (
+            expected_response
+        )
 
         # Act
         result = await publish_asset(domain_id, asset_id)
@@ -169,10 +171,14 @@ class TestDataManagement:
             "nextToken": None,
             "totalMatchCount": 1,
         }
-        mcp_server_with_tools._mock_client.search_listings.return_value = expected_response
+        mcp_server_with_tools._mock_client.search_listings.return_value = (
+            expected_response
+        )
 
         # Act
-        result = await search_listings(domain_identifier=domain_id, search_text=search_text)
+        result = await search_listings(
+            domain_identifier=domain_id, search_text=search_text
+        )
 
         # Assert
         assert result == expected_response
@@ -181,7 +187,9 @@ class TestDataManagement:
         )
 
     @pytest.mark.asyncio
-    async def test_create_data_source_success(self, mcp_server_with_tools, tool_extractor):
+    async def test_create_data_source_success(
+        self, mcp_server_with_tools, tool_extractor
+    ):
         """Test successful data source creation."""
         # Get the tool function from the MCP server
         create_data_source = tool_extractor(mcp_server_with_tools, "create_data_source")
@@ -202,7 +210,9 @@ class TestDataManagement:
             "type": source_type,
             "status": "CREATING",
         }
-        mcp_server_with_tools._mock_client.create_data_source.return_value = expected_response
+        mcp_server_with_tools._mock_client.create_data_source.return_value = (
+            expected_response
+        )
 
         # Act
         result = await create_data_source(
@@ -240,7 +250,9 @@ class TestDataManagement:
             "domainId": domain_id,
             "status": "ACTIVE",
         }
-        mcp_server_with_tools._mock_client.get_data_source.return_value = expected_response
+        mcp_server_with_tools._mock_client.get_data_source.return_value = (
+            expected_response
+        )
 
         # Act
         result = await get_data_source(domain_id, ds_id)
@@ -252,10 +264,14 @@ class TestDataManagement:
         )
 
     @pytest.mark.asyncio
-    async def test_start_data_source_run_success(self, mcp_server_with_tools, tool_extractor):
+    async def test_start_data_source_run_success(
+        self, mcp_server_with_tools, tool_extractor
+    ):
         """Test successful data source run start."""
         # Get the tool function from the MCP server
-        start_data_source_run = tool_extractor(mcp_server_with_tools, "start_data_source_run")
+        start_data_source_run = tool_extractor(
+            mcp_server_with_tools, "start_data_source_run"
+        )
 
         # Arrange
         domain_id = "dzd_test123"
@@ -267,7 +283,9 @@ class TestDataManagement:
             "status": "REQUESTED",
             "createdAt": 1234567890,
         }
-        mcp_server_with_tools._mock_client.start_data_source_run.return_value = expected_response
+        mcp_server_with_tools._mock_client.start_data_source_run.return_value = (
+            expected_response
+        )
 
         # Act
         result = await start_data_source_run(domain_id, ds_id)
@@ -369,7 +387,9 @@ class TestDataManagement:
             "revision": "1",
             "status": "ENABLED",
         }
-        mcp_server_with_tools._mock_client.get_form_type.return_value = expected_response
+        mcp_server_with_tools._mock_client.get_form_type.return_value = (
+            expected_response
+        )
 
         # Act
         result = await get_form_type(domain_id, form_type_id)
@@ -406,7 +426,9 @@ class TestDataManagement:
         assert "Access denied" in str(exc_info.value)
 
     @pytest.mark.asyncio
-    async def test_asset_not_found(self, mcp_server_with_tools, tool_extractor, mock_client_error):
+    async def test_asset_not_found(
+        self, mcp_server_with_tools, tool_extractor, mock_client_error
+    ):
         """Test get_asset with asset not found error."""
         # Get the tool function from the MCP server
         get_asset = tool_extractor(mcp_server_with_tools, "get_asset")
@@ -443,7 +465,9 @@ class TestDataManagement:
         self, mcp_server_with_tools, tool_extractor, client_error_helper
     ):
         """Test start_data_source_run with all error types to cover lines 1008-1031."""
-        start_data_source_run = tool_extractor(mcp_server_with_tools, "start_data_source_run")
+        start_data_source_run = tool_extractor(
+            mcp_server_with_tools, "start_data_source_run"
+        )
 
         domain_id = "dzd_test123"
         ds_id = "ds_test123"
@@ -479,14 +503,16 @@ class TestDataManagement:
         self, mcp_server_with_tools, tool_extractor
     ):
         """Test start_data_source_run with unexpected exception to cover line 1012-1013."""
-        start_data_source_run = tool_extractor(mcp_server_with_tools, "start_data_source_run")
+        start_data_source_run = tool_extractor(
+            mcp_server_with_tools, "start_data_source_run"
+        )
 
         domain_id = "dzd_test123"
         ds_id = "ds_test123"
 
         # Test unexpected exception (non-ClientError)
-        mcp_server_with_tools._mock_client.start_data_source_run.side_effect = ValueError(
-            "Unexpected error"
+        mcp_server_with_tools._mock_client.start_data_source_run.side_effect = (
+            ValueError("Unexpected error")
         )
 
         with pytest.raises(Exception) as exc_info:
@@ -499,7 +525,9 @@ class TestDataManagement:
         self, mcp_server_with_tools, tool_extractor
     ):
         """Test start_data_source_run with client_token to cover line 1008."""
-        start_data_source_run = tool_extractor(mcp_server_with_tools, "start_data_source_run")
+        start_data_source_run = tool_extractor(
+            mcp_server_with_tools, "start_data_source_run"
+        )
 
         domain_id = "dzd_test123"
         ds_id = "ds_test123"
@@ -511,13 +539,17 @@ class TestDataManagement:
             "domainId": domain_id,
             "status": "REQUESTED",
         }
-        mcp_server_with_tools._mock_client.start_data_source_run.return_value = expected_response
+        mcp_server_with_tools._mock_client.start_data_source_run.return_value = (
+            expected_response
+        )
 
         result = await start_data_source_run(domain_id, ds_id, client_token)
 
         assert result == expected_response
         mcp_server_with_tools._mock_client.start_data_source_run.assert_called_once_with(
-            domainIdentifier=domain_id, dataSourceIdentifier=ds_id, clientToken=client_token
+            domainIdentifier=domain_id,
+            dataSourceIdentifier=ds_id,
+            clientToken=client_token,
         )
 
 
@@ -578,7 +610,9 @@ class TestDataManagementParameterValidation:
         # Arrange
         domain_id = "dzd_test123"
         expected_response = {"items": [], "nextToken": None}
-        mcp_server_with_tools._mock_client.search_listings.return_value = expected_response
+        mcp_server_with_tools._mock_client.search_listings.return_value = (
+            expected_response
+        )
 
         # Test with max_results > 50 (should be clamped to 50)
         result = await search_listings(domain_identifier=domain_id, max_results=100)

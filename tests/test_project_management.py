@@ -24,7 +24,9 @@ class TestProjectManagement:
             "status": "ACTIVE",
             "glossaryTerms": sample_project_data["glossary_terms"],
         }
-        mcp_server_with_tools._mock_client.create_project.return_value = expected_response
+        mcp_server_with_tools._mock_client.create_project.return_value = (
+            expected_response
+        )
 
         # Act
         result = await create_project(
@@ -44,7 +46,9 @@ class TestProjectManagement:
         )
 
     @pytest.mark.asyncio
-    async def test_create_project_minimal_params(self, mcp_server_with_tools, tool_extractor):
+    async def test_create_project_minimal_params(
+        self, mcp_server_with_tools, tool_extractor
+    ):
         """Test project creation with minimal required parameters."""
         # Get the tool function from the MCP server
         create_project = tool_extractor(mcp_server_with_tools, "create_project")
@@ -58,7 +62,9 @@ class TestProjectManagement:
             "domainId": domain_id,
             "status": "ACTIVE",
         }
-        mcp_server_with_tools._mock_client.create_project.return_value = expected_response
+        mcp_server_with_tools._mock_client.create_project.return_value = (
+            expected_response
+        )
 
         # Act
         result = await create_project(domain_identifier=domain_id, name=project_name)
@@ -111,7 +117,9 @@ class TestProjectManagement:
         with pytest.raises(Exception) as exc_info:
             await get_project(domain_id, project_id)
 
-        assert f"Error getting project {project_id} in domain {domain_id}" in str(exc_info.value)
+        assert f"Error getting project {project_id} in domain {domain_id}" in str(
+            exc_info.value
+        )
 
     @pytest.mark.asyncio
     async def test_list_projects_success(self, mcp_server_with_tools, tool_extractor):
@@ -138,7 +146,9 @@ class TestProjectManagement:
             ],
             "nextToken": None,
         }
-        mcp_server_with_tools._mock_client.list_projects.return_value = expected_response
+        mcp_server_with_tools._mock_client.list_projects.return_value = (
+            expected_response
+        )
 
         # Act
         result = await list_projects(domain_id)
@@ -150,7 +160,9 @@ class TestProjectManagement:
         )
 
     @pytest.mark.asyncio
-    async def test_list_projects_with_filters(self, mcp_server_with_tools, tool_extractor):
+    async def test_list_projects_with_filters(
+        self, mcp_server_with_tools, tool_extractor
+    ):
         """Test projects listing with filters."""
         # Get the tool function from the MCP server
         list_projects = tool_extractor(mcp_server_with_tools, "list_projects")
@@ -160,21 +172,31 @@ class TestProjectManagement:
         user_id = "user123"
         project_name = "Analytics"
         expected_response = {"items": [], "nextToken": None}
-        mcp_server_with_tools._mock_client.list_projects.return_value = expected_response
+        mcp_server_with_tools._mock_client.list_projects.return_value = (
+            expected_response
+        )
 
         # Act
         result = await list_projects(
-            domain_identifier=domain_id, max_results=25, name=project_name, user_identifier=user_id
+            domain_identifier=domain_id,
+            max_results=25,
+            name=project_name,
+            user_identifier=user_id,
         )
 
         # Assert
         assert result == expected_response
         mcp_server_with_tools._mock_client.list_projects.assert_called_once_with(
-            domainIdentifier=domain_id, maxResults=25, name=project_name, userIdentifier=user_id
+            domainIdentifier=domain_id,
+            maxResults=25,
+            name=project_name,
+            userIdentifier=user_id,
         )
 
     @pytest.mark.asyncio
-    async def test_create_project_membership_success(self, mcp_server_with_tools, tool_extractor):
+    async def test_create_project_membership_success(
+        self, mcp_server_with_tools, tool_extractor
+    ):
         """Test successful project membership creation."""
         # Get the tool function from the MCP server
         create_project_membership = tool_extractor(
@@ -207,14 +229,18 @@ class TestProjectManagement:
             "servers.datazone.tools.common.httpx.AsyncClient", return_value=mock_client
         ):
             # Act
-            result = await create_project_membership(domain_id, project_id, designation, member_id)
+            result = await create_project_membership(
+                domain_id, project_id, designation, member_id
+            )
 
             # Assert
             assert result == expected_response
             mock_client.post.assert_called_once()
 
     @pytest.mark.asyncio
-    async def test_list_project_profiles_success(self, mcp_server_with_tools, tool_extractor):
+    async def test_list_project_profiles_success(
+        self, mcp_server_with_tools, tool_extractor
+    ):
         """Test successful project profiles listing."""
         # Arrange
         domain_id = "dzd_test123"
@@ -230,10 +256,14 @@ class TestProjectManagement:
             ],
             "nextToken": None,
         }
-        mcp_server_with_tools._mock_client.list_project_profiles.return_value = expected_response
+        mcp_server_with_tools._mock_client.list_project_profiles.return_value = (
+            expected_response
+        )
 
         # Get the tool function from the MCP server
-        list_project_profiles = tool_extractor(mcp_server_with_tools, "list_project_profiles")
+        list_project_profiles = tool_extractor(
+            mcp_server_with_tools, "list_project_profiles"
+        )
 
         # Act
         result = await list_project_profiles(domain_id)
@@ -245,7 +275,9 @@ class TestProjectManagement:
         )
 
     @pytest.mark.asyncio
-    async def test_create_project_profile_success(self, mcp_server_with_tools, tool_extractor):
+    async def test_create_project_profile_success(
+        self, mcp_server_with_tools, tool_extractor
+    ):
         """Test successful project profile creation."""
         # Arrange
         domain_id = "dzd_test123"
@@ -261,7 +293,9 @@ class TestProjectManagement:
             "createdAt": 1234567890,
             "createdBy": "test-user",
         }
-        mcp_server_with_tools._mock_client.create_project_profile.return_value = mock_response
+        mcp_server_with_tools._mock_client.create_project_profile.return_value = (
+            mock_response
+        )
 
         expected_response = {
             "id": "pp_new123",
@@ -277,7 +311,9 @@ class TestProjectManagement:
         }
 
         # Get the tool function from the MCP server
-        create_project_profile = tool_extractor(mcp_server_with_tools, "create_project_profile")
+        create_project_profile = tool_extractor(
+            mcp_server_with_tools, "create_project_profile"
+        )
 
         # Act
         result = await create_project_profile(
@@ -319,11 +355,15 @@ class TestProjectManagement:
         }
 
         # Get the tool function from the MCP server
-        create_project_profile = tool_extractor(mcp_server_with_tools, "create_project_profile")
+        create_project_profile = tool_extractor(
+            mcp_server_with_tools, "create_project_profile"
+        )
 
         # Act
         result = await create_project_profile(
-            domain_identifier=domain_id, name=profile_name, environment_configurations=env_configs
+            domain_identifier=domain_id,
+            name=profile_name,
+            environment_configurations=env_configs,
         )
 
         # Assert
@@ -343,12 +383,14 @@ class TestProjectManagement:
         # Arrange
         domain_id = "dzd_test123"
         profile_name = "Denied Profile"
-        mcp_server_with_tools._mock_client.create_project_profile.side_effect = mock_client_error(
-            "AccessDeniedException", "Insufficient permissions"
+        mcp_server_with_tools._mock_client.create_project_profile.side_effect = (
+            mock_client_error("AccessDeniedException", "Insufficient permissions")
         )
 
         # Get the tool function from the MCP server
-        create_project_profile = tool_extractor(mcp_server_with_tools, "create_project_profile")
+        create_project_profile = tool_extractor(
+            mcp_server_with_tools, "create_project_profile"
+        )
 
         # Act & Assert
         with pytest.raises(Exception) as exc_info:
@@ -366,8 +408,8 @@ class TestProjectManagement:
         # Arrange
         domain_id = "dzd_test123"
         project_name = "Denied Project"
-        mcp_server_with_tools._mock_client.create_project.side_effect = mock_client_error(
-            "AccessDeniedException", "Insufficient permissions"
+        mcp_server_with_tools._mock_client.create_project.side_effect = (
+            mock_client_error("AccessDeniedException", "Insufficient permissions")
         )
 
         # Get the tool function from the MCP server
@@ -400,7 +442,11 @@ class TestProjectManagementParameterValidation:
     ):
         """Test create_project with all optional parameters."""
         # Arrange
-        mock_response = {"id": "prj_full123", "name": "Full Project", "status": "ACTIVE"}
+        mock_response = {
+            "id": "prj_full123",
+            "name": "Full Project",
+            "status": "ACTIVE",
+        }
         mcp_server_with_tools._mock_client.create_project.return_value = mock_response
 
         # Get the tool function from the MCP server

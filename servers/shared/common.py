@@ -43,7 +43,10 @@ def setup_logging(server_name: str, level: int = logging.INFO) -> logging.Logger
 
 
 def create_error_response(
-    error: Exception, server_name: str, operation: str = None, context: Dict[str, Any] = None
+    error: Exception,
+    server_name: str,
+    operation: str = None,
+    context: Dict[str, Any] = None,
 ) -> Dict[str, Any]:
     """
     Create a standardized error response for MCP servers.
@@ -61,7 +64,11 @@ def create_error_response(
         "error": str(error),
         "type": type(error).__name__,
         "message": f"MCP server {server_name} encountered an error",
-        "details": {"server": server_name, "status": "failed", "traceback": traceback.format_exc()},
+        "details": {
+            "server": server_name,
+            "status": "failed",
+            "traceback": traceback.format_exc(),
+        },
     }
 
     if operation:
@@ -120,14 +127,16 @@ def validate_aws_credentials() -> bool:
 
 def validate_aws_config(config: Dict[str, Any]) -> bool:
     """Validate AWS configuration parameters."""
-    required_fields = ['region', 'access_key_id', 'secret_access_key']
+    required_fields = ["region", "access_key_id", "secret_access_key"]
     return all(field in config for field in required_fields)
 
 
-def format_error_response(error: Exception, context: Optional[str] = None) -> Dict[str, Any]:
+def format_error_response(
+    error: Exception, context: Optional[str] = None
+) -> Dict[str, Any]:
     """Format error response for consistent error handling."""
     return {
         "error": str(error),
         "type": type(error).__name__,
-        "context": context or "Unknown context"
+        "context": context or "Unknown context",
     }

@@ -2,7 +2,7 @@
 
 import json
 import os
-from unittest.mock import Mock, patch, MagicMock
+from unittest.mock import Mock, patch
 import pytest
 from botocore.exceptions import ClientError
 
@@ -359,8 +359,13 @@ class TestGlueGetCrawler:
         # The actual implementation returns direct AWS response keys
         assert "Crawler" in result
         assert result["Crawler"]["Name"] == "test_crawler"
-        assert result["Crawler"]["Role"] == "arn:aws:iam::123456789012:role/GlueServiceRole"
-        assert result["Crawler"]["Targets"]["S3Targets"][0]["Path"] == "s3://bucket/data/"
+        assert (
+            result["Crawler"]["Role"]
+            == "arn:aws:iam::123456789012:role/GlueServiceRole"
+        )
+        assert (
+            result["Crawler"]["Targets"]["S3Targets"][0]["Path"] == "s3://bucket/data/"
+        )
         assert result["Crawler"]["DatabaseName"] == "test_database"
 
         # Verify Glue client call
@@ -747,7 +752,10 @@ class TestErrorHandling:
             with pytest.raises(Exception) as exc_info:
                 await glue_create_database(name="test_database")
 
-            assert "unexpected error" in str(exc_info.value).lower() or "nonetype" in str(exc_info.value).lower()
+            assert (
+                "unexpected error" in str(exc_info.value).lower()
+                or "nonetype" in str(exc_info.value).lower()
+            )
         finally:
             # Restore original client
             servers.glue.server.glue_client = original_client
@@ -759,8 +767,10 @@ class TestErrorHandling:
 
         # Test with empty database name - the implementation doesn't validate input parameters
         # so this should pass through to AWS Glue client
-        mock_glue_client.create_database.return_value = {"ResponseMetadata": {"HTTPStatusCode": 200}}
-        
+        mock_glue_client.create_database.return_value = {
+            "ResponseMetadata": {"HTTPStatusCode": 200}
+        }
+
         try:
             result = await glue_create_database(name="")
             # Should succeed if AWS client accepts it
