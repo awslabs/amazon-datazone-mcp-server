@@ -15,7 +15,7 @@ class TestGetMCPCredentials:
             "AWS_ACCESS_KEY_ID": "ASIAQGYBP5OXW5MTKVKQ123456",  # pragma: allowlist secret
             "AWS_SECRET_ACCESS_KEY": "test-secret",  # pragma: allowlist secret
             "AWS_SESSION_TOKEN": "test-token",  # pragma: allowlist secret
-            "AWS_DEFAULT_REGION": "us-west-2",
+            "AWS_DEFAULT_REGION": "us-west-2",  # pragma: allowlist secret
         },
     )
     def test_local_development_credentials(self):
@@ -26,12 +26,14 @@ class TestGetMCPCredentials:
 
         assert result is not None
         assert (
-            result["aws_access_key_id"] == "ASIAQGYBP5OXW5MTKVKQ123456"
+            result["aws_access_key_id"] == "ASIAQGYBP5OXW5MTKVKQ123456"  # pragma: allowlist secret
         )  # pragma: allowlist secret
-        assert result["aws_secret_access_key"] == "test-secret"  # pragma: allowlist secret
+        assert (
+            result["aws_secret_access_key"] == "test-secret"
+        )  # pragma: allowlist secret
         assert result["aws_session_token"] == "test-token"  # pragma: allowlist secret
-        assert result["region_name"] == "us-west-2"
-        assert result["account_id"] == "014498655151"
+        assert result["region_name"] == "us-west-2"  # pragma: allowlist secret
+        assert result["account_id"] == "014498655151"  # pragma: allowlist secret
 
     @patch.dict(
         os.environ,
@@ -52,26 +54,26 @@ class TestGetMCPCredentials:
         mock_secrets_client.get_secret_value.return_value = {
             "SecretString": json.dumps(
                 {
-                    "AWS_ACCESS_KEY_ID": "secrets-access-key",
-                    "AWS_SECRET_ACCESS_KEY": "secrets-secret-key",
-                    "AWS_SESSION_TOKEN": "secrets-session-token",
-                    "AWS_DEFAULT_REGION": "us-east-1",
-                    "ACCOUNT_ID": "123456789012",
-                }
+                    "AWS_ACCESS_KEY_ID": "secrets-access-key",  # pragma: allowlist secret
+                    "AWS_SECRET_ACCESS_KEY": "secrets-secret-key",  # pragma: allowlist secret
+                    "AWS_SESSION_TOKEN": "secrets-session-token",  # pragma: allowlist secret
+                    "AWS_DEFAULT_REGION": "us-east-1",  # pragma: allowlist secret
+                    "ACCOUNT_ID": "123456789012",  # pragma: allowlist secret
+                }  # pragma: allowlist secret
             )
         }
 
         result = get_mcp_credentials()
 
         assert result is not None
-        assert result["aws_access_key_id"] == "secrets-access-key"
-        assert result["aws_secret_access_key"] == "secrets-secret-key"
-        assert result["aws_session_token"] == "secrets-session-token"
-        assert result["region_name"] == "us-east-1"
-        assert result["account_id"] == "123456789012"
+        assert result["aws_access_key_id"] == "secrets-access-key"  # pragma: allowlist secret
+        assert result["aws_secret_access_key"] == "secrets-secret-key"  # pragma: allowlist secret
+        assert result["aws_session_token"] == "secrets-session-token"  # pragma: allowlist secret
+        assert result["region_name"] == "us-east-1"  # pragma: allowlist secret
+        assert result["account_id"] == "123456789012"  # pragma: allowlist secret
 
         # Verify secrets manager was called correctly
-        mock_boto_client.assert_called_with("secretsmanager", region_name="us-east-1")
+        mock_boto_client.assert_called_with("secretsmanager", region_name="us-east-1")  # pragma: allowlist secret
         mock_secrets_client.get_secret_value.assert_called_with(
             SecretId="smus-ai/dev/mcp-aws-credentials"
         )  # pragma: allowlist secret
@@ -95,7 +97,7 @@ class TestGetMCPCredentials:
         os.environ,
         {
             "AWS_ACCESS_KEY_ID": "ASIAQGYBP5OXW5MTKVKQ123456",  # pragma: allowlist secret
-            "AWS_SECRET_ACCESS_KEY": "test-secret",
+            "AWS_SECRET_ACCESS_KEY": "test-secret",  # pragma: allowlist secret
             # Missing AWS_SESSION_TOKEN
         },
         clear=True,
@@ -111,11 +113,11 @@ class TestGetMCPCredentials:
         mock_secrets_client.get_secret_value.return_value = {
             "SecretString": json.dumps(
                 {
-                    "AWS_ACCESS_KEY_ID": "secrets-access-key",
-                    "AWS_SECRET_ACCESS_KEY": "secrets-secret-key",
-                    "AWS_SESSION_TOKEN": "secrets-session-token",
-                    "AWS_DEFAULT_REGION": "us-east-1",
-                    "ACCOUNT_ID": "123456789012",
+                    "AWS_ACCESS_KEY_ID": "secrets-access-key",  # pragma: allowlist secret
+                    "AWS_SECRET_ACCESS_KEY": "secrets-secret-key",  # pragma: allowlist secret
+                    "AWS_SESSION_TOKEN": "secrets-session-token",  # pragma: allowlist secret
+                    "AWS_DEFAULT_REGION": "us-east-1",  # pragma: allowlist secret
+                    "ACCOUNT_ID": "123456789012",  # pragma: allowlist secret
                 }
             )
         }
@@ -124,9 +126,9 @@ class TestGetMCPCredentials:
 
         # Should use Secrets Manager, not environment variables
         assert result is not None
-        assert result["aws_access_key_id"] == "secrets-access-key"
+        assert result["aws_access_key_id"] == "secrets-access-key"  # pragma: allowlist secret
         mock_boto_client.assert_called_once_with(
-            "secretsmanager", region_name="us-east-1"
+            "secretsmanager", region_name="us-east-1"  # pragma: allowlist secret
         )
         mock_secrets_client.get_secret_value.assert_called_once()
 
@@ -177,8 +179,8 @@ class TestCreateMCPServer:
 
         # Mock STS response
         mock_sts_client.get_caller_identity.return_value = {
-            "Account": "123456789012",
-            "Arn": "arn:aws:sts::123456789012:assumed-role/test-role/test-session",
+            "Account": "123456789012",  # pragma: allowlist secret
+            "Arn": "arn:aws:sts::123456789012:assumed-role/test-role/test-session",  # pragma: allowlist secret
         }
 
         # Act
@@ -225,8 +227,8 @@ class TestCreateMCPServer:
 
         # Mock STS response
         mock_sts_client.get_caller_identity.return_value = {
-            "Account": "123456789012",
-            "Arn": "arn:aws:sts::123456789012:user/test-user",
+            "Account": "123456789012",  # pragma: allowlist secret
+            "Arn": "arn:aws:sts::123456789012:user/test-user",  # pragma: allowlist secret
         }
 
         # Act
@@ -293,7 +295,9 @@ class TestCreateHTTPApp:
 
     @patch("servers.datazone.server.create_mcp_server")
     @patch("fastapi.FastAPI")
-    def test_create_http_app_without_fastapi(self, mock_fastapi_class, mock_create_server):
+    def test_create_http_app_without_fastapi(
+        self, mock_fastapi_class, mock_create_server
+    ):
         """Test HTTP app creation when FastAPI is not available."""
         # This test would need to mock the ImportError, but since FastAPI is available in test env,
         # we'll just verify the function returns something when create_mcp_server works
@@ -308,7 +312,7 @@ class TestCreateHTTPApp:
         mock_fastapi_class.return_value = mock_app
 
         app = create_http_app()
-        
+
         assert app is not None
 
 
@@ -396,7 +400,7 @@ class TestMainFunction:
 
         # Mock app creation to return None
         mock_create_app.return_value = None
-        
+
         # Make sys.exit actually stop execution
         mock_exit.side_effect = SystemExit(1)
 

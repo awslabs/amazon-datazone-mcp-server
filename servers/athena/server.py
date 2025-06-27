@@ -50,11 +50,11 @@ def get_mcp_credentials():
                 "Using MCP credentials from environment variables (local development)"
             )
             return {
-                "aws_access_key_id": os.environ.get("AWS_ACCESS_KEY_ID"),
-                "aws_secret_access_key": os.environ.get("AWS_SECRET_ACCESS_KEY"),
-                "aws_session_token": os.environ.get("AWS_SESSION_TOKEN"),
-                "region_name": os.environ.get("AWS_DEFAULT_REGION", "us-east-1"),
-                "account_id": "014498655151",
+                "aws_access_key_id": os.environ.get("AWS_ACCESS_KEY_ID"),  # pragma: allowlist secret
+                "aws_secret_access_key": os.environ.get("AWS_SECRET_ACCESS_KEY"),  # pragma: allowlist secret
+                "aws_session_token": os.environ.get("AWS_SESSION_TOKEN"),  # pragma: allowlist secret
+                "region_name": os.environ.get("AWS_DEFAULT_REGION", "us-east-1"),  # pragma: allowlist secret
+                "account_id": "014498655151",  # pragma: allowlist secret
             }
 
         # For AWS deployment, always retrieve from Secrets Manager
@@ -71,14 +71,14 @@ def get_mcp_credentials():
         secret_value = json.loads(response["SecretString"])
 
         logger.info(
-            f" Successfully retrieved MCP credentials from Secrets Manager for account: {secret_value.get('ACCOUNT_ID', 'unknown')}"
+            f" Successfully retrieved MCP credentials from Secrets Manager for account: {secret_value.get('ACCOUNT_ID', 'unknown')}"  # pragma: allowlist secret
         )
         return {
-            "aws_access_key_id": secret_value["AWS_ACCESS_KEY_ID"],
-            "aws_secret_access_key": secret_value["AWS_SECRET_ACCESS_KEY"],
-            "aws_session_token": secret_value["AWS_SESSION_TOKEN"],
-            "region_name": secret_value["AWS_DEFAULT_REGION"],
-            "account_id": secret_value.get("ACCOUNT_ID", "unknown"),
+            "aws_access_key_id": secret_value["AWS_ACCESS_KEY_ID"],  # pragma: allowlist secret
+            "aws_secret_access_key": secret_value["AWS_SECRET_ACCESS_KEY"],  # pragma: allowlist secret
+            "aws_session_token": secret_value["AWS_SESSION_TOKEN"],  # pragma: allowlist secret
+            "region_name": secret_value["AWS_DEFAULT_REGION"],  # pragma: allowlist secret
+            "account_id": secret_value.get("ACCOUNT_ID", "unknown"),  # pragma: allowlist secret
         }
 
     except Exception as e:
@@ -99,10 +99,10 @@ try:
     if mcp_credentials:
         # Create session with explicit credentials
         session = boto3.Session(
-            aws_access_key_id=mcp_credentials["aws_access_key_id"],
-            aws_secret_access_key=mcp_credentials["aws_secret_access_key"],
-            aws_session_token=mcp_credentials["aws_session_token"],
-            region_name=mcp_credentials["region_name"],
+            aws_access_key_id=mcp_credentials["aws_access_key_id"],  # pragma: allowlist secret
+            aws_secret_access_key=mcp_credentials["aws_secret_access_key"],  # pragma: allowlist secret
+            aws_session_token=mcp_credentials["aws_session_token"],  # pragma: allowlist secret
+            region_name=mcp_credentials["region_name"],  # pragma: allowlist secret
         )
         athena_client = session.client("athena")
         s3_client = session.client("s3")
@@ -122,7 +122,7 @@ try:
             logger.info(f" STS Identity ARN: {user_arn}")
 
             # Log warning if account mismatch
-            expected_account = mcp_credentials.get("account_id", "014498655151")
+            expected_account = mcp_credentials.get("account_id", "014498655151")  # pragma: allowlist secret
             if actual_account != expected_account:
                 logger.warning(
                     f" ACCOUNT MISMATCH - Expected: {expected_account}, Actual: {actual_account}"
@@ -173,7 +173,7 @@ try:
     sts_client = boto3.client("sts")
 
     # Get region for logging (this doesn't require credentials)
-    region = boto3.session.Session().region_name or "us-east-1"
+    region = boto3.session.Session().region_name or "us-east-1"  # pragma: allowlist secret
     logger.info(f"AWS region: {region}, Clients initialized")
 except Exception as e:
     logger.error(f"Failed to initialize AWS clients: {str(e)}")

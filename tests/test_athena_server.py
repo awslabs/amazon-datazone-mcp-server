@@ -14,9 +14,9 @@ class TestGetMCPCredentials:
         os.environ,
         {
             "AWS_ACCESS_KEY_ID": "ASIAQGYBP5OXW5MTKVKQ123456",  # pragma: allowlist secret
-            "AWS_SECRET_ACCESS_KEY": "test-secret",
-            "AWS_SESSION_TOKEN": "test-token",
-            "AWS_DEFAULT_REGION": "us-west-2",
+            "AWS_SECRET_ACCESS_KEY": "test-secret",  # pragma: allowlist secret
+            "AWS_SESSION_TOKEN": "test-token",  # pragma: allowlist secret
+            "AWS_DEFAULT_REGION": "us-west-2",  # pragma: allowlist secret
         },
     )
     def test_local_development_credentials(self):
@@ -27,19 +27,19 @@ class TestGetMCPCredentials:
 
         assert result is not None
         assert (
-            result["aws_access_key_id"] == "ASIAQGYBP5OXW5MTKVKQ123456"
+            result["aws_access_key_id"] == "ASIAQGYBP5OXW5MTKVKQ123456"  # pragma: allowlist secret
         )  # pragma: allowlist secret
-        assert result["aws_secret_access_key"] == "test-secret"
-        assert result["aws_session_token"] == "test-token"
-        assert result["region_name"] == "us-west-2"
-        assert result["account_id"] == "014498655151"
+        assert result["aws_secret_access_key"] == "test-secret"  # pragma: allowlist secret
+        assert result["aws_session_token"] == "test-token"  # pragma: allowlist secret
+        assert result["region_name"] == "us-west-2"  # pragma: allowlist secret
+        assert result["account_id"] == "014498655151"  # pragma: allowlist secret
 
     @patch.dict(
         os.environ,
         {
             "AWS_ACCESS_KEY_ID": "AKIAIOSFODNN7EXAMPLE",  # Different pattern  # pragma: allowlist secret
-            "AWS_SECRET_ACCESS_KEY": "test-secret",
-            "AWS_SESSION_TOKEN": "test-token",
+            "AWS_SECRET_ACCESS_KEY": "test-secret",  # pragma: allowlist secret
+            "AWS_SESSION_TOKEN": "test-token",  # pragma: allowlist secret
         },
     )
     @patch("boto3.client")
@@ -53,11 +53,11 @@ class TestGetMCPCredentials:
         mock_secrets_client.get_secret_value.return_value = {
             "SecretString": json.dumps(
                 {
-                    "AWS_ACCESS_KEY_ID": "secrets-access-key",
-                    "AWS_SECRET_ACCESS_KEY": "secrets-secret-key",
-                    "AWS_SESSION_TOKEN": "secrets-session-token",
-                    "AWS_DEFAULT_REGION": "us-east-1",
-                    "ACCOUNT_ID": "123456789012",
+                    "AWS_ACCESS_KEY_ID": "secrets-access-key",  # pragma: allowlist secret
+                    "AWS_SECRET_ACCESS_KEY": "secrets-secret-key",  # pragma: allowlist secret
+                    "AWS_SESSION_TOKEN": "secrets-session-token",  # pragma: allowlist secret
+                    "AWS_DEFAULT_REGION": "us-east-1",  # pragma: allowlist secret
+                    "ACCOUNT_ID": "123456789012",  # pragma: allowlist secret
                 }
             )
         }
@@ -65,14 +65,14 @@ class TestGetMCPCredentials:
         result = get_mcp_credentials()
 
         assert result is not None
-        assert result["aws_access_key_id"] == "secrets-access-key"
-        assert result["aws_secret_access_key"] == "secrets-secret-key"
-        assert result["aws_session_token"] == "secrets-session-token"
-        assert result["region_name"] == "us-east-1"
-        assert result["account_id"] == "123456789012"
+        assert result["aws_access_key_id"] == "secrets-access-key"  # pragma: allowlist secret
+        assert result["aws_secret_access_key"] == "secrets-secret-key"  # pragma: allowlist secret
+        assert result["aws_session_token"] == "secrets-session-token"  # pragma: allowlist secret
+        assert result["region_name"] == "us-east-1"  # pragma: allowlist secret
+        assert result["account_id"] == "123456789012"  # pragma: allowlist secret
 
         # Verify secrets manager was called correctly
-        mock_boto_client.assert_called_with("secretsmanager", region_name="us-east-1")
+        mock_boto_client.assert_called_with("secretsmanager", region_name="us-east-1")  # pragma: allowlist secret
         mock_secrets_client.get_secret_value.assert_called_with(
             SecretId="smus-ai/dev/mcp-aws-credentials"
         )  # pragma: allowlist secret
@@ -118,7 +118,7 @@ class TestAthenaExecuteSQLQuery:
         mock_session_instance.region_name = "us-east-1"
 
         # Mock STS get_caller_identity
-        mock_sts_client.get_caller_identity.return_value = {"Account": "123456789012"}
+        mock_sts_client.get_caller_identity.return_value = {"Account": "123456789012"}  # pragma: allowlist secret
 
         # Mock DataZone list_environments
         mock_datazone_client.list_environments.return_value = {
@@ -251,7 +251,7 @@ class TestAthenaExecuteSQLQuery:
         mock_session_instance.region_name = "us-east-1"
 
         # Mock STS get_caller_identity
-        mock_sts_client.get_caller_identity.return_value = {"Account": "123456789012"}
+        mock_sts_client.get_caller_identity.return_value = {"Account": "123456789012"}  # pragma: allowlist secret
 
         # Mock DataZone list_environments
         mock_datazone_client.list_environments.return_value = {
@@ -417,7 +417,7 @@ class TestCreateHTTPApp:
         mock_app.routes = [
             Mock(path="/health"),
             Mock(path="/"),
-            Mock(path="/mcp/athena")
+            Mock(path="/mcp/athena"),
         ]
         mock_fastapi_class.return_value = mock_app
 
@@ -508,14 +508,14 @@ class TestEnvironmentConfiguration:
             os.environ,
             {
                 "AWS_ACCESS_KEY_ID": "ASIAQGYBP5OXW5MTKVKQ123456",  # pragma: allowlist secret
-                "AWS_SECRET_ACCESS_KEY": "test-secret",
-                "AWS_SESSION_TOKEN": "test-token",
+                "AWS_SECRET_ACCESS_KEY": "test-secret",  # pragma: allowlist secret
+                "AWS_SESSION_TOKEN": "test-token",  # pragma: allowlist secret
                 # No AWS_DEFAULT_REGION
             },
         ):
             result = get_mcp_credentials()
             assert result is not None
-            assert result["region_name"] == "us-east-1"  # Default region
+            assert result["region_name"] == "us-east-1"  # Default region   # pragma: allowlist secret
 
     def test_custom_region(self):
         """Test custom region configuration."""
@@ -525,14 +525,14 @@ class TestEnvironmentConfiguration:
             os.environ,
             {
                 "AWS_ACCESS_KEY_ID": "ASIAQGYBP5OXW5MTKVKQ123456",  # pragma: allowlist secret
-                "AWS_SECRET_ACCESS_KEY": "test-secret",
-                "AWS_SESSION_TOKEN": "test-token",
-                "AWS_DEFAULT_REGION": "us-west-2",
+                "AWS_SECRET_ACCESS_KEY": "test-secret",  # pragma: allowlist secret
+                "AWS_SESSION_TOKEN": "test-token",  # pragma: allowlist secret
+                "AWS_DEFAULT_REGION": "us-west-2",  # pragma: allowlist secret
             },
         ):
             result = get_mcp_credentials()
             assert result is not None
-            assert result["region_name"] == "us-west-2"
+            assert result["region_name"] == "us-west-2"  # pragma: allowlist secret
 
 
 class TestErrorHandling:
@@ -611,7 +611,7 @@ class TestIntegration:
         mock_session_instance.region_name = "us-east-1"
 
         # Mock STS get_caller_identity
-        mock_sts_client.get_caller_identity.return_value = {"Account": "123456789012"}
+        mock_sts_client.get_caller_identity.return_value = {"Account": "123456789012"}  # pragma: allowlist secret
 
         # Mock DataZone responses
         mock_datazone_client.list_environments.return_value = {
