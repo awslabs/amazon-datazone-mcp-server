@@ -41,7 +41,7 @@ class TestGetMCPCredentials:
             "AWS_SESSION_TOKEN": "test-token",
         },
     )
-    @patch("boto3.client")
+    @patch("servers.datazone.server.boto3.client")
     def test_secrets_manager_retrieval(self, mock_boto_client):
         """Test credentials retrieval from Secrets Manager."""
         from servers.datazone.server import get_mcp_credentials
@@ -77,7 +77,7 @@ class TestGetMCPCredentials:
         )  # pragma: allowlist secret
 
     @patch.dict(os.environ, {}, clear=True)
-    @patch("boto3.client")
+    @patch("servers.datazone.server.boto3.client")
     def test_secrets_manager_failure_fallback(self, mock_boto_client):
         """Test fallback to None when Secrets Manager fails."""
         from servers.datazone.server import get_mcp_credentials
@@ -98,8 +98,9 @@ class TestGetMCPCredentials:
             "AWS_SECRET_ACCESS_KEY": "test-secret",
             # Missing AWS_SESSION_TOKEN
         },
+        clear=True
     )
-    @patch("boto3.client")
+    @patch("servers.datazone.server.boto3.client")
     def test_incomplete_environment_variables(self, mock_boto_client):
         """Test that incomplete environment variables trigger Secrets Manager."""
         from servers.datazone.server import get_mcp_credentials
@@ -124,6 +125,7 @@ class TestGetMCPCredentials:
         # Should use Secrets Manager, not environment variables
         assert result is not None
         assert result["aws_access_key_id"] == "secrets-access-key"
+        mock_boto_client.assert_called_once_with("secretsmanager", region_name="us-east-1")
         mock_secrets_client.get_secret_value.assert_called_once()
 
 
@@ -131,7 +133,7 @@ class TestCreateMCPServer:
     """Test create_mcp_server function."""
 
     @patch("servers.datazone.server.get_mcp_credentials")
-    @patch("boto3.Session")
+    @patch("servers.datazone.server.boto3.Session")
     @patch("boto3.client")
     @patch("servers.datazone.server.domain_management.register_tools")
     @patch("servers.datazone.server.data_management.register_tools")
@@ -200,7 +202,7 @@ class TestCreateMCPServer:
         mock_glossary.assert_called_once()
 
     @patch("servers.datazone.server.get_mcp_credentials")
-    @patch("boto3.client")
+    @patch("servers.datazone.server.boto3.client")
     @patch("servers.datazone.server.domain_management.register_tools")
     def test_create_server_without_credentials(
         self, mock_domain, mock_boto_client, mock_get_credentials
@@ -237,7 +239,7 @@ class TestCreateMCPServer:
         mock_boto_client.assert_any_call("sts")
 
     @patch("servers.datazone.server.get_mcp_credentials")
-    @patch("boto3.Session")
+    @patch("servers.datazone.server.boto3.Session")
     def test_create_server_aws_client_error(self, mock_session, mock_get_credentials):
         """Test server creation when AWS client initialization fails."""
         from servers.datazone.server import create_mcp_server
@@ -347,21 +349,24 @@ class TestMainFunction:
         os.environ, {"MCP_TRANSPORT": "http", "HOST": "127.0.0.1", "PORT": "9000"}
     )
     @patch("servers.datazone.server.create_http_app")
-    @patch("uvicorn.run")
-    def test_main_http_transport(self, mock_uvicorn, mock_create_app):
+    def test_main_http_transport(self, mock_create_app):
         """Test main function with HTTP transport."""
         from servers.datazone.server import main
+        import sys
 
         # Mock HTTP app
         mock_app = Mock()
         mock_create_app.return_value = mock_app
 
-        # Act
-        main()
+        # Mock uvicorn module in sys.modules
+        mock_uvicorn = Mock()
+        with patch.dict(sys.modules, {'uvicorn': mock_uvicorn}):
+            # Act
+            main()
 
         # Assert
         mock_create_app.assert_called_once()
-        mock_uvicorn.assert_called_once_with(
+        mock_uvicorn.run.assert_called_once_with(
             mock_app, host="127.0.0.1", port=9000, log_level="info"
         )
 
@@ -374,12 +379,23 @@ class TestMainFunction:
 
         # Mock app creation to return None
         mock_create_app.return_value = None
+        
+        # Make sys.exit actually stop execution
+        mock_exit.side_effect = SystemExit(1)
 
-        # Act
-        main()
+        # Mock uvicorn module in sys.modules to avoid import errors
+        mock_uvicorn = Mock()
+        with patch.dict(sys.modules, {'uvicorn': mock_uvicorn}):
+            # Act - should raise SystemExit
+            try:
+                main()
+            except SystemExit:
+                pass  # Expected
 
         # Assert
         mock_exit.assert_called_once_with(1)
+        # uvicorn should not be called since app creation failed
+        mock_uvicorn.run.assert_not_called()
 
     @patch("servers.datazone.server.create_mcp_server")
     @patch("sys.exit")

@@ -37,21 +37,25 @@ class TestDatazoneMCPServer:
         """Test the main function execution path."""
         from servers.datazone.server import main
 
-        # Mock the mcp.run method to avoid actual execution
-        with patch("servers.datazone.server.mcp") as mock_mcp:
-            mock_mcp.run = Mock()
+        # Mock the create_mcp_server function to avoid actual execution
+        with patch("servers.datazone.server.create_mcp_server") as mock_create_mcp:
+            mock_mcp = Mock()
+            mock_create_mcp.return_value = mock_mcp
 
-            # Test normal execution
+            # Test normal execution (default stdio transport)
             main()
 
-            # Verify mcp.run was called with correct transport
-            mock_mcp.run.assert_called_once_with(transport="stdio")
+            # Verify create_mcp_server was called and mcp.run was called
+            mock_create_mcp.assert_called_once()
+            mock_mcp.run.assert_called_once()
 
     def test_main_function_with_keyboard_interrupt(self):
         """Test main function handling KeyboardInterrupt."""
         from servers.datazone.server import main
 
-        with patch("servers.datazone.server.mcp") as mock_mcp:
+        with patch("servers.datazone.server.create_mcp_server") as mock_create_mcp:
+            mock_mcp = Mock()
+            mock_create_mcp.return_value = mock_mcp
             # Mock mcp.run to raise KeyboardInterrupt
             mock_mcp.run.side_effect = KeyboardInterrupt()
 
@@ -65,7 +69,9 @@ class TestDatazoneMCPServer:
         """Test main function handling general exceptions."""
         from servers.datazone.server import main
 
-        with patch("servers.datazone.server.mcp") as mock_mcp:
+        with patch("servers.datazone.server.create_mcp_server") as mock_create_mcp:
+            mock_mcp = Mock()
+            mock_create_mcp.return_value = mock_mcp
             # Mock mcp.run to raise a general exception
             mock_mcp.run.side_effect = Exception("Test error")
 
