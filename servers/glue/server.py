@@ -17,7 +17,7 @@ import logging
 import os
 import sys
 import traceback
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 import boto3
 from botocore.exceptions import ClientError
@@ -167,14 +167,14 @@ except Exception as e:
 @mcp.tool()
 async def glue_create_database(
     name: str,
-    catalog_id: str = None,
-    description: str = None,
-    location_uri: str = None,
-    parameters: Dict[str, str] = None,
-    tags: Dict[str, str] = None,
-    create_table_default_permissions: List[Dict[str, Any]] = None,
-    federated_database: Dict[str, str] = None,
-    target_database: Dict[str, str] = None,
+    catalog_id: Optional[str] = None,
+    description: Optional[str] = None,
+    location_uri: Optional[str] = None,
+    parameters: Optional[Dict[str, str]] = None,
+    tags: Optional[Dict[str, str]] = None,
+    create_table_default_permissions: Optional[List[Dict[str, Any]]] = None,
+    federated_database: Optional[Dict[str, str]] = None,
+    target_database: Optional[Dict[str, str]] = None,
 ) -> Any:
     """
     Creates a new database in the AWS Glue Data Catalog.
@@ -196,26 +196,26 @@ async def glue_create_database(
     try:
         logger.info(f"Creating database: {name}")
         # Prepare the request parameters
-        database_input = {"Name": name}
+        database_input: Dict[str, Any] = {"Name": name}
 
         # Add optional parameters if provided
-        if description:
+        if description is not None:
             database_input["Description"] = description
-        if location_uri:
+        if location_uri is not None:
             database_input["LocationUri"] = location_uri
-        if parameters:
+        if parameters is not None:
             database_input["Parameters"] = parameters
-        if create_table_default_permissions:
+        if create_table_default_permissions is not None:
             database_input["CreateTableDefaultPermissions"] = (
                 create_table_default_permissions
             )
-        if federated_database:
+        if federated_database is not None:
             database_input["FederatedDatabase"] = federated_database
-        if target_database:
+        if target_database is not None:
             database_input["TargetDatabase"] = target_database
 
         # Prepare the request
-        params = {"DatabaseInput": database_input}
+        params: Dict[str, Any] = {"DatabaseInput": database_input}
 
         # Add optional catalog_id if provided
         if catalog_id:
@@ -225,6 +225,8 @@ async def glue_create_database(
         if tags:
             params["Tags"] = tags
 
+        if not glue_client:
+            raise Exception("Glue client not initialized")
         response = glue_client.create_database(**params)
         logger.info(f"Successfully created database: {name}")
         return response
@@ -260,18 +262,18 @@ async def glue_create_crawler(
     name: str,
     role: str,
     targets: Dict[str, List[Dict[str, Any]]],
-    database_name: str = None,
-    classifiers: List[str] = None,
-    configuration: str = None,
-    crawler_security_configuration: str = None,
-    description: str = None,
-    lake_formation_configuration: Dict[str, Any] = None,
-    lineage_configuration: Dict[str, str] = None,
-    recrawl_policy: Dict[str, str] = None,
-    schedule: str = None,
-    schema_change_policy: Dict[str, str] = None,
-    table_prefix: str = None,
-    tags: Dict[str, str] = None,
+    database_name: Optional[str] = None,
+    classifiers: Optional[List[str]] = None,
+    configuration: Optional[str] = None,
+    crawler_security_configuration: Optional[str] = None,
+    description: Optional[str] = None,
+    lake_formation_configuration: Optional[Dict[str, Any]] = None,
+    lineage_configuration: Optional[Dict[str, str]] = None,
+    recrawl_policy: Optional[Dict[str, str]] = None,
+    schedule: Optional[str] = None,
+    schema_change_policy: Optional[Dict[str, str]] = None,
+    table_prefix: Optional[str] = None,
+    tags: Optional[Dict[str, str]] = None,
 ) -> Any:
     """
     Creates a new crawler with specified targets, role, configuration, and optional schedule.
@@ -299,7 +301,7 @@ async def glue_create_crawler(
     try:
         logger.info(f"Creating crawler: {name}")
         # Prepare the request parameters
-        params = {"Name": name, "Role": role, "Targets": targets}
+        params: Dict[str, Any] = {"Name": name, "Role": role, "Targets": targets}
 
         # Add optional parameters if provided
         if database_name:
@@ -327,6 +329,8 @@ async def glue_create_crawler(
         if tags:
             params["Tags"] = tags
 
+        if not glue_client:
+            raise Exception("Glue client not initialized")
         response = glue_client.create_crawler(**params)
         logger.info(f"Successfully created crawler: {name}")
         return response
@@ -352,6 +356,8 @@ async def glue_start_crawler(name: str) -> Any:
     """
     try:
         logger.info(f"Starting crawler: {name}")
+        if not glue_client:
+            raise Exception("Glue client not initialized")
         response = glue_client.start_crawler(Name=name)
         logger.info(f"Successfully started crawler: {name}")
         return response
@@ -377,6 +383,8 @@ async def glue_get_crawler(name: str) -> Any:
     """
     try:
         logger.info(f"Getting crawler: {name}")
+        if not glue_client:
+            raise Exception("Glue client not initialized")
         response = glue_client.get_crawler(Name=name)
         logger.info(f"Successfully retrieved crawler: {name}")
         return response
@@ -392,14 +400,14 @@ async def glue_get_crawler(name: str) -> Any:
 @mcp.tool()
 async def glue_get_tables(
     database_name: str,
-    catalog_id: str = None,
-    expression: str = None,
+    catalog_id: Optional[str] = None,
+    expression: Optional[str] = None,
     include_status_details: bool = False,
     max_results: int = 100,
-    next_token: str = None,
-    query_as_of_time: int = None,
-    transaction_id: str = None,
-    attributes_to_get: List[str] = None,
+    next_token: Optional[str] = None,
+    query_as_of_time: Optional[int] = None,
+    transaction_id: Optional[str] = None,
+    attributes_to_get: Optional[List[str]] = None,
 ) -> Any:
     """
     Retrieves the definitions of some or all of the tables in a given database.
@@ -444,6 +452,8 @@ async def glue_get_tables(
         if attributes_to_get:
             params["AttributesToGet"] = attributes_to_get
 
+        if not glue_client:
+            raise Exception("Glue client not initialized")
         response = glue_client.get_tables(**params)
         logger.info(f"Successfully retrieved tables from database: {database_name}")
         return response
@@ -462,10 +472,10 @@ async def glue_get_tables(
 async def glue_get_table(
     database_name: str,
     name: str,
-    catalog_id: str = None,
+    catalog_id: Optional[str] = None,
     include_status_details: bool = False,
-    query_as_of_time: int = None,
-    transaction_id: str = None,
+    query_as_of_time: Optional[int] = None,
+    transaction_id: Optional[str] = None,
 ) -> Any:
     """
     Retrieves the Table definition in a Data Catalog for a specified table.
@@ -484,7 +494,7 @@ async def glue_get_table(
     try:
         logger.info(f"Getting table {name} from database: {database_name}")
         # Prepare the request parameters
-        params = {"DatabaseName": database_name, "Name": name}
+        params: Dict[str, Any] = {"DatabaseName": database_name, "Name": name}
 
         # Add optional parameters if provided
         if catalog_id:
@@ -496,6 +506,8 @@ async def glue_get_table(
         if transaction_id:
             params["TransactionId"] = transaction_id
 
+        if not glue_client:
+            raise Exception("Glue client not initialized")
         response = glue_client.get_table(**params)
         logger.info(
             f"Successfully retrieved table {name} from database: {database_name}"
@@ -567,6 +579,7 @@ def create_http_app():
         @app.post("/mcp/glue")
         async def mcp_endpoint(request: Request):
             """MCP JSON-RPC endpoint using real tools"""
+            request_data = {}
             try:
                 # Parse the request body
                 request_data = await request.json()
@@ -672,9 +685,7 @@ def create_http_app():
                 logger.error(f"Error processing MCP request: {e}")
                 return {
                     "jsonrpc": "2.0",
-                    "id": request_data.get("id", None)
-                    if "request_data" in locals()
-                    else None,
+                    "id": request_data.get("id", None),
                     "error": {"code": -32603, "message": f"Internal error: {str(e)}"},
                 }
 

@@ -233,6 +233,7 @@ def create_http_app():
         @app.post("/mcp/datazone")
         async def mcp_endpoint(request: Request):
             """MCP JSON-RPC endpoint using real tools"""
+            request_data = {}
             try:
                 # Parse the request body
                 request_data = await request.json()
@@ -338,9 +339,7 @@ def create_http_app():
                 logger.error(f"Error processing MCP request: {e}")
                 return {
                     "jsonrpc": "2.0",
-                    "id": request_data.get("id", None)
-                    if "request_data" in locals()
-                    else None,
+                    "id": request_data.get("id", None),
                     "error": {"code": -32603, "message": f"Internal error: {str(e)}"},
                 }
 

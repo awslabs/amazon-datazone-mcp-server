@@ -18,7 +18,7 @@ import os
 import sys
 import time
 import traceback
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 import boto3
 from botocore.exceptions import ClientError
@@ -173,7 +173,7 @@ try:
     sts_client = boto3.client("sts")
 
     # Get region for logging (this doesn't require credentials)
-    region = boto3.session.Session().region_name or "us-east-1"  # pragma: allowlist secret
+    region = boto3.Session().region_name or "us-east-1"  # pragma: allowlist secret
     logger.info(f"AWS region: {region}, Clients initialized")
 except Exception as e:
     logger.error(f"Failed to initialize AWS clients: {str(e)}")
@@ -187,7 +187,7 @@ async def athena_execute_sql_query(
     domain_identifier: str,
     project_identifier: str,
     sql_query: str,
-    database_name: str = None,
+    database_name: Optional[str] = None,
     max_results: int = 100,
 ) -> Any:
     """
@@ -213,6 +213,8 @@ async def athena_execute_sql_query(
         logger.info(f"Executing SQL query for project {project_identifier}")
 
         # List all environments for the project
+        if not datazone_client:
+            raise Exception("DataZone client not initialized")
         environments = datazone_client.list_environments(
             domainIdentifier=domain_identifier, projectIdentifier=project_identifier
         )
@@ -257,8 +259,10 @@ async def athena_execute_sql_query(
             raise Exception("No Athena workgroup found in connection properties")
 
         # Prepare query execution parameters
+        if not sts_client:
+            raise Exception("STS client not initialized")
         account_id = sts_client.get_caller_identity()["Account"]
-        region = boto3.session.Session().region_name
+        region = boto3.Session().region_name
 
         query_params = {
             "QueryString": sql_query,
@@ -274,6 +278,8 @@ async def athena_execute_sql_query(
 
         # Start query execution
         logger.info(f"Starting query execution with workgroup {workgroup}")
+        if not athena_client:
+            raise Exception("Athena client not initialized")
         query_execution = athena_client.start_query_execution(**query_params)
         query_execution_id = query_execution["QueryExecutionId"]
 
@@ -281,11 +287,14 @@ async def athena_execute_sql_query(
         state = "RUNNING"
         max_wait_time = 300  # 5 minutes timeout
         start_time = time.time()
+        response = None
 
         while (
             state in ["RUNNING", "QUEUED"]
             and (time.time() - start_time) < max_wait_time
         ):
+            if not athena_client:
+                raise Exception("Athena client not initialized")
             response = athena_client.get_query_execution(
                 QueryExecutionId=query_execution_id
             )
@@ -306,8 +315,14 @@ async def athena_execute_sql_query(
         if state not in ["SUCCEEDED", "FAILED", "CANCELLED"]:
             raise Exception("Query execution timed out")
 
+        # Ensure we have a valid response
+        if not response:
+            raise Exception("Query execution response not available")
+
         # Get query results
         logger.info("Query execution completed, fetching results")
+        if not athena_client:
+            raise Exception("Athena client not initialized")
         results = athena_client.get_query_results(
             QueryExecutionId=query_execution_id, MaxResults=max_results
         )
@@ -361,10 +376,10 @@ async def athena_execute_sql_query(
 @mcp.tool()
 async def athena_describe_available_tables(
     database_name: str,
-    workgroup: str = None,
-    catalog_name: str = None,
+    workgroup: Optional[str] = None,
+    catalog_name: Optional[str] = None,
     max_results: int = 50,
-    next_token: str = None,
+    next_token: Optional[str] = None,
 ) -> Dict[str, Any]:
     """
     Describes the available tables in an Athena database.
@@ -394,14 +409,16 @@ async def athena_describe_available_tables(
         params = {"DatabaseName": database_name, "MaxResults": max_results}
 
         # Add optional parameters if provided
-        if workgroup:
+        if workgroup is not None and workgroup != "":
             params["WorkGroup"] = workgroup
-        if catalog_name:
+        if catalog_name is not None and catalog_name != "":
             params["CatalogName"] = catalog_name
-        if next_token:
+        if next_token is not None and next_token != "":
             params["NextToken"] = next_token
 
         # Get table list
+        if not athena_client:
+            raise Exception("Athena client not initialized")
         response = athena_client.list_table_metadata(**params)
 
         # Format the response
@@ -464,7 +481,14 @@ def create_http_app():
         async def health_check():
             """Health check endpoint for ALB"""
             # Get the actual tool count from FastMCP's tool manager
-            tool_count = len(mcp._tool_manager._tools)
+            tool_count = 0
+            try:
+                if hasattr(mcp, "_tool_manager") and hasattr(mcp._tool_manager, "_tools"):
+                    tool_count = len(mcp._tool_manager._tools)
+                else:
+                    tool_count = 2  # Known tools: athena_execute_sql_query, athena_describe_available_tables
+            except Exception:
+                tool_count = 2
             return {
                 "status": "healthy",
                 "service": "athena-mcp-server",
@@ -477,7 +501,14 @@ def create_http_app():
         def root():
             """Root endpoint with service info"""
             # Get actual tools from FastMCP's tool manager
-            tools_available = list(mcp._tool_manager._tools.keys())
+            tools_available = []
+            try:
+                if hasattr(mcp, "_tool_manager") and hasattr(mcp._tool_manager, "_tools"):
+                    tools_available = list(mcp._tool_manager._tools.keys())
+                else:
+                    tools_available = ["athena_execute_sql_query", "athena_describe_available_tables"]
+            except Exception:
+                tools_available = ["athena_execute_sql_query", "athena_describe_available_tables"]
             return {
                 "service": "Athena MCP Server",
                 "status": "running",
@@ -502,6 +533,7 @@ def create_http_app():
         @app.post("/mcp/athena")
         async def mcp_endpoint(request: Request):
             """MCP JSON-RPC endpoint using real tools"""
+            request_data = {}
             try:
                 # Parse the request body
                 request_data = await request.json()
@@ -607,9 +639,7 @@ def create_http_app():
                 logger.error(f"Error processing MCP request: {e}")
                 return {
                     "jsonrpc": "2.0",
-                    "id": request_data.get("id", None)
-                    if "request_data" in locals()
-                    else None,
+                    "id": request_data.get("id", None),
                     "error": {"code": -32603, "message": f"Internal error: {str(e)}"},
                 }
 
@@ -630,11 +660,7 @@ if __name__ == "__main__":
         # Properly count registered tools
         tool_count = 0
         try:
-            if hasattr(mcp, "_tools"):
-                tool_count = len(mcp._tools)
-            elif hasattr(mcp, "tools"):
-                tool_count = len(mcp.tools)
-            elif hasattr(mcp, "_tool_manager") and hasattr(mcp._tool_manager, "_tools"):
+            if hasattr(mcp, "_tool_manager") and hasattr(mcp._tool_manager, "_tools"):
                 tool_count = len(mcp._tool_manager._tools)
             else:
                 tool_count = 2  # We know there are 2 tools defined
