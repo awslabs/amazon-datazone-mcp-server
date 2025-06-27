@@ -33,130 +33,103 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-def get_mcp_credentials():
-    """Retrieve MCP AWS credentials from environment variables or Secrets Manager"""
+def initialize_aws_session():
+    """Initialize AWS session with proper credential handling (no credential exposure)"""
     try:
-        # Only use environment variables for local development (specific session key pattern)
-        # In AWS/ECS, always use Secrets Manager even if task role credentials exist
-        local_access_key = os.environ.get("AWS_ACCESS_KEY_ID", "")
+        # Check for local development environment using generic environment variable
+        # Use MCP_LOCAL_DEV=true to indicate local development instead of hardcoded key patterns
+        is_local_dev = os.environ.get("MCP_LOCAL_DEV", "").lower() == "true"
+
         if (
-            local_access_key.startswith(
-                "ASIAQGYBP5OXW5MTKVKQ"
-            )  # pragma: allowlist secret
+            is_local_dev
+            and os.environ.get("AWS_ACCESS_KEY_ID")
             and os.environ.get("AWS_SECRET_ACCESS_KEY")
             and os.environ.get("AWS_SESSION_TOKEN")
         ):
-            logger.info(
-                "Using MCP credentials from environment variables (local development)"
+            logger.info("Using AWS credentials from environment variables (local development)")
+            session = boto3.Session(
+                aws_access_key_id=os.environ.get("AWS_ACCESS_KEY_ID"),
+                aws_secret_access_key=os.environ.get("AWS_SECRET_ACCESS_KEY"),
+                aws_session_token=os.environ.get("AWS_SESSION_TOKEN"),
+                region_name=os.environ.get("AWS_DEFAULT_REGION", "us-east-1"),
             )
-            return {
-                "aws_access_key_id": os.environ.get("AWS_ACCESS_KEY_ID"),  # pragma: allowlist secret
-                "aws_secret_access_key": os.environ.get("AWS_SECRET_ACCESS_KEY"),  # pragma: allowlist secret
-                "aws_session_token": os.environ.get("AWS_SESSION_TOKEN"),  # pragma: allowlist secret
-                "region_name": os.environ.get("AWS_DEFAULT_REGION", "us-east-1"),  # pragma: allowlist secret
-                "account_id": "014498655151",  # pragma: allowlist secret
-            }
+            # Get account ID dynamically from STS
+            try:
+                sts_client = session.client("sts")
+                account_id = sts_client.get_caller_identity()["Account"]
+                logger.info(f"Retrieved account ID from STS: {account_id}")
+                return session, account_id
+            except Exception as e:
+                logger.warning(f"Could not retrieve account ID from STS: {e}")
+                return session, os.environ.get("AWS_ACCOUNT_ID", "unknown")
 
-        # For AWS deployment, always retrieve from Secrets Manager
-        logger.info(
-            "Running in AWS environment - retrieving MCP credentials from Secrets Manager..."
-        )
+        # For AWS deployment, retrieve from Secrets Manager
+        logger.info("Running in AWS environment - retrieving credentials from Secrets Manager...")
         secrets_client = boto3.client("secretsmanager", region_name="us-east-1")
 
-        # Get the secret
-        secret_name = "smus-ai/dev/mcp-aws-credentials"  # pragma: allowlist secret
-        logger.info(f"Retrieving MCP credentials from secret: {secret_name}")
+        secret_name = "smus-ai/dev/mcp-aws-credentials"
+        logger.info(f"Retrieving credentials from secret: {secret_name}")
 
         response = secrets_client.get_secret_value(SecretId=secret_name)
         secret_value = json.loads(response["SecretString"])
 
         logger.info(
-            f" Successfully retrieved MCP credentials from Secrets Manager for account: {secret_value.get('ACCOUNT_ID', 'unknown')}"  # pragma: allowlist secret
+            f"Successfully retrieved credentials from Secrets Manager for account: {secret_value.get('ACCOUNT_ID', 'unknown')}"
         )
-        return {
-            "aws_access_key_id": secret_value["AWS_ACCESS_KEY_ID"],  # pragma: allowlist secret
-            "aws_secret_access_key": secret_value["AWS_SECRET_ACCESS_KEY"],  # pragma: allowlist secret
-            "aws_session_token": secret_value["AWS_SESSION_TOKEN"],  # pragma: allowlist secret
-            "region_name": secret_value["AWS_DEFAULT_REGION"],  # pragma: allowlist secret
-            "account_id": secret_value.get("ACCOUNT_ID", "unknown"),  # pragma: allowlist secret
-        }
+        session = boto3.Session(
+            aws_access_key_id=secret_value["AWS_ACCESS_KEY_ID"],
+            aws_secret_access_key=secret_value["AWS_SECRET_ACCESS_KEY"],
+            aws_session_token=secret_value["AWS_SESSION_TOKEN"],
+            region_name=secret_value["AWS_DEFAULT_REGION"],
+        )
+        return session, secret_value.get("ACCOUNT_ID", "unknown")
 
     except Exception as e:
-        logger.error(f" Failed to retrieve MCP credentials from Secrets Manager: {e}")
-        # Fall back to default credentials
-        logger.warning(" Falling back to default AWS credentials")
-        return None
+        logger.error(f"Failed to retrieve credentials from Secrets Manager: {e}")
+        logger.warning("Falling back to default AWS credentials")
+        # Try to get account ID from default session
+        try:
+            default_session = boto3.Session()
+            sts_client = default_session.client("sts")
+            account_id = sts_client.get_caller_identity()["Account"]
+            logger.info(f"Retrieved account ID from default credentials: {account_id}")
+            return default_session, account_id
+        except Exception as sts_e:
+            logger.warning(f"Could not retrieve account ID from default credentials: {sts_e}")
+            return boto3.Session(), os.environ.get("AWS_ACCOUNT_ID", "unknown")
 
 
-# Initialize MCP credentials and create boto3 session
-mcp_credentials = get_mcp_credentials()
+# Initialize AWS session securely
+session, account_id = initialize_aws_session()
 
 # Initialize FastMCP server
 mcp = FastMCP("athena")
 
 # Initialize boto3 clients with explicit credentials
 try:
-    if mcp_credentials:
-        # Create session with explicit credentials
-        session = boto3.Session(
-            aws_access_key_id=mcp_credentials["aws_access_key_id"],  # pragma: allowlist secret
-            aws_secret_access_key=mcp_credentials["aws_secret_access_key"],  # pragma: allowlist secret
-            aws_session_token=mcp_credentials["aws_session_token"],  # pragma: allowlist secret
-            region_name=mcp_credentials["region_name"],  # pragma: allowlist secret
-        )
-        athena_client = session.client("athena")
-        s3_client = session.client("s3")
+    athena_client = session.client("athena")
+    s3_client = session.client("s3")
+    logger.info(f"Successfully initialized Athena clients for account: {account_id}")
+
+    # Verify credentials with STS get_caller_identity
+    try:
+        sts_client = session.client("sts")
+        identity = sts_client.get_caller_identity()
+        actual_account = identity.get("Account", "unknown")
+        user_arn = identity.get("Arn", "unknown")
         logger.info(
-            f"Successfully initialized Athena clients with MCP credentials for account: {mcp_credentials.get('account_id', 'unknown')}"
+            f"STS VERIFICATION SUCCESS - Athena MCP connected to AWS Account: {actual_account}"
         )
+        logger.info(f"STS Identity ARN: {user_arn}")
 
-        # Verify credentials with STS get_caller_identity
-        try:
-            sts_client = session.client("sts")
-            identity = sts_client.get_caller_identity()
-            actual_account = identity.get("Account", "unknown")
-            user_arn = identity.get("Arn", "unknown")
-            logger.info(
-                f" STS VERIFICATION SUCCESS - Athena MCP connected to AWS Account: {actual_account}"
-            )
-            logger.info(f" STS Identity ARN: {user_arn}")
+        # Log warning if account mismatch
+        if actual_account != account_id and account_id != "unknown":
+            logger.warning(f"ACCOUNT MISMATCH - Expected: {account_id}, Actual: {actual_account}")
+        else:
+            logger.info(f"ACCOUNT MATCH CONFIRMED - Using correct account: {actual_account}")
 
-            # Log warning if account mismatch
-            expected_account = mcp_credentials.get("account_id", "014498655151")  # pragma: allowlist secret
-            if actual_account != expected_account:
-                logger.warning(
-                    f" ACCOUNT MISMATCH - Expected: {expected_account}, Actual: {actual_account}"
-                )
-            else:
-                logger.info(
-                    f" ACCOUNT MATCH CONFIRMED - Using correct account: {actual_account}"
-                )
-
-        except Exception as sts_error:
-            logger.error(
-                f" STS VERIFICATION FAILED - Cannot verify AWS credentials: {sts_error}"
-            )
-
-    else:
-        # Fall back to default credentials
-        athena_client = boto3.client("athena")
-        s3_client = boto3.client("s3")
-        logger.info("Initialized Athena clients with default credentials")
-
-        # Verify default credentials with STS
-        try:
-            sts_client = boto3.client("sts")
-            identity = sts_client.get_caller_identity()
-            actual_account = identity.get("Account", "unknown")
-            user_arn = identity.get("Arn", "unknown")
-            logger.info(
-                f" STS VERIFICATION (DEFAULT) - Athena MCP connected to AWS Account: {actual_account}"
-            )
-            logger.info(f" STS Identity ARN: {user_arn}")
-        except Exception as sts_error:
-            logger.error(
-                f" STS VERIFICATION FAILED (DEFAULT) - Cannot verify AWS credentials: {sts_error}"
-            )
+    except Exception as sts_error:
+        logger.error(f"STS VERIFICATION FAILED - Cannot verify AWS credentials: {sts_error}")
 
 except Exception as e:
     logger.error(f"Failed to initialize Athena clients: {str(e)}")
@@ -169,11 +142,11 @@ logger.info("Creating FastMCP server for Athena tool...")
 logger.info("Initializing AWS clients...")
 # Initialize boto3 clients (don't call APIs during module load)
 try:
-    datazone_client = boto3.client("datazone")
-    sts_client = boto3.client("sts")
+    datazone_client = session.client("datazone")
+    sts_client = session.client("sts")
 
     # Get region for logging (this doesn't require credentials)
-    region = boto3.Session().region_name or "us-east-1"  # pragma: allowlist secret
+    region = session.region_name or "us-east-1"
     logger.info(f"AWS region: {region}, Clients initialized")
 except Exception as e:
     logger.error(f"Failed to initialize AWS clients: {str(e)}")
@@ -227,15 +200,11 @@ async def athena_execute_sql_query(
                 break
 
         if not active_env:
-            raise Exception(
-                f"No active environment found for project {project_identifier}"
-            )
+            raise Exception(f"No active environment found for project {project_identifier}")
 
         # List connections for the project to find the Athena connection
         connections = datazone_client.list_connections(
-            domainIdentifier=domain_identifier,
-            projectIdentifier=project_identifier,
-            type="ATHENA",
+            domainIdentifier=domain_identifier, projectIdentifier=project_identifier, type="ATHENA"
         )
 
         athena_connection = None
@@ -245,15 +214,11 @@ async def athena_execute_sql_query(
                 break
 
         if not athena_connection:
-            raise Exception(
-                f"No Athena connection found for project {project_identifier}"
-            )
+            raise Exception(f"No Athena connection found for project {project_identifier}")
 
         # Get the workgroup name from the Athena connection properties
         workgroup = (
-            athena_connection.get("props", {})
-            .get("athenaProperties", {})
-            .get("workgroupName")
+            athena_connection.get("props", {}).get("athenaProperties", {}).get("workgroupName")
         )
         if not workgroup:
             raise Exception("No Athena workgroup found in connection properties")
@@ -262,7 +227,7 @@ async def athena_execute_sql_query(
         if not sts_client:
             raise Exception("STS client not initialized")
         account_id = sts_client.get_caller_identity()["Account"]
-        region = boto3.Session().region_name
+        region = session.region_name
 
         query_params = {
             "QueryString": sql_query,
@@ -289,15 +254,8 @@ async def athena_execute_sql_query(
         start_time = time.time()
         response = None
 
-        while (
-            state in ["RUNNING", "QUEUED"]
-            and (time.time() - start_time) < max_wait_time
-        ):
-            if not athena_client:
-                raise Exception("Athena client not initialized")
-            response = athena_client.get_query_execution(
-                QueryExecutionId=query_execution_id
-            )
+        while state in ["RUNNING", "QUEUED"] and (time.time() - start_time) < max_wait_time:
+            response = athena_client.get_query_execution(QueryExecutionId=query_execution_id)
             state = response["QueryExecution"]["Status"]["State"]
 
             if state == "FAILED":
@@ -334,16 +292,12 @@ async def athena_execute_sql_query(
             "execution_time_ms": response["QueryExecution"]["Statistics"][
                 "TotalExecutionTimeInMillis"
             ],
-            "data_scanned_bytes": response["QueryExecution"]["Statistics"][
-                "DataScannedInBytes"
-            ],
+            "data_scanned_bytes": response["QueryExecution"]["Statistics"]["DataScannedInBytes"],
         }
 
         # Extract column information
         for column in results["ResultSet"]["ResultSetMetadata"]["ColumnInfo"]:
-            formatted_results["columns"].append(
-                {"name": column["Name"], "type": column["Type"]}
-            )
+            formatted_results["columns"].append({"name": column["Name"], "type": column["Type"]})
 
         # Extract row data (skip the header row)
         for row in results["ResultSet"]["Rows"][1:]:
@@ -352,25 +306,13 @@ async def athena_execute_sql_query(
                 formatted_row.append(data.get("VarCharValue", ""))
             formatted_results["rows"].append(formatted_row)
 
-        logger.info(
-            f"Query completed successfully. Returned {len(formatted_results['rows'])} rows"
-        )
+        logger.info(f"Query completed successfully. Returned {len(formatted_results['rows'])} rows")
         return formatted_results
 
-    except ClientError as e:
-        error_code = e.response["Error"]["Code"]
-        error_msg = f"Error executing SQL query: {str(e)}"
-        logger.error(error_msg)
-        if error_code == "InvalidRequestException":
-            raise Exception(f"Invalid SQL query: {str(e)}")
-        elif error_code == "TooManyRequestsException":
-            raise Exception("Too many requests. Please try again later.")
-        else:
-            raise Exception(error_msg)
     except Exception as e:
-        error_msg = f"Unexpected error executing SQL query: {str(e)}"
-        logger.error(error_msg)
-        raise Exception(error_msg)
+        logger.error(f"Error executing Athena SQL query: {str(e)}")
+        logger.error(f"Traceback: {traceback.format_exc()}")
+        raise Exception(f"Athena SQL query failed: {str(e)}")
 
 
 @mcp.tool()
@@ -379,7 +321,7 @@ async def athena_describe_available_tables(
     workgroup: Optional[str] = None,
     catalog_name: Optional[str] = None,
     max_results: int = 50,
-    next_token: Optional[str] = None,
+    next_token: str = None,
 ) -> Dict[str, Any]:
     """
     Describes the available tables in an Athena database.
@@ -409,11 +351,11 @@ async def athena_describe_available_tables(
         params = {"DatabaseName": database_name, "MaxResults": max_results}
 
         # Add optional parameters if provided
-        if workgroup is not None and workgroup != "":
+        if workgroup:
             params["WorkGroup"] = workgroup
-        if catalog_name is not None and catalog_name != "":
+        if catalog_name:
             params["CatalogName"] = catalog_name
-        if next_token is not None and next_token != "":
+        if next_token:
             params["NextToken"] = next_token
 
         # Get table list
@@ -470,6 +412,7 @@ def create_http_app():
     """Create FastAPI app for HTTP transport"""
     try:
         from fastapi import FastAPI, Request
+        import uvicorn
 
         app = FastAPI(
             title="Athena MCP Server",
@@ -560,16 +503,14 @@ def create_http_app():
 
                             tool_info = {
                                 "name": tool_name,
-                                "description": tool_obj.description
-                                or f"Athena tool: {tool_name}",
+                                "description": tool_obj.description or f"Athena tool: {tool_name}",
                                 "inputSchema": input_schema,
                             }
                         except Exception:
                             # Fallback if schema generation fails
                             tool_info = {
                                 "name": tool_name,
-                                "description": tool_obj.description
-                                or f"Athena tool: {tool_name}",
+                                "description": tool_obj.description or f"Athena tool: {tool_name}",
                                 "inputSchema": {
                                     "type": "object",
                                     "properties": {},
@@ -602,9 +543,7 @@ def create_http_app():
                             return {
                                 "jsonrpc": "2.0",
                                 "id": request_id,
-                                "result": {
-                                    "content": [{"type": "text", "text": result_text}]
-                                },
+                                "result": {"content": [{"type": "text", "text": result_text}]},
                             }
                         except Exception as e:
                             logger.error(f"Error calling tool {tool_name}: {e}")
@@ -620,26 +559,20 @@ def create_http_app():
                         return {
                             "jsonrpc": "2.0",
                             "id": request_id,
-                            "error": {
-                                "code": -32601,
-                                "message": f"Tool not found: {tool_name}",
-                            },
+                            "error": {"code": -32601, "message": f"Tool not found: {tool_name}"},
                         }
                 else:
                     return {
                         "jsonrpc": "2.0",
                         "id": request_id,
-                        "error": {
-                            "code": -32601,
-                            "message": f"Method not found: {method}",
-                        },
+                        "error": {"code": -32601, "message": f"Method not found: {method}"},
                     }
 
             except Exception as e:
                 logger.error(f"Error processing MCP request: {e}")
                 return {
                     "jsonrpc": "2.0",
-                    "id": request_data.get("id", None),
+                    "id": request_data.get("id", None) if "request_data" in locals() else None,
                     "error": {"code": -32603, "message": f"Internal error: {str(e)}"},
                 }
 
@@ -662,6 +595,8 @@ if __name__ == "__main__":
         try:
             if hasattr(mcp, "_tool_manager") and hasattr(mcp._tool_manager, "_tools"):
                 tool_count = len(mcp._tool_manager._tools)
+            elif hasattr(mcp, "tools"):
+                tool_count = len(mcp.tools)
             else:
                 tool_count = 2  # We know there are 2 tools defined
         except Exception as e:
@@ -671,7 +606,7 @@ if __name__ == "__main__":
         logger.info(f"Number of registered tools: {tool_count}")
         if tool_count == 0:
             logger.warning(
-                "  No tools registered! This may indicate a FastMCP version compatibility issue."
+                "No tools registered! This may indicate a FastMCP version compatibility issue."
             )
             logger.info(
                 "Available tools should be: athena_execute_sql_query, athena_describe_available_tables"
