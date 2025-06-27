@@ -1,8 +1,4 @@
-"""
-Unit tests for glossary tools.
-"""
-
-from unittest.mock import Mock
+"""Unit tests for glossary tools."""
 
 import pytest
 
@@ -176,7 +172,7 @@ class TestGlossary:
     async def test_glossary_not_found(
         self, mcp_server_with_tools, tool_extractor, mock_client_error
     ):
-        """Test glossary retrieval when glossary doesn't exist."""
+        """Test glossary retrieval when glossary doesn"t exist."""
         # Get the tool function from the MCP server
         get_glossary = tool_extractor(mcp_server_with_tools, "get_glossary")
 
@@ -223,7 +219,7 @@ class TestGlossary:
     def test_register_tools(self, mock_fastmcp):
         """Test that tools are properly registered with FastMCP."""
         # Import here to avoid circular import issues
-        from datazone_mcp_server.tools import glossary
+        from servers.datazone.tools import glossary
 
         # Act
         glossary.register_tools(mock_fastmcp)

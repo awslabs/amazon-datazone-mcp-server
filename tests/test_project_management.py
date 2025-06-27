@@ -1,10 +1,7 @@
-"""
-Unit tests for project_management tools.
-"""
-
-from unittest.mock import AsyncMock, Mock, patch
+"""Unit tests for project_management tools."""
 
 import pytest
+from unittest.mock import AsyncMock, Mock, patch
 
 
 class TestProjectManagement:
@@ -99,7 +96,7 @@ class TestProjectManagement:
     async def test_get_project_not_found(
         self, mcp_server_with_tools, tool_extractor, mock_client_error
     ):
-        """Test project retrieval when project doesn't exist."""
+        """Test project retrieval when project doesn"t exist."""
         # Get the tool function from the MCP server
         get_project = tool_extractor(mcp_server_with_tools, "get_project")
 
@@ -206,7 +203,9 @@ class TestProjectManagement:
         mock_client.__aenter__.return_value = mock_client
         mock_client.__aexit__.return_value = None
 
-        with patch("datazone_mcp_server.tools.common.httpx.AsyncClient", return_value=mock_client):
+        with patch(
+            "servers.datazone.tools.common.httpx.AsyncClient", return_value=mock_client
+        ):
             # Act
             result = await create_project_membership(domain_id, project_id, designation, member_id)
 
@@ -288,7 +287,10 @@ class TestProjectManagement:
         # Assert
         assert result == expected_response
         mcp_server_with_tools._mock_client.create_project_profile.assert_called_once_with(
-            domainIdentifier=domain_id, name=profile_name, status="ENABLED", description=description
+            domainIdentifier=domain_id,
+            name=profile_name,
+            status="ENABLED",
+            description=description,
         )
 
     @pytest.mark.asyncio
@@ -380,7 +382,7 @@ class TestProjectManagement:
     def test_register_tools(self, mock_fastmcp):
         """Test that tools are properly registered with FastMCP."""
         # Import here to avoid circular import issues
-        from datazone_mcp_server.tools import project_management
+        from servers.datazone.tools import project_management
 
         # Act
         project_management.register_tools(mock_fastmcp)
@@ -440,10 +442,12 @@ class TestProjectManagementParameterValidation:
 
         # Act
         await list_projects(
-            domain_identifier="dzd_test123", max_results=100  # Should be capped at 50
+            domain_identifier="dzd_test123",
+            max_results=100,  # Should be capped at 50
         )
 
         # Assert
         mcp_server_with_tools._mock_client.list_projects.assert_called_once_with(
-            domainIdentifier="dzd_test123", maxResults=50  # Capped value
+            domainIdentifier="dzd_test123",
+            maxResults=50,  # Capped value
         )

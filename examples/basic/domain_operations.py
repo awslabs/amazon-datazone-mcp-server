@@ -26,7 +26,7 @@ Prerequisites:
 
 Usage:
     python examples/basic/domain_operations.py
-    
+
     # With custom domain ID
     DATAZONE_DOMAIN_ID=dzd_abc123 python examples/basic/domain_operations.py
 """
@@ -49,7 +49,9 @@ class DomainOperationsExample:
     async def setup_client(self):
         """Initialize the MCP client connection."""
         print("Setting up MCP client connection...")
-        self.client = await create_client("stdio", ["python", "-m", "datazone_mcp_server.server"])
+        self.client = await create_client(
+            "stdio", ["python", "-m", "datazone_mcp_server.server"]
+        )
         print("Client connection established")
 
     async def get_domain_details(self) -> Dict[str, Any]:
@@ -62,7 +64,9 @@ class DomainOperationsExample:
         print(f"\nGetting details for domain: {self.domain_id}")
 
         try:
-            result = await self.client.call_tool("get_domain", {"identifier": self.domain_id})
+            result = await self.client.call_tool(
+                "get_domain", {"identifier": self.domain_id}
+            )
 
             domain_data = json.loads(result.content[0].text)
 

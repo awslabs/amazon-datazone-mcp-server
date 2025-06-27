@@ -1,15 +1,12 @@
-"""
-Test configuration and fixtures for Amazon DataZone MCP Server tests.
-"""
+"""Test configuration and fixtures for Amazon DataZone MCP Server tests."""
 
 import asyncio
 import os
-from typing import Any, Dict, List
-from unittest.mock import AsyncMock, Mock, patch
-
 import pytest
 from botocore.exceptions import ClientError
 from mcp.server.fastmcp import FastMCP
+from typing import Any, Callable, Dict, Optional
+from unittest.mock import Mock, patch
 
 
 @pytest.fixture(scope="session")
@@ -31,7 +28,7 @@ def mock_datazone_client():
         "name": "Test Domain",
         "description": "Test domain description",
         "status": "AVAILABLE",
-        "arn": "arn:aws:datazone:us-east-1:123456789012:domain/dzd_test123",
+        "arn": os.getenv("ARN"),
         "portalUrl": "https://dzd_test123.datazone.aws.amazon.com",
         "domainVersion": "V2",
         "rootDomainUnitId": "root_unit_123",
@@ -42,7 +39,7 @@ def mock_datazone_client():
         "name": "New Test Domain",
         "description": "New test domain description",
         "status": "CREATING",
-        "arn": "arn:aws:datazone:us-east-1:123456789012:domain/dzd_new123",
+        "arn": os.getenv("ARN"),
         "portalUrl": "https://dzd_new123.datazone.aws.amazon.com",
         "domainVersion": "V2",
         "rootDomainUnitId": "root_unit_new123",
@@ -122,18 +119,17 @@ def mock_datazone_client():
 def mcp_server_with_tools(mock_datazone_client):
     """Create MCP server instance with all tools registered and mocked client."""
     mcp = FastMCP("test-datazone")
+    import boto3
 
     # Start a persistent patch that will last for the entire test
     # Patch boto3.client to return our mock for datazone
-    original_boto3_client = None
+    original_boto3_client: Callable = boto3.client
 
     def mock_boto3_client(service_name, **kwargs):
         if service_name == "datazone":
             return mock_datazone_client
         # For other services, use the original client function
         return original_boto3_client(service_name, **kwargs)
-
-    import boto3
 
     original_boto3_client = boto3.client
     patcher = patch("boto3.client", side_effect=mock_boto3_client)
@@ -142,12 +138,11 @@ def mcp_server_with_tools(mock_datazone_client):
     try:
         # Now import and reload the modules to get the mocked client
         import importlib
-
-        from datazone_mcp_server.tools import common
+        from servers.datazone.tools import common
 
         importlib.reload(common)  # This will recreate datazone_client with our mock
 
-        from datazone_mcp_server.tools import (
+        from servers.datazone.tools import (
             data_management,
             domain_management,
             environment,
@@ -169,8 +164,8 @@ def mcp_server_with_tools(mock_datazone_client):
         environment.register_tools(mcp)
 
         # Store the mock client and patcher on the server for test access
-        mcp._mock_client = mock_datazone_client
-        mcp._patcher = patcher
+        setattr(mcp, "_mock_client", mock_datazone_client)
+        setattr(mcp, "_patcher", patcher)
 
         yield mcp
 
@@ -183,7 +178,7 @@ def mcp_server_with_tools(mock_datazone_client):
 def client_error_helper():
     """Helper function to create ClientError exceptions for testing."""
 
-    def create_client_error(error_code: str, message: str = None):
+    def create_client_error(error_code: str, message: Optional[str] = None):
         if message is None:
             message = f"An error occurred ({error_code})"
 
@@ -199,8 +194,8 @@ def sample_domain_data():
     return {
         "name": "Test Domain",
         "description": "Test domain description",
-        "domain_execution_role": "arn:aws:iam::123456789012:role/DataZoneDomainExecutionRole",
-        "service_role": "arn:aws:iam::123456789012:role/DataZoneServiceRole",
+        "domain_execution_role": os.getenv("DOMAIN_EXECUTION_ROLE"),
+        "service_role": os.getenv("SERVICE_ROLE"),
         "domain_version": "V2",
     }
 
@@ -255,22 +250,27 @@ class TestDataHelper:
 
     @staticmethod
     def get_domain_id() -> str:
+        """Get domain id."""
         return "dzd_test123"
 
     @staticmethod
     def get_project_id() -> str:
+        """Get project id."""
         return "prj_test123"
 
     @staticmethod
     def get_asset_id() -> str:
+        """Get asset id."""
         return "asset_test123"
 
     @staticmethod
     def get_glossary_id() -> str:
+        """Get glossary id."""
         return "glossary_test123"
 
     @staticmethod
     def get_environment_id() -> str:
+        """Get environment id."""
         return "env_test123"
 
     @staticmethod
@@ -327,7 +327,10 @@ def aws_error_scenarios():
             "error_code": "ValidationException",
             "message": "The input fails to satisfy the constraints",
         },
-        "throttling": {"error_code": "ThrottlingException", "message": "The request was throttled"},
+        "throttling": {
+            "error_code": "ThrottlingException",
+            "message": "The request was throttled",
+        },
         "internal_error": {
             "error_code": "InternalServerException",
             "message": "An internal server error occurred",
@@ -342,11 +345,11 @@ def mock_aws_credentials():
     with patch.dict(
         os.environ,
         {
-            "AWS_ACCESS_KEY_ID": "testing",
-            "AWS_SECRET_ACCESS_KEY": "testing",
-            "AWS_SECURITY_TOKEN": "testing",
-            "AWS_SESSION_TOKEN": "testing",
-            "AWS_DEFAULT_REGION": "us-east-1",
+            "AWS_ACCESS_KEY_ID": "testing",  # pragma: allowlist secret
+            "AWS_SECRET_ACCESS_KEY": "testing",  # pragma: allowlist secret
+            "AWS_SECURITY_TOKEN": "testing",  # pragma: allowlist secret
+            "AWS_SESSION_TOKEN": "testing",  # pragma: allowlist secret
+            "AWS_DEFAULT_REGION": "us-east-1",  # pragma: allowlist secret
         },
     ):
         yield

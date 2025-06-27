@@ -59,7 +59,7 @@ Available tools: 38 tools across 5 categories
 
 ### Step 2: Configure AWS Credentials
 
-**Option A: Using AWS CLI (Recommended)**
+**=Using AWS CLI (Recommended)**
 ```bash
 # Install AWS CLI if you haven't already
 pip install awscli
@@ -69,16 +69,10 @@ aws configure
 ```
 
 You'll be prompted for:
-- AWS Access Key ID: `your_access_key_here`
-- AWS Secret Access Key: `your_secret_key_here`
-- Default region: `us-east-1` (or your preferred region)
+- AWS Access Key ID
+- AWS Secret Access Key
+- Default region
 - Default output format: `json`
-
-**Option B: Using Environment Variables**
-```bash
-export AWS_ACCESS_KEY_ID="your_access_key_here"
-export AWS_SECRET_ACCESS_KEY="your_secret_key_here"
-export AWS_DEFAULT_REGION="us-east-1"
 ```
 
 **If you have a specific DataZone domain ID:**
@@ -88,7 +82,7 @@ export AWS_DEFAULT_REGION="us-east-1"
         "aws-datazone": {
             "command": "python",
             "args": [
-                "-m", 
+                "-m",
                 "datazone_mcp_server.server"
             ],
             "env": {
@@ -206,7 +200,7 @@ Add this configuration to your `claude_desktop_config.json`:
         "aws-datazone": {
             "command": "python",
             "args": [
-                "-m", 
+                "-m",
                 "datazone_mcp_server.server"
             ],
             "env": {
@@ -224,7 +218,7 @@ Add this configuration to your `claude_desktop_config.json`:
         "aws-datazone": {
             "command": "python",
             "args": [
-                "-m", 
+                "-m",
                 "datazone_mcp_server.server"
             ],
             "env": {
@@ -287,7 +281,7 @@ I found 2 DataZone domains in your account:
    - Description: Domain for analytics workloads
 
 2. **Data Lake Domain** (dzd_xyz789)
-   - Status: ACTIVE  
+   - Status: ACTIVE
    - Created: 2024-02-01
    - Description: Central data lake domain
 ```
@@ -498,7 +492,7 @@ which python
 #### 2. AWS Permission Errors
 
 **Symptoms:**
-- "AccessDeniedException" 
+- "AccessDeniedException"
 - "NoCredentialsError"
 
 **Solutions:**
@@ -609,14 +603,14 @@ from mcp import create_client
 
 async def automate_project_setup():
     client = await create_client("stdio", ["python", "-m", "datazone_mcp_server.server"])
-    
+
     # Create project
     project = await client.call_tool("create_project", {
         "domain_identifier": "dzd_abc123",
         "name": "Automated Project",
         "description": "Created via automation"
     })
-    
+
     # Add more automation steps...
 ```
 
@@ -704,4 +698,4 @@ export DATAZONE_MCP_DEBUG="true"  # For debugging
 
 This getting started guide has taken you from installation to real-world usage. You now have the foundation to manage AWS DataZone resources through natural language conversation.
 
-**Happy data governing!** 
+**Happy data governing!**

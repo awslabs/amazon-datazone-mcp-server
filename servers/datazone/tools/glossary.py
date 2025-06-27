@@ -11,16 +11,14 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-"""
-Glossary management tools for Amazon DataZone.
-"""
+"""Glossary management tools for Amazon DataZone."""
 
 from typing import Any, Dict, List, Optional
 
-from mcp.server.fastmcp import FastMCP
+from botocore.exceptions import ClientError
 
-from .common import ClientError, datazone_client, logger
+from .common import datazone_client
+from mcp.server.fastmcp import FastMCP
 
 
 def register_tools(mcp: FastMCP):
@@ -35,8 +33,7 @@ def register_tools(mcp: FastMCP):
         status: str = "ENABLED",
         client_token: Optional[str] = None,
     ) -> Any:
-        """
-        Creates a new business glossary in Amazon DataZone.
+        """Creates a new business glossary in Amazon DataZone.
 
         Args:
             domain_identifier (str): The ID of the domain where the glossary will be created
@@ -56,7 +53,7 @@ def register_tools(mcp: FastMCP):
                 name="Sales Glossary",
                 owning_project_identifier="prj_987654321",
                 description="Glossary for sales-related terms",
-                status="ENABLED"
+                status="ENABLED",
             )
             ```
         """
@@ -78,7 +75,9 @@ def register_tools(mcp: FastMCP):
             if client_token:
                 params["clientToken"] = client_token
 
-            response = datazone_client.create_glossary(domainIdentifier=domain_identifier, **params)
+            response = datazone_client.create_glossary(
+                domainIdentifier=domain_identifier, **params
+            )
             return response
         except ClientError as e:
             raise Exception(f"Error creating glossary in domain {domain_identifier}: {e}")
@@ -94,8 +93,7 @@ def register_tools(mcp: FastMCP):
         term_relations: Optional[Dict[str, List[str]]] = None,
         client_token: Optional[str] = None,
     ) -> Any:
-        """
-        Creates a new business glossary term in Amazon DataZone.
+        r"""Creates a new business glossary term in Amazon DataZone.
 
         Args:
             domain_identifier (str): The ID of the domain where the glossary term will be created
@@ -126,10 +124,7 @@ def register_tools(mcp: FastMCP):
                 short_description="A person or organization that purchases goods or services",
                 long_description="In business, a customer is an individual or organization that purchases goods or services from a company. Customers are vital to the success of any business as they provide revenue and feedback.",
                 status="ENABLED",
-                term_relations={
-                    "classifies": ["term_123", "term_456"],
-                    "isA": ["term_789"]
-                }
+                term_relations={"classifies": ["term_123", "term_456"], "isA": ["term_789"]},
             )
             ```
         """
@@ -163,9 +158,11 @@ def register_tools(mcp: FastMCP):
             raise Exception(f"Error creating glossary term in domain {domain_identifier}: {e}")
 
     @mcp.tool()
-    async def get_glossary(domain_identifier: str, identifier: str) -> Any:
-        """
-        Retrieves detailed information about a specific business glossary in Amazon DataZone.
+    async def get_glossary(
+        domain_identifier: str,
+        identifier: str
+    ) -> Any:
+        """Retrieves detailed information about a specific business glossary in Amazon DataZone.
 
         Args:
             domain_identifier (str): The ID of the domain where the glossary exists
@@ -189,8 +186,7 @@ def register_tools(mcp: FastMCP):
         Example:
             ```python
             response = await get_glossary(
-                domain_identifier="dzd_123456789",
-                identifier="gloss_987654321"
+                domain_identifier="dzd_123456789", identifier="gloss_987654321"
             )
             ```
         """
@@ -205,9 +201,11 @@ def register_tools(mcp: FastMCP):
             )
 
     @mcp.tool()
-    async def get_glossary_term(domain_identifier: str, identifier: str) -> Any:
-        """
-        Retrieves detailed information about a specific business glossary term in Amazon DataZone.
+    async def get_glossary_term(
+        domain_identifier: str,
+        identifier: str
+    ) -> Any:
+        """Retrieves detailed information about a specific business glossary term in Amazon DataZone.
 
         Args:
             domain_identifier (str): The ID of the domain where the glossary term exists
@@ -237,8 +235,7 @@ def register_tools(mcp: FastMCP):
         Example:
             ```python
             response = await get_glossary_term(
-                domain_identifier="dzd_123456789",
-                identifier="term_987654321"
+                domain_identifier="dzd_123456789", identifier="term_987654321"
             )
             ```
         """

@@ -1,8 +1,4 @@
-"""
-Unit tests for environment tools.
-"""
-
-from unittest.mock import Mock
+"""Unit tests for environment tools."""
 
 import pytest
 
@@ -135,7 +131,9 @@ class TestEnvironment:
         )
 
     @pytest.mark.asyncio
-    async def test_list_environment_blueprints_success(self, mcp_server_with_tools, tool_extractor):
+    async def test_list_environment_blueprints_success(
+        self, mcp_server_with_tools, tool_extractor
+    ):
         """Test successful environment blueprints listing."""
         # Get the tool function from the MCP server
         list_environment_blueprints = tool_extractor(
@@ -250,7 +248,7 @@ class TestEnvironment:
     async def test_environment_not_found(
         self, mcp_server_with_tools, tool_extractor, mock_client_error
     ):
-        """Test environment listing when environment doesn't exist."""
+        """Test environment listing when environment doesn"t exist."""
         # Get the tool function from the MCP server
         list_environments = tool_extractor(mcp_server_with_tools, "list_environments")
 
@@ -265,13 +263,13 @@ class TestEnvironment:
         with pytest.raises(Exception) as exc_info:
             await list_environments(domain_id, project_id)
 
-        assert f"Error listing environments" in str(exc_info.value)
+        assert "Error listing environments" in str(exc_info.value)
 
     @pytest.mark.asyncio
     async def test_connection_not_found(
         self, mcp_server_with_tools, tool_extractor, mock_client_error
     ):
-        """Test connection retrieval when connection doesn't exist."""
+        """Test connection retrieval when connection doesn"t exist."""
         # Get the tool function from the MCP server
         get_connection = tool_extractor(mcp_server_with_tools, "get_connection")
 
@@ -291,7 +289,7 @@ class TestEnvironment:
     def test_register_tools(self, mock_fastmcp):
         """Test that tools are properly registered with FastMCP."""
         # Import here to avoid circular import issues
-        from datazone_mcp_server.tools import environment
+        from servers.datazone.tools import environment
 
         # Act
         environment.register_tools(mock_fastmcp)
@@ -359,5 +357,5 @@ class TestEnvironmentParameterValidation:
         mock_client.list_environments.assert_called_once_with(
             domainIdentifier="dzd_test123",
             projectIdentifier="prj_test123",
-            maxResults=100,  # The function doesn't cap this, it passes through
+            maxResults=100,  # The function doesn"t cap this, it passes through
         )

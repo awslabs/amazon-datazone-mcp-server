@@ -254,4 +254,4 @@ See our [Contributing Guide](../CONTRIBUTING.md) for details.
 
 ---
 
-**Need help?** Check out our [documentation](../docs/) or open an [issue](https://github.com/wangtianren/datazone-mcp-server/issues). 
+**Need help?** Check out our [documentation](../docs/) or open an [issue](https://github.com/wangtianren/datazone-mcp-server/issues).
