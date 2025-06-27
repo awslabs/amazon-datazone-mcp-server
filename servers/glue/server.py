@@ -705,7 +705,7 @@ if __name__ == "__main__":
                 sys.exit(1)
 
             # Get configuration from environment
-            host = os.getenv("HOST", "0.0.0.0")
+            host = os.getenv("HOST", "0.0.0.0")  # nosec B104
             port = int(os.getenv("PORT", "8081"))
 
             # Start server with uvicorn
