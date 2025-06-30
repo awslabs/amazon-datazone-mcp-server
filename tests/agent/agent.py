@@ -104,6 +104,10 @@ class SMUSAdminAgent:
     
     def __init__(self):
         self.config = config  # Store config as instance variable
+        
+        # Validate API key before initializing LLM
+        config.validate_api_key()
+        
         self.llm = ChatAnthropic(
             model=config.default_model,
             api_key=config.anthropic_api_key,
@@ -274,7 +278,7 @@ class SMUSAdminAgent:
             print(f"Error: {str(e)}")
 
         if output_path is None:
-            output_path = "/Users/jiayixin/Desktop/results_try.csv"
+            output_path = "/Users/jiayixin/Desktop/results.csv"
         df.to_csv(output_path, index=False)
         print(f"✅ Results saved to: {output_path}")
 
