@@ -147,17 +147,10 @@ class SMUSAdminAgent:
             # Run the datazone server directly
             server_params = StdioServerParameters(
                 command=python_cmd,
-                args=["servers/datazone/server.py"],
-                env={
-                    "PYTHONPATH": "servers",
-                    "AWS_ACCESS_KEY_ID": "ASIAQGYBP5OXW5MTKVKQ_test",
-                    "AWS_SECRET_ACCESS_KEY": "test_secret_key",
-                    "AWS_SESSION_TOKEN": "test_session_token",
-                    "AWS_DEFAULT_REGION": "us-east-1"
-                },
+                args=["-m", "servers.datazone.server"],
+                env=None,
                 cwd=server_path
             )
-            
             print(f"🔍 Debug: Server params - command: {server_params.command}, args: {server_params.args}, cwd: {server_params.cwd}")
             
             # This is an async operation, but we are in a sync constructor.
@@ -173,6 +166,7 @@ class SMUSAdminAgent:
     async def _ensure_mcp_client(self):
         """Ensure MCP client is connected (lazy initialization)."""
         if self.mcp_client is None and hasattr(self, 'server_params'):
+            print("✅ Entered if clause!")
             try:
                 self.exit_stack = AsyncExitStack()
                 stdio_transport = await self.exit_stack.enter_async_context(
