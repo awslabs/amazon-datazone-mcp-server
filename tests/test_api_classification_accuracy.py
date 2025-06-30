@@ -37,15 +37,15 @@ class TestAPIClassificationAccuracy:
         if hasattr(self.agent, 'cleanup_mcp'):
             try:
                 asyncio.run(self.agent.cleanup_mcp())
-            except:
+            except Exception:
                 # Ignore cleanup errors
                 pass
     
     @pytest.mark.asyncio
     async def test_api_classification_accuracy(self):
         """Test the accuracy of API classification."""
-        # Load the test dataset
-        df = pd.read_csv(self.dataset_path)
+        # Verify dataset exists before proceeding
+        assert os.path.exists(self.dataset_path), f"Dataset file {self.dataset_path} not found"
         
         # Create temporary file for results
         with tempfile.NamedTemporaryFile(mode='w', suffix='.csv', delete=False) as f:
@@ -79,11 +79,11 @@ class TestAPIClassificationAccuracy:
             assert accuracy_results['overall_accuracy'] >= 0.7, f"Overall accuracy {accuracy_results['overall_accuracy']:.2%} is below 70% threshold"
             
             # Print summary for CI logs
-            print(f"\n=== API Classification Test Results ===")
+            print("\n=== API Classification Test Results ===")
             print(f"Total questions tested: {accuracy_results['total_questions']}")
             print(f"Correct classifications: {accuracy_results['correct_classifications']}")
             print(f"Overall accuracy: {accuracy_results['overall_accuracy']:.2%}")
-            print(f"Accuracy by API type:")
+            print("Accuracy by API type:")
             for api, acc in accuracy_results['accuracy_by_api'].items():
                 print(f"  {api}: {acc:.2%}")
             

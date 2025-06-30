@@ -33,7 +33,7 @@ from pathlib import Path
 from datetime import datetime
 import matplotlib.pyplot as plt
 import seaborn as sns
-from typing import Dict, List, Tuple
+from typing import Dict, Tuple
 
 
 def load_results(results_dir: Path) -> Tuple[pd.DataFrame, Dict]:
@@ -314,7 +314,7 @@ def main():
             print(f"  {api:<20}: {acc:>6.1%} ({count:>3} questions)")
         
         # Generate detailed report
-        print(f"\nGenerating detailed analysis report...")
+        print("\nGenerating detailed analysis report...")
         generate_detailed_report(df, metrics, output_dir)
         
         # Create visualizations

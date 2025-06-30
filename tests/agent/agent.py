@@ -1,21 +1,16 @@
 """Main LangGraph agent implementation for SMUS Admin Agent."""
 
-import asyncio
 import os
-import sys
 from contextlib import AsyncExitStack
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import Any, AsyncGenerator, Dict, List
-import re
+from typing import Any, Dict, List
 
 
 from langchain_core.messages import SystemMessage, HumanMessage, AIMessage, BaseMessage
 from langchain_core.tools import BaseTool
 from langchain_anthropic import ChatAnthropic
 from langgraph.graph import StateGraph, START, END
-from langgraph.graph.message import add_messages
-from langgraph.prebuilt import ToolNode
 from pydantic import BaseModel, Field
 
 from .config import config
@@ -29,7 +24,6 @@ except ImportError:
     stdio_client = None
 
 import pandas as pd
-import re
 from tqdm.asyncio import tqdm
 
 DATASET_PATH = "tests/agent/smus_test.csv"
@@ -309,7 +303,6 @@ class SMUSAdminAgent:
                 print("❌ MCP connection failed, using fallback tool list")
             
             # Create system message with actual available tools
-            tools_list = ", ".join(available_tools)
             system_message = SystemMessage(content=(
                 """
 
@@ -384,7 +377,7 @@ class SMUSAdminAgent:
                 # Then close the exit stack
                 await self.exit_stack.aclose()
                 self.exit_stack = None
-        except Exception as e:
+        except Exception:
             # Suppress cleanup errors to avoid confusing users
             # These are usually harmless asyncio context manager issues
             pass 
