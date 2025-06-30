@@ -148,7 +148,13 @@ class SMUSAdminAgent:
             server_params = StdioServerParameters(
                 command=python_cmd,
                 args=["servers/datazone/server.py"],
-                env={"PYTHONPATH": "servers"},
+                env={
+                    "PYTHONPATH": "servers",
+                    "AWS_ACCESS_KEY_ID": "ASIAQGYBP5OXW5MTKVKQ_test",
+                    "AWS_SECRET_ACCESS_KEY": "test_secret_key",
+                    "AWS_SESSION_TOKEN": "test_session_token",
+                    "AWS_DEFAULT_REGION": "us-east-1"
+                },
                 cwd=server_path
             )
             
@@ -200,6 +206,17 @@ class SMUSAdminAgent:
         except Exception as e:
             print(f"Failed to list MCP tools: {e}")
             return []
+
+    async def call_mcp_tool(self, tool_name: str, arguments: dict):
+        """Call an MCP tool with the given arguments."""
+        if not await self._ensure_mcp_client():
+            raise Exception("MCP client not available")
+        
+        try:
+            result = await self.mcp_client.call_tool(tool_name, arguments)
+            return result
+        except Exception as e:
+            raise Exception(f"Error calling MCP tool {tool_name}: {e}")
 
     async def _setup_mcp_tools(self):
         """Convert MCP tools to LangChain tools."""
@@ -285,7 +302,20 @@ class SMUSAdminAgent:
         try:
             session = self.get_or_create_session(session_id)
             
-            # Add SystemMessage to session once before the loop
+            # Try to connect to MCP server and get actual tools
+            print("🔄 Attempting to connect to MCP server...")
+            mcp_connected = await self._ensure_mcp_client()
+            
+            available_tools = []
+            if mcp_connected:
+                print("✅ MCP client connected successfully!")
+                available_tools = await self.list_mcp_tools()
+                print(f"📋 Found {len(available_tools)} MCP tools: {', '.join(available_tools[:5])}...")
+            else:
+                print("❌ MCP connection failed, using fallback tool list")
+            
+            # Create system message with actual available tools
+            tools_list = ", ".join(available_tools)
             system_message = SystemMessage(content=(
                 """
 

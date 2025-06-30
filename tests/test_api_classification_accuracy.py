@@ -51,21 +51,6 @@ class TestAPIClassificationAccuracy:
         with tempfile.NamedTemporaryFile(mode='w', suffix='.csv', delete=False) as f:
             self.results_file = f.name
 
-        # Check MCP integration
-        if hasattr(self.agent, 'server_params'):
-            print(f"MCP integration configured")
-            # Try to connect to MCP server
-            mcp_available = await self.agent._ensure_mcp_client()
-            if mcp_available:
-                print(f"Connected to DataZone MCP server")
-                tools = await self.agent.list_mcp_tools()
-                print(f"Available MCP tools: {len(tools)}")
-                print(f"   Sample tools:", tools[:5] if len(tools) > 5 else tools)
-            else:
-                print(f"MCP server connection failed - continuing without MCP")
-        else:
-            print(f"No MCP configuration found")
-            
         try:
             # Create a results directory for CI
             results_dir = Path("test_results")
