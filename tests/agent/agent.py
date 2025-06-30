@@ -164,6 +164,75 @@ class SMUSAdminAgent:
             traceback.print_exc()
             self.mcp_client = None
     
+    async def _ensure_mcp_client(self):
+        """Ensure MCP client is connected (lazy initialization)."""
+        if self.mcp_client is None and hasattr(self, 'server_params'):
+            try:
+                self.exit_stack = AsyncExitStack()
+                stdio_transport = await self.exit_stack.enter_async_context(
+                    stdio_client(self.server_params)
+                )
+                self.stdio, self.write = stdio_transport
+                self.mcp_client = await self.exit_stack.enter_async_context(
+                    ClientSession(self.stdio, self.write)
+                )
+                await self.mcp_client.initialize()
+                print("✅ MCP client connected and initialized!")
+                
+                # Convert MCP tools to LangChain tools
+                await self._setup_mcp_tools()
+                return True
+            except Exception as e:
+                print(f"Failed to connect MCP client: {e}")
+                import traceback
+                traceback.print_exc()
+                return False
+        return self.mcp_client is not None
+
+    async def list_mcp_tools(self) -> List[str]:
+        """List available MCP tools."""
+        if not await self._ensure_mcp_client():
+            return []
+        
+        try:
+            tools = await self.mcp_client.list_tools()
+            return [tool.name for tool in tools.tools]
+        except Exception as e:
+            print(f"Failed to list MCP tools: {e}")
+            return []
+
+    async def _setup_mcp_tools(self):
+        """Convert MCP tools to LangChain tools."""
+        if not self.mcp_client:
+            return
+        
+        try:
+            # Get MCP tools
+            tools_response = await self.mcp_client.list_tools()
+            self.mcp_tools = []
+            
+            for mcp_tool in tools_response.tools:
+                # Create a LangChain tool wrapper
+                langchain_tool = MCPTool(
+                    name=mcp_tool.name,
+                    description=mcp_tool.description or f"MCP tool: {mcp_tool.name}",
+                    mcp_tool_name=mcp_tool.name,
+                    agent=self
+                )
+                self.mcp_tools.append(langchain_tool)
+            
+            # Bind tools to the LLM
+            if self.mcp_tools:
+                self.llm_with_tools = self.llm.bind_tools(self.mcp_tools)
+                print(f"✅ Bound {len(self.mcp_tools)} MCP tools to LLM")
+            else:
+                self.llm_with_tools = self.llm
+                
+        except Exception as e:
+            print(f"Failed to setup MCP tools: {e}")
+            self.llm_with_tools = self.llm
+    
+    
     def _build_graph(self) -> StateGraph:
         """Build the LangGraph conversation graph."""
         
