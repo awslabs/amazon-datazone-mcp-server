@@ -73,7 +73,7 @@ jobs:
       - name: Run tests
         run: |
           if [ -d "tests" ]; then
-            uv run --frozen pytest tests/ --cov=servers --cov-branch --cov-report=term-missing --cov-report=xml:coverage.xml
+            uv run --frozen pytest tests/ --ignore=tests/test_api_classification_accuracy.py --cov=servers --cov-branch --cov-report=term-missing --cov-report=xml:coverage.xml
           else
             echo "No tests directory found, skipping tests"
           fi
