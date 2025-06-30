@@ -126,8 +126,7 @@ class SMUSAdminAgent:
     def _initialize_mcp_client(self):
         """Initialize the MCP client."""
         try:
-            # The mcp_server_path should point to the local server directory
-            # We need to run: python -m datazone_mcp_server.server from that directory
+            # The mcp_server_path should point to the project root directory
             server_path = config.mcp_server_path
             if not os.path.exists(server_path):
                 raise ValueError(f"MCP server path does not exist: {server_path}")
@@ -145,10 +144,11 @@ class SMUSAdminAgent:
                 print(f"🔍 Debug: Using system python: {python_cmd}")
             
             # Create server parameters for stdio connection
+            # Run the datazone server directly
             server_params = StdioServerParameters(
                 command=python_cmd,
-                args=["-m", "datazone_mcp_server.server"],
-                env=None,
+                args=["servers/datazone/server.py"],
+                env={"PYTHONPATH": "servers"},
                 cwd=server_path
             )
             

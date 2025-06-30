@@ -16,7 +16,7 @@ class Config:
         self.default_model = os.getenv("DEFAULT_MODEL", "claude-3-5-sonnet-20241022")
         self.max_tokens = int(os.getenv("MAX_TOKENS", "4096"))
         self.temperature = float(os.getenv("TEMPERATURE", "0.1"))
-        self.mcp_server_path = "servers/datazone/server.py"
+        self.mcp_server_path = "."
     
     @property
     def is_configured(self) -> bool:
