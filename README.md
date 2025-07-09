@@ -34,14 +34,6 @@ A high-performance Model Context Protocol (MCP) server that provides seamless in
 - An active Amazon DataZone domain
 
 
-### Install from Source
-
-```bash
-git clone https://github.com/awslabs/amazon-datazone-mcp-server.git
-cd datazone-mcp-server
-pip install -e .
-```
-
 ## Quick Start
 
 ### 1. Configure AWS Credentials
