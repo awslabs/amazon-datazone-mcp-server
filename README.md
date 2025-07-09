@@ -33,11 +33,6 @@ A high-performance Model Context Protocol (MCP) server that provides seamless in
 - AWS credentials configured
 - An active Amazon DataZone domain
 
-### Install from PyPI
-
-```bash
-pip install datazone-mcp-server
-```
 
 ### Install from Source
 
