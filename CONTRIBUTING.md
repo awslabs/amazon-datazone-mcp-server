@@ -2,7 +2,7 @@
 
 Thank you for your interest in contributing to the AWS DataZone MCP Server! We welcome contributions from the community and are pleased to have you help make this project better.
 
-## ## Table of Contents
+## Table of Contents
 
 - [Code of Conduct](#code-of-conduct)
 - [Getting Started](#getting-started)
@@ -14,11 +14,11 @@ Thank you for your interest in contributing to the AWS DataZone MCP Server! We w
 - [Reporting Issues](#reporting-issues)
 - [Feature Requests](#feature-requests)
 
-## ## Code of Conduct
+## Code of Conduct
 
 This project adheres to a code of conduct. By participating, you are expected to uphold this code. Please be respectful and constructive in all interactions.
 
-## ## Getting Started
+## Getting Started
 
 ### Prerequisites
 
@@ -31,8 +31,8 @@ This project adheres to a code of conduct. By participating, you are expected to
 
 1. **Fork and Clone the Repository**
    ```bash
-   git clone https://github.com/wangtianren/datazone-mcp-server.git
-   cd datazone-mcp-server
+   git clone https://github.com/awslabs/amazon-datazone-mcp-server.git
+cd amazon-datazone-mcp-server
    ```
 
 2. **Set Up Development Environment**
@@ -65,7 +65,7 @@ This project adheres to a code of conduct. By participating, you are expected to
    python -c "import datazone_mcp_server; print('Setup successful!')"
    ```
 
-## ## Making Changes
+## Making Changes
 
 ### Branch Naming Convention
 
@@ -91,7 +91,7 @@ Examples:
 - `fix(project): handle missing project identifier`
 - `docs(readme): add installation instructions`
 
-## ### Development Guidelines
+## Development Guidelines
 
 ### Adding New Tools
 
@@ -166,7 +166,7 @@ When adding new DataZone API operations:
 - Provide usage examples in docstrings
 - Update README.md if adding major features
 
-## ## Testing
+## Testing
 
 ### Running Tests
 
@@ -262,7 +262,7 @@ The project uses:
 - Use `Any` for complex AWS API responses
 - Be consistent with `List`, `Dict`, etc. (not `list`, `dict`)
 
-## ## Submitting Changes
+## Submitting Changes
 
 ### Pull Request Process
 
@@ -328,7 +328,7 @@ Brief description of the changes
 - [ ] Documentation updated
 ```
 
-## ## Reporting Issues
+## Reporting Issues
 
 ### Bug Reports
 
@@ -341,9 +341,9 @@ Use the issue template and include:
 
 ### Security Issues
 
-For security vulnerabilities, please email [security@yourproject.com] instead of creating a public issue.
+For security vulnerabilities, please email [trwang@amazon.com] instead of creating a public issue.
 
-## ## Feature Requests
+## Feature Requests
 
 We welcome feature requests! Please:
 - Check existing issues first
@@ -351,14 +351,14 @@ We welcome feature requests! Please:
 - Explain why the feature would benefit users
 - Consider implementation complexity
 
-## ## Getting Help
+## Getting Help
 
 - - Check the [documentation](docs/)
-- - Join [discussions](https://github.com/wangtianren/datazone-mcp-server/discussions)
-- ## Browse [existing issues](https://github.com/wangtianren/datazone-mcp-server/issues)
+- - Join [discussions](https://github.com/awslabs/amazon-datazone-mcp-server/discussions)
+- ## Browse [existing issues](https://github.com/awslabs/amazon-datazone-mcp-server/issues)
 - 📧 Contact maintainers
 
-## ## Recognition
+## Recognition
 
 Contributors will be recognized in:
 - README.md acknowledgments

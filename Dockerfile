@@ -52,4 +52,4 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=60s --retries=3 \
 EXPOSE 8080
 
 # Command to run the application
-CMD ["datazone-mcp-server"]
+CMD ["amazon-datazone-mcp-server"]

@@ -1,7 +1,7 @@
 # Amazon DataZone MCP Server
 
 [![Python](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
-[![Version](https://img.shields.io/badge/version-0.1.0-green.svg)](https://github.com/wangtianren/datazone-mcp-server/releases)
+[![Version](https://img.shields.io/badge/version-0.1.0-green.svg)](https://github.com/awslabs/amazon-datazone-mcp-server/releases)
 [![License](https://img.shields.io/badge/license-Apache%202.0-green.svg)](LICENSE)
 [![MCP](https://img.shields.io/badge/MCP-compatible-purple.svg)](https://modelcontextprotocol.io/)
 
@@ -27,7 +27,7 @@ A high-performance Model Context Protocol (MCP) server that provides seamless in
 
 ## Configuration
 
-Please follow the https://modelcontextprotocol.io/ for configure this MCP server via stdio. 
+Please follow the https://modelcontextprotocol.io/ for configure this MCP server via stdio.
 
 ## Available Tools
 

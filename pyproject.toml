@@ -3,11 +3,11 @@ requires = ["setuptools>=42", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "datazone-mcp-server"
+name = "amazon-datazone-mcp-server"
 dynamic = ["version"]
-description = "MCP server for AWS DataZone service"
+description = "MCP server for AWS DataZone service - NOT FOR PYPI DISTRIBUTION"
 authors = [
-    {name = "AWS DataZone MCP Community", email = "trwang@amazon.com"}
+    {name = "AWS Labs Contributors"}
 ]
 readme = "README.md"
 requires-python = ">=3.10"
@@ -66,7 +66,7 @@ dev = [
 ]
 
 [project.scripts]
-datazone-mcp-server = "datazone_mcp_server.server:main"
+amazon-datazone-mcp-server = "datazone_mcp_server.server:main"
 
 [tool.black]
 line-length = 100
@@ -116,11 +116,11 @@ markers = [
 ]
 
 [project.urls]
-"Homepage" = "https://github.com/wangtianren/datazone-mcp-server"
-"Documentation" = "https://github.com/wangtianren/datazone-mcp-server/blob/main/docs/README.md"
-"Repository" = "https://github.com/wangtianren/datazone-mcp-server"
-"Issues" = "https://github.com/wangtianren/datazone-mcp-server/issues"
-"Changelog" = "https://github.com/wangtianren/datazone-mcp-server/blob/main/CHANGELOG.md"
+"Homepage" = "https://github.com/awslabs/amazon-datazone-mcp-server"
+"Documentation" = "https://github.com/awslabs/amazon-datazone-mcp-server/blob/main/docs/README.md"
+"Repository" = "https://github.com/awslabs/amazon-datazone-mcp-server"
+"Issues" = "https://github.com/awslabs/amazon-datazone-mcp-server/issues"
+"Changelog" = "https://github.com/awslabs/amazon-datazone-mcp-server/blob/main/CHANGELOG.md"
 
 [tool.setuptools.dynamic]
 version = {file = "VERSION"}

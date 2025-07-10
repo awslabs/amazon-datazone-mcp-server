@@ -43,7 +43,7 @@ def update_readme_version():
 
     # Update version badge
     old_pattern = r"\[\!\[Version\]\([^)]+\)\]"
-    new_badge = f"[![Version](https://img.shields.io/badge/version-{version}-green.svg)](https://github.com/wangtianren/datazone-mcp-server/releases)"
+    new_badge = f"[![Version](https://img.shields.io/badge/version-{version}-green.svg)](https://github.com/awslabs/amazon-datazone-mcp-server/releases)"
 
     updated_content = re.sub(old_pattern, new_badge, content)
 

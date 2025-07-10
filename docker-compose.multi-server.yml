@@ -6,7 +6,7 @@ services:
     build:
       context: .
       dockerfile: docker/Dockerfile.datazone
-    container_name: datazone-mcp-server
+    container_name: amazon-datazone-mcp-server
     ports:
       - "8080:8080"
     environment:

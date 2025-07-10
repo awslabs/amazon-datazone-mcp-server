@@ -424,7 +424,7 @@ wheels = [
 ]
 
 [[package]]
-name = "datazone-mcp-server"
+name = "amazon-datazone-mcp-server"
 source = { editable = "." }
 dependencies = [
     { name = "boto3" },
