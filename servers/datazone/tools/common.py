@@ -17,7 +17,7 @@ import boto3
 import httpx  # noqa: F401
 import logging
 from typing import Any, Dict, List, Optional  # noqa: F401
-
+from botocore.exceptions import ClientError
 
 # Constants
 USER_AGENT = "datazone-app/1.0"

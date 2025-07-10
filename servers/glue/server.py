@@ -1,27 +1,12 @@
-# Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
+from typing import Any, List, Dict, Optional
+import boto3
+from botocore.exceptions import ClientError
+from mcp.server.fastmcp import FastMCP
 import json
 import logging
 import os
 import sys
 import traceback
-from typing import Any, Dict, List, Optional
-
-import boto3
-from botocore.exceptions import ClientError
-from mcp.server.fastmcp import FastMCP
 
 # Configure logging
 logging.basicConfig(
@@ -32,63 +17,74 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-def get_mcp_credentials():
-    """Retrieve MCP AWS credentials from environment variables or Secrets Manager"""
+def initialize_aws_session():
+    """Initialize AWS session with proper credential handling (no credential exposure)"""
     try:
-        # Only use environment variables for local development (specific session key pattern)
-        # In AWS/ECS, always use Secrets Manager even if task role credentials exist
-        local_access_key = os.environ.get("AWS_ACCESS_KEY_ID", "")  # pragma: allowlist secret
+        # Check for local development environment using generic environment variable
+        # Use MCP_LOCAL_DEV=true to indicate local development instead of hardcoded key patterns
+        is_local_dev = os.environ.get("MCP_LOCAL_DEV", "").lower() == "true"
+
         if (
-            local_access_key.startswith(
-                "ASIAQGYBP5OXW5MTKVKQ"
-            )  # pragma: allowlist secret
-            and os.environ.get("AWS_SECRET_ACCESS_KEY")  # pragma: allowlist secret
-            and os.environ.get("AWS_SESSION_TOKEN")  # pragma: allowlist secret
+            is_local_dev
+            and os.environ.get("AWS_ACCESS_KEY_ID")
+            and os.environ.get("AWS_SECRET_ACCESS_KEY")
+            and os.environ.get("AWS_SESSION_TOKEN")
         ):
-            logger.info(
-                " Using MCP credentials from environment variables (local development)"
+            logger.info("Using AWS credentials from environment variables (local development)")
+            session = boto3.Session(
+                aws_access_key_id=os.environ.get("AWS_ACCESS_KEY_ID"),
+                aws_secret_access_key=os.environ.get("AWS_SECRET_ACCESS_KEY"),
+                aws_session_token=os.environ.get("AWS_SESSION_TOKEN"),
+                region_name=os.environ.get("AWS_DEFAULT_REGION", "us-east-1"),
             )
-            return {
-                "aws_access_key_id": os.environ.get("AWS_ACCESS_KEY_ID"),  # pragma: allowlist secret
-                "aws_secret_access_key": os.environ.get("AWS_SECRET_ACCESS_KEY"),  # pragma: allowlist secret
-                "aws_session_token": os.environ.get("AWS_SESSION_TOKEN"),  # pragma: allowlist secret
-                "region_name": os.environ.get("AWS_DEFAULT_REGION", "us-east-1"),  # pragma: allowlist secret
-                "account_id": "014498655151",  # pragma: allowlist secret
-            }
+            # Get account ID dynamically from STS
+            try:
+                sts_client = session.client("sts")
+                account_id = sts_client.get_caller_identity()["Account"]
+                logger.info(f"Retrieved account ID from STS: {account_id}")
+                return session, account_id
+            except Exception as e:
+                logger.warning(f"Could not retrieve account ID from STS: {e}")
+                return session, os.environ.get("AWS_ACCOUNT_ID", "unknown")
 
-        # For AWS deployment, always retrieve from Secrets Manager
-        logger.info(
-            " Running in AWS environment - retrieving MCP credentials from Secrets Manager..."
-        )
-        secrets_client = boto3.client("secretsmanager", region_name="us-east-1")  # pragma: allowlist secret
+        # For AWS deployment, retrieve from Secrets Manager
+        logger.info("Running in AWS environment - retrieving credentials from Secrets Manager...")
+        secrets_client = boto3.client("secretsmanager", region_name="us-east-1")
 
-        # Get the secret
-        secret_name = "smus-ai/dev/mcp-aws-credentials"  # pragma: allowlist secret
-        logger.info(f"Retrieving MCP credentials from secret: {secret_name}")
+        secret_name = "smus-ai/dev/mcp-aws-credentials"
+        logger.info(f"Retrieving credentials from secret: {secret_name}")
 
         response = secrets_client.get_secret_value(SecretId=secret_name)
         secret_value = json.loads(response["SecretString"])
 
         logger.info(
-            f" Successfully retrieved MCP credentials from Secrets Manager for account: {secret_value.get('ACCOUNT_ID', 'unknown')}"
+            f"Successfully retrieved credentials from Secrets Manager for account: {secret_value.get('ACCOUNT_ID', 'unknown')}"
         )
-        return {
-            "aws_access_key_id": secret_value["AWS_ACCESS_KEY_ID"],  # pragma: allowlist secret
-            "aws_secret_access_key": secret_value["AWS_SECRET_ACCESS_KEY"],  # pragma: allowlist secret
-            "aws_session_token": secret_value["AWS_SESSION_TOKEN"],  # pragma: allowlist secret
-            "region_name": secret_value["AWS_DEFAULT_REGION"],  # pragma: allowlist secret
-            "account_id": secret_value.get("ACCOUNT_ID", "unknown"),  # pragma: allowlist secret
-        }
+        session = boto3.Session(
+            aws_access_key_id=secret_value["AWS_ACCESS_KEY_ID"],
+            aws_secret_access_key=secret_value["AWS_SECRET_ACCESS_KEY"],
+            aws_session_token=secret_value["AWS_SESSION_TOKEN"],
+            region_name=secret_value["AWS_DEFAULT_REGION"],
+        )
+        return session, secret_value.get("ACCOUNT_ID", "unknown")
 
     except Exception as e:
-        logger.error(f" Failed to retrieve MCP credentials from Secrets Manager: {e}")
-        # Fall back to default credentials
-        logger.warning(" Falling back to default AWS credentials")
-        return None
+        logger.error(f"Failed to retrieve credentials from Secrets Manager: {e}")
+        logger.warning("Falling back to default AWS credentials")
+        # Try to get account ID from default session
+        try:
+            default_session = boto3.Session()
+            sts_client = default_session.client("sts")
+            account_id = sts_client.get_caller_identity()["Account"]
+            logger.info(f"Retrieved account ID from default credentials: {account_id}")
+            return default_session, account_id
+        except Exception as sts_e:
+            logger.warning(f"Could not retrieve account ID from default credentials: {sts_e}")
+            return boto3.Session(), os.environ.get("AWS_ACCOUNT_ID", "unknown")
 
 
-# Initialize MCP credentials and create boto3 session
-mcp_credentials = get_mcp_credentials()
+# Initialize AWS session and create boto3 client
+session, account_id = initialize_aws_session()
 
 # Initialize FastMCP server
 mcp = FastMCP("glue")
@@ -96,67 +92,30 @@ mcp = FastMCP("glue")
 # Constants
 USER_AGENT = "glue-app/1.0"
 
-# Initialize boto3 client with explicit credentials
+# Initialize boto3 client with session
 try:
-    if mcp_credentials:
-        # Create session with explicit credentials
-        session = boto3.Session(
-            aws_access_key_id=mcp_credentials["aws_access_key_id"],  # pragma: allowlist secret
-            aws_secret_access_key=mcp_credentials["aws_secret_access_key"],  # pragma: allowlist secret
-            aws_session_token=mcp_credentials["aws_session_token"],  # pragma: allowlist secret
-            region_name=mcp_credentials["region_name"],  # pragma: allowlist secret
-        )
-        glue_client = session.client("glue")
+    glue_client = session.client("glue")
+    logger.info(f"Successfully initialized Glue client for account: {account_id}")
+
+    # Verify credentials with STS get_caller_identity
+    try:
+        sts_client = session.client("sts")
+        identity = sts_client.get_caller_identity()
+        actual_account = identity.get("Account", "unknown")
+        user_arn = identity.get("Arn", "unknown")
         logger.info(
-            f"Successfully initialized Glue client with MCP credentials for account: {mcp_credentials.get('account_id', 'unknown')}"
+            f"STS VERIFICATION SUCCESS - Glue MCP connected to AWS Account: {actual_account}"
         )
+        logger.info(f"STS Identity ARN: {user_arn}")
 
-        # Verify credentials with STS get_caller_identity
-        try:
-            sts_client = session.client("sts")
-            identity = sts_client.get_caller_identity()
-            actual_account = identity.get("Account", "unknown")
-            user_arn = identity.get("Arn", "unknown")
-            logger.info(
-                f" STS VERIFICATION SUCCESS - Glue MCP connected to AWS Account: {actual_account}"
-            )
-            logger.info(f" STS Identity ARN: {user_arn}")
+        # Log warning if account mismatch
+        if actual_account != account_id and account_id != "unknown":
+            logger.warning(f"ACCOUNT MISMATCH - Expected: {account_id}, Actual: {actual_account}")
+        else:
+            logger.info(f"ACCOUNT MATCH CONFIRMED - Using correct account: {actual_account}")
 
-            # Log warning if account mismatch
-            expected_account = mcp_credentials.get("account_id", "014498655151")  # pragma: allowlist secret
-            if actual_account != expected_account:
-                logger.warning(
-                    f" ACCOUNT MISMATCH - Expected: {expected_account}, Actual: {actual_account}"
-                )
-            else:
-                logger.info(
-                    f" ACCOUNT MATCH CONFIRMED - Using correct account: {actual_account}"
-                )
-
-        except Exception as sts_error:
-            logger.error(
-                f" STS VERIFICATION FAILED - Cannot verify AWS credentials: {sts_error}"
-            )
-
-    else:
-        # Fall back to default credentials
-        glue_client = boto3.client("glue")
-        logger.info("Initialized Glue client with default credentials")
-
-        # Verify default credentials with STS
-        try:
-            sts_client = boto3.client("sts")
-            identity = sts_client.get_caller_identity()
-            actual_account = identity.get("Account", "unknown")
-            user_arn = identity.get("Arn", "unknown")
-            logger.info(
-                f" STS VERIFICATION (DEFAULT) - Glue MCP connected to AWS Account: {actual_account}"
-            )
-            logger.info(f" STS Identity ARN: {user_arn}")
-        except Exception as sts_error:
-            logger.error(
-                f" STS VERIFICATION FAILED (DEFAULT) - Cannot verify AWS credentials: {sts_error}"
-            )
+    except Exception as sts_error:
+        logger.error(f"STS VERIFICATION FAILED - Cannot verify AWS credentials: {sts_error}")
 
 except Exception as e:
     logger.error(f"Failed to initialize Glue client: {str(e)}")
@@ -167,14 +126,14 @@ except Exception as e:
 @mcp.tool()
 async def glue_create_database(
     name: str,
-    catalog_id: Optional[str] = None,
-    description: Optional[str] = None,
-    location_uri: Optional[str] = None,
-    parameters: Optional[Dict[str, str]] = None,
-    tags: Optional[Dict[str, str]] = None,
-    create_table_default_permissions: Optional[List[Dict[str, Any]]] = None,
-    federated_database: Optional[Dict[str, str]] = None,
-    target_database: Optional[Dict[str, str]] = None,
+    catalog_id: str = None,
+    description: str = None,
+    location_uri: str = None,
+    parameters: Dict[str, str] = None,
+    tags: Dict[str, str] = None,
+    create_table_default_permissions: List[Dict[str, Any]] = None,
+    federated_database: Dict[str, str] = None,
+    target_database: Dict[str, str] = None,
 ) -> Any:
     """
     Creates a new database in the AWS Glue Data Catalog.
@@ -196,26 +155,24 @@ async def glue_create_database(
     try:
         logger.info(f"Creating database: {name}")
         # Prepare the request parameters
-        database_input: Dict[str, Any] = {"Name": name}
+        database_input = {"Name": name}
 
         # Add optional parameters if provided
-        if description is not None:
+        if description:
             database_input["Description"] = description
-        if location_uri is not None:
+        if location_uri:
             database_input["LocationUri"] = location_uri
-        if parameters is not None:
+        if parameters:
             database_input["Parameters"] = parameters
-        if create_table_default_permissions is not None:
-            database_input["CreateTableDefaultPermissions"] = (
-                create_table_default_permissions
-            )
-        if federated_database is not None:
+        if create_table_default_permissions:
+            database_input["CreateTableDefaultPermissions"] = create_table_default_permissions
+        if federated_database:
             database_input["FederatedDatabase"] = federated_database
-        if target_database is not None:
+        if target_database:
             database_input["TargetDatabase"] = target_database
 
         # Prepare the request
-        params: Dict[str, Any] = {"DatabaseInput": database_input}
+        params = {"DatabaseInput": database_input}
 
         # Add optional catalog_id if provided
         if catalog_id:
@@ -225,8 +182,6 @@ async def glue_create_database(
         if tags:
             params["Tags"] = tags
 
-        if not glue_client:
-            raise Exception("Glue client not initialized")
         response = glue_client.create_database(**params)
         logger.info(f"Successfully created database: {name}")
         return response
@@ -262,18 +217,18 @@ async def glue_create_crawler(
     name: str,
     role: str,
     targets: Dict[str, List[Dict[str, Any]]],
-    database_name: Optional[str] = None,
-    classifiers: Optional[List[str]] = None,
-    configuration: Optional[str] = None,
-    crawler_security_configuration: Optional[str] = None,
-    description: Optional[str] = None,
-    lake_formation_configuration: Optional[Dict[str, Any]] = None,
-    lineage_configuration: Optional[Dict[str, str]] = None,
-    recrawl_policy: Optional[Dict[str, str]] = None,
-    schedule: Optional[str] = None,
-    schema_change_policy: Optional[Dict[str, str]] = None,
-    table_prefix: Optional[str] = None,
-    tags: Optional[Dict[str, str]] = None,
+    database_name: str = None,
+    classifiers: List[str] = None,
+    configuration: str = None,
+    crawler_security_configuration: str = None,
+    description: str = None,
+    lake_formation_configuration: Dict[str, Any] = None,
+    lineage_configuration: Dict[str, str] = None,
+    recrawl_policy: Dict[str, str] = None,
+    schedule: str = None,
+    schema_change_policy: Dict[str, str] = None,
+    table_prefix: str = None,
+    tags: Dict[str, str] = None,
 ) -> Any:
     """
     Creates a new crawler with specified targets, role, configuration, and optional schedule.
@@ -301,7 +256,7 @@ async def glue_create_crawler(
     try:
         logger.info(f"Creating crawler: {name}")
         # Prepare the request parameters
-        params: Dict[str, Any] = {"Name": name, "Role": role, "Targets": targets}
+        params = {"Name": name, "Role": role, "Targets": targets}
 
         # Add optional parameters if provided
         if database_name:
@@ -329,8 +284,6 @@ async def glue_create_crawler(
         if tags:
             params["Tags"] = tags
 
-        if not glue_client:
-            raise Exception("Glue client not initialized")
         response = glue_client.create_crawler(**params)
         logger.info(f"Successfully created crawler: {name}")
         return response
@@ -356,8 +309,6 @@ async def glue_start_crawler(name: str) -> Any:
     """
     try:
         logger.info(f"Starting crawler: {name}")
-        if not glue_client:
-            raise Exception("Glue client not initialized")
         response = glue_client.start_crawler(Name=name)
         logger.info(f"Successfully started crawler: {name}")
         return response
@@ -383,8 +334,6 @@ async def glue_get_crawler(name: str) -> Any:
     """
     try:
         logger.info(f"Getting crawler: {name}")
-        if not glue_client:
-            raise Exception("Glue client not initialized")
         response = glue_client.get_crawler(Name=name)
         logger.info(f"Successfully retrieved crawler: {name}")
         return response
@@ -400,14 +349,14 @@ async def glue_get_crawler(name: str) -> Any:
 @mcp.tool()
 async def glue_get_tables(
     database_name: str,
-    catalog_id: Optional[str] = None,
-    expression: Optional[str] = None,
+    catalog_id: str = None,
+    expression: str = None,
     include_status_details: bool = False,
     max_results: int = 100,
-    next_token: Optional[str] = None,
-    query_as_of_time: Optional[int] = None,
-    transaction_id: Optional[str] = None,
-    attributes_to_get: Optional[List[str]] = None,
+    next_token: str = None,
+    query_as_of_time: int = None,
+    transaction_id: str = None,
+    attributes_to_get: List[str] = None,
 ) -> Any:
     """
     Retrieves the definitions of some or all of the tables in a given database.
@@ -431,9 +380,7 @@ async def glue_get_tables(
         # Prepare the request parameters
         params = {
             "DatabaseName": database_name,
-            "MaxResults": min(
-                max_results, 100
-            ),  # Ensure maxResults is within valid range
+            "MaxResults": min(max_results, 100),  # Ensure maxResults is within valid range
         }
 
         # Add optional parameters if provided
@@ -452,8 +399,6 @@ async def glue_get_tables(
         if attributes_to_get:
             params["AttributesToGet"] = attributes_to_get
 
-        if not glue_client:
-            raise Exception("Glue client not initialized")
         response = glue_client.get_tables(**params)
         logger.info(f"Successfully retrieved tables from database: {database_name}")
         return response
@@ -463,19 +408,17 @@ async def glue_get_tables(
     except Exception as e:
         logger.error(f"Unexpected error in get_tables: {str(e)}")
         logger.error(traceback.format_exc())
-        raise Exception(
-            f"Unexpected error getting tables from database {database_name}: {str(e)}"
-        )
+        raise Exception(f"Unexpected error getting tables from database {database_name}: {str(e)}")
 
 
 @mcp.tool()
 async def glue_get_table(
     database_name: str,
     name: str,
-    catalog_id: Optional[str] = None,
+    catalog_id: str = None,
     include_status_details: bool = False,
-    query_as_of_time: Optional[int] = None,
-    transaction_id: Optional[str] = None,
+    query_as_of_time: int = None,
+    transaction_id: str = None,
 ) -> Any:
     """
     Retrieves the Table definition in a Data Catalog for a specified table.
@@ -494,7 +437,7 @@ async def glue_get_table(
     try:
         logger.info(f"Getting table {name} from database: {database_name}")
         # Prepare the request parameters
-        params: Dict[str, Any] = {"DatabaseName": database_name, "Name": name}
+        params = {"DatabaseName": database_name, "Name": name}
 
         # Add optional parameters if provided
         if catalog_id:
@@ -506,18 +449,12 @@ async def glue_get_table(
         if transaction_id:
             params["TransactionId"] = transaction_id
 
-        if not glue_client:
-            raise Exception("Glue client not initialized")
         response = glue_client.get_table(**params)
-        logger.info(
-            f"Successfully retrieved table {name} from database: {database_name}"
-        )
+        logger.info(f"Successfully retrieved table {name} from database: {database_name}")
         return response
     except ClientError as e:
         logger.error(f"ClientError in get_table: {str(e)}")
-        raise Exception(
-            f"Error getting table {name} from database {database_name}: {str(e)}"
-        )
+        raise Exception(f"Error getting table {name} from database {database_name}: {str(e)}")
     except Exception as e:
         logger.error(f"Unexpected error in get_table: {str(e)}")
         logger.error(traceback.format_exc())
@@ -530,11 +467,10 @@ def create_http_app():
     """Create FastAPI app for HTTP transport"""
     try:
         from fastapi import FastAPI, Request
+        import uvicorn
 
         app = FastAPI(
-            title="Glue MCP Server",
-            description="MCP server for AWS Glue service",
-            version="1.0.0",
+            title="Glue MCP Server", description="MCP server for AWS Glue service", version="1.0.0"
         )
 
         @app.get("/health")
@@ -579,7 +515,6 @@ def create_http_app():
         @app.post("/mcp/glue")
         async def mcp_endpoint(request: Request):
             """MCP JSON-RPC endpoint using real tools"""
-            request_data = {}
             try:
                 # Parse the request body
                 request_data = await request.json()
@@ -597,38 +532,24 @@ def create_http_app():
                             input_schema = (
                                 tool_obj.model_json_schema()
                                 if hasattr(tool_obj, "model_json_schema")
-                                else {
-                                    "type": "object",
-                                    "properties": {},
-                                    "required": [],
-                                }
+                                else {"type": "object", "properties": {}, "required": []}
                             )
 
                             tool_info = {
                                 "name": tool_name,
-                                "description": tool_obj.description
-                                or f"Glue tool: {tool_name}",
+                                "description": tool_obj.description or f"Glue tool: {tool_name}",
                                 "inputSchema": input_schema,
                             }
-                        except Exception:
+                        except Exception as e:
                             # Fallback if schema generation fails
                             tool_info = {
                                 "name": tool_name,
-                                "description": tool_obj.description
-                                or f"Glue tool: {tool_name}",
-                                "inputSchema": {
-                                    "type": "object",
-                                    "properties": {},
-                                    "required": [],
-                                },
+                                "description": tool_obj.description or f"Glue tool: {tool_name}",
+                                "inputSchema": {"type": "object", "properties": {}, "required": []},
                             }
                         tools.append(tool_info)
 
-                    return {
-                        "jsonrpc": "2.0",
-                        "id": request_id,
-                        "result": {"tools": tools},
-                    }
+                    return {"jsonrpc": "2.0", "id": request_id, "result": {"tools": tools}}
 
                 elif method == "tools/call":
                     tool_name = params.get("name")
@@ -648,9 +569,7 @@ def create_http_app():
                             return {
                                 "jsonrpc": "2.0",
                                 "id": request_id,
-                                "result": {
-                                    "content": [{"type": "text", "text": result_text}]
-                                },
+                                "result": {"content": [{"type": "text", "text": result_text}]},
                             }
                         except Exception as e:
                             logger.error(f"Error calling tool {tool_name}: {e}")
@@ -666,26 +585,20 @@ def create_http_app():
                         return {
                             "jsonrpc": "2.0",
                             "id": request_id,
-                            "error": {
-                                "code": -32601,
-                                "message": f"Tool not found: {tool_name}",
-                            },
+                            "error": {"code": -32601, "message": f"Tool not found: {tool_name}"},
                         }
                 else:
                     return {
                         "jsonrpc": "2.0",
                         "id": request_id,
-                        "error": {
-                            "code": -32601,
-                            "message": f"Method not found: {method}",
-                        },
+                        "error": {"code": -32601, "message": f"Method not found: {method}"},
                     }
 
             except Exception as e:
                 logger.error(f"Error processing MCP request: {e}")
                 return {
                     "jsonrpc": "2.0",
-                    "id": request_data.get("id", None),
+                    "id": request_data.get("id", None) if "request_data" in locals() else None,
                     "error": {"code": -32603, "message": f"Internal error: {str(e)}"},
                 }
 
@@ -716,7 +629,7 @@ if __name__ == "__main__":
                 sys.exit(1)
 
             # Get configuration from environment
-            host = os.getenv("HOST", "0.0.0.0")  # nosec B104
+            host = os.getenv("HOST", "0.0.0.0")
             port = int(os.getenv("PORT", "8081"))
 
             # Start server with uvicorn
@@ -736,11 +649,7 @@ if __name__ == "__main__":
             "error": str(e),
             "type": type(e).__name__,
             "message": "MCP server encountered an error",
-            "details": {
-                "server": "glue",
-                "status": "failed",
-                "traceback": traceback.format_exc(),
-            },
+            "details": {"server": "glue", "status": "failed", "traceback": traceback.format_exc()},
         }
         print(json.dumps(error_response), file=sys.stderr)
         sys.exit(1)

@@ -1,26 +1,12 @@
-# Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
 """
 Common utilities shared across all MCP servers.
 """
 
 import json
-import logging
 import sys
 import traceback
-from typing import Any, Dict, Optional
+import logging
+from typing import Dict, Any
 
 
 def setup_logging(server_name: str, level: int = logging.INFO) -> logging.Logger:
@@ -43,10 +29,7 @@ def setup_logging(server_name: str, level: int = logging.INFO) -> logging.Logger
 
 
 def create_error_response(
-    error: Exception,
-    server_name: str,
-    operation: Optional[str] = None,
-    context: Optional[Dict[str, Any]] = None,
+    error: Exception, server_name: str, operation: str = None, context: Dict[str, Any] = None
 ) -> Dict[str, Any]:
     """
     Create a standardized error response for MCP servers.
@@ -64,11 +47,7 @@ def create_error_response(
         "error": str(error),
         "type": type(error).__name__,
         "message": f"MCP server {server_name} encountered an error",
-        "details": {
-            "server": server_name,
-            "status": "failed",
-            "traceback": traceback.format_exc(),
-        },
+        "details": {"server": server_name, "status": "failed", "traceback": traceback.format_exc()},
     }
 
     if operation:
@@ -84,8 +63,8 @@ def log_error_and_exit(
     error: Exception,
     logger: logging.Logger,
     server_name: str,
-    operation: Optional[str] = None,
-    context: Optional[Dict[str, Any]] = None,
+    operation: str = None,
+    context: Dict[str, Any] = None,
     exit_code: int = 1,
 ):
     """
@@ -123,20 +102,3 @@ def validate_aws_credentials() -> bool:
         return True
     except Exception:
         return False
-
-
-def validate_aws_config(config: Dict[str, Any]) -> bool:
-    """Validate AWS configuration parameters."""
-    required_fields = ["region", "access_key_id", "secret_access_key"]
-    return all(field in config for field in required_fields)
-
-
-def format_error_response(
-    error: Exception, context: Optional[str] = None
-) -> Dict[str, Any]:
-    """Format error response for consistent error handling."""
-    return {
-        "error": str(error),
-        "type": type(error).__name__,
-        "context": context or "Unknown context",
-    }
