@@ -25,167 +25,9 @@ A high-performance Model Context Protocol (MCP) server that provides seamless in
 | **Glossary** | Business glossaries, glossary terms |
 | **Environment** | Environments, connections, blueprints |
 
-## Installation
+## Configuration
 
-### Prerequisites
-
-- Python 3.10 or higher
-- AWS credentials configured
-- An active Amazon DataZone domain
-
-
-## Quick Start
-
-### 1. Configure AWS Credentials
-
-```bash
-# Using AWS CLI
-aws configure
-
-# Or set environment variables
-export AWS_ACCESS_KEY_ID=your_access_key
-export AWS_SECRET_ACCESS_KEY=your_secret_key
-export AWS_DEFAULT_REGION=us-east-1
-```
-
-### 2. Start the MCP Server
-
-```bash
-python -m datazone_mcp_server.server
-```
-
-### 3. Use with an MCP Client
-
-```python
-import asyncio
-from mcp import create_client
-
-async def main():
-    # Connect to the DataZone MCP server
-    client = await create_client("stdio", ["python", "-m", "datazone_mcp_server.server"])
-
-    # List available tools
-    tools = await client.list_tools()
-    print(f"Available tools: {len(tools.tools)}")
-
-    # Call a DataZone operation
-    result = await client.call_tool("get_domain", {
-        "identifier": "dzd_your_domain_id"
-    })
-    print(result.content)
-
-asyncio.run(main())
-```
-
-## Usage Examples
-
-### Creating a DataZone Domain
-
-```python
-# Create a new DataZone domain
-domain = await client.call_tool("create_domain", {
-    "name": "MyDataDomain",
-    "domain_execution_role": "arn:aws:iam::123456789012:role/DataZoneExecutionRole",
-    "service_role": "arn:aws:iam::123456789012:role/DataZoneServiceRole",
-    "description": "My data governance domain"
-})
-```
-
-### Managing Projects
-
-```python
-# Create a project
-project = await client.call_tool("create_project", {
-    "domain_identifier": "dzd_abc123",
-    "name": "Analytics Project",
-    "description": "Project for analytics workloads"
-})
-
-# List projects
-projects = await client.call_tool("list_projects", {
-    "domain_identifier": "dzd_abc123"
-})
-```
-
-### Working with Assets
-
-```python
-# Create an asset
-asset = await client.call_tool("create_asset", {
-    "domain_identifier": "dzd_abc123",
-    "name": "Customer Data",
-    "type_identifier": "amazon.datazone.RelationalTable",
-    "owning_project_identifier": "prj_xyz789"
-})
-
-# Publish the asset
-published = await client.call_tool("publish_asset", {
-    "domain_identifier": "dzd_abc123",
-    "asset_identifier": asset["id"]
-})
-```
-
-## Architecture
-
-```
-datazone-mcp-server/
-├── src/datazone_mcp_server/
-│   ├── server.py              # Main MCP server entry point
-│   ├── tools/                 # Tool modules
-│   │   ├── common.py          # Shared utilities
-│   │   ├── domain_management.py
-│   │   ├── project_management.py
-│   │   ├── data_management.py
-│   │   ├── glossary.py
-│   │   └── environment.py
-│   └── __init__.py
-├── tests/                     # Test suite
-├── examples/                  # Usage examples
-└── docs/                      # Documentation
-```
-
-## Development
-
-### Setup Development Environment
-
-```bash
-# Clone the repository
-git clone https://github.com/awslabs/amazon-datazone-mcp-server.git
-cd datazone-mcp-server
-
-# Install with development dependencies
-pip install -e ".[dev]"
-
-# Install pre-commit hooks
-pre-commit install
-```
-
-### Running Tests
-
-```bash
-# Run all tests
-pytest
-
-# Run with coverage
-pytest --cov=datazone_mcp_server
-
-# Run specific test file
-pytest tests/test_domain_management.py
-```
-
-### Code Quality
-
-```bash
-# Format code
-black src tests
-isort src tests
-
-# Type checking
-mypy src
-
-# Linting
-flake8 src tests
-```
+Please follow the https://modelcontextprotocol.io/ for configure this MCP server via stdio. 
 
 ## Available Tools
 
@@ -252,16 +94,6 @@ The Amazon DataZone MCP server provides **38 tools** organized into 5 categories
 
 > **For detailed documentation** of each tool with parameters and examples, see our [Tool Reference](docs/TOOL_REFERENCE.md).
 
-## Contributing
-
-We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
 ## License
 
 This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details.
@@ -277,12 +109,6 @@ This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENS
 - Always follow AWS security best practices when using this tool
 
 For official Amazon DataZone documentation and support, visit [Amazon DataZone Documentation](https://docs.aws.amazon.com/datazone/).
-
-## Support
-
-- [Documentation](docs/)
-- [Issue Tracker](https://github.com/wangtianren/datazone-mcp-server/issues)
-- [Discussions](https://github.com/wangtianren/datazone-mcp-server/discussions)
 
 ## Acknowledgments
 
