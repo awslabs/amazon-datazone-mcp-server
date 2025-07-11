@@ -1,4 +1,18 @@
-from typing import Any, List, Dict, Optional
+# Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+from typing import Any, Dict, Optional
 import boto3
 from botocore.exceptions import ClientError
 from mcp.server.fastmcp import FastMCP
@@ -30,7 +44,9 @@ def initialize_aws_session():
             and os.environ.get("AWS_SECRET_ACCESS_KEY")
             and os.environ.get("AWS_SESSION_TOKEN")
         ):
-            logger.info("Using AWS credentials from environment variables (local development)")
+            logger.info(
+                "Using AWS credentials from environment variables (local development)"
+            )
             session = boto3.Session(
                 aws_access_key_id=os.environ.get("AWS_ACCESS_KEY_ID"),
                 aws_secret_access_key=os.environ.get("AWS_SECRET_ACCESS_KEY"),
@@ -48,10 +64,12 @@ def initialize_aws_session():
                 return session, os.environ.get("AWS_ACCOUNT_ID", "unknown")
 
         # For AWS deployment, retrieve from Secrets Manager
-        logger.info("Running in AWS environment - retrieving credentials from Secrets Manager...")
+        logger.info(
+            "Running in AWS environment - retrieving credentials from Secrets Manager..."
+        )
         secrets_client = boto3.client("secretsmanager", region_name="us-east-1")
 
-        secret_name = "smus-ai/dev/mcp-aws-credentials"
+        secret_name = "smus-ai/dev/mcp-aws-credentials"  # pragma: allowlist secret
         logger.info(f"Retrieving credentials from secret: {secret_name}")
 
         response = secrets_client.get_secret_value(SecretId=secret_name)
@@ -79,7 +97,9 @@ def initialize_aws_session():
             logger.info(f"Retrieved account ID from default credentials: {account_id}")
             return default_session, account_id
         except Exception as sts_e:
-            logger.warning(f"Could not retrieve account ID from default credentials: {sts_e}")
+            logger.warning(
+                f"Could not retrieve account ID from default credentials: {sts_e}"
+            )
             return boto3.Session(), os.environ.get("AWS_ACCOUNT_ID", "unknown")
 
 
@@ -100,17 +120,25 @@ try:
         identity = sts_client.get_caller_identity()
         actual_account = identity.get("Account", "unknown")
         user_arn = identity.get("Arn", "unknown")
-        logger.info(f"STS VERIFICATION SUCCESS - S3 MCP connected to AWS Account: {actual_account}")
+        logger.info(
+            f"STS VERIFICATION SUCCESS - S3 MCP connected to AWS Account: {actual_account}"
+        )
         logger.info(f"STS Identity ARN: {user_arn}")
 
         # Log warning if account mismatch
         if actual_account != account_id and account_id != "unknown":
-            logger.warning(f"ACCOUNT MISMATCH - Expected: {account_id}, Actual: {actual_account}")
+            logger.warning(
+                f"ACCOUNT MISMATCH - Expected: {account_id}, Actual: {actual_account}"
+            )
         else:
-            logger.info(f"ACCOUNT MATCH CONFIRMED - Using correct account: {actual_account}")
+            logger.info(
+                f"ACCOUNT MATCH CONFIRMED - Using correct account: {actual_account}"
+            )
 
     except Exception as sts_error:
-        logger.error(f"STS VERIFICATION FAILED - Cannot verify AWS credentials: {sts_error}")
+        logger.error(
+            f"STS VERIFICATION FAILED - Cannot verify AWS credentials: {sts_error}"
+        )
 
 except Exception as e:
     logger.error(f"Failed to initialize S3 client: {str(e)}")
@@ -144,7 +172,9 @@ async def s3_read_file(
 
         # For text files, decode to string
         content_type = response.get("ContentType", "")
-        if content_type.startswith("text/") or file_path.endswith((".txt", ".csv", ".json", ".md")):
+        if content_type.startswith("text/") or file_path.endswith(
+            (".txt", ".csv", ".json", ".md")
+        ):
             try:
                 content = content.decode("utf-8")
             except UnicodeDecodeError:
@@ -171,7 +201,9 @@ async def s3_read_file(
             raise Exception(f"File {file_path} not found in bucket {bucket_name}")
         elif error_code == "AccessDenied":
             logger.error(f"Access denied to file {file_path} in bucket {bucket_name}")
-            raise Exception(f"Access denied to file {file_path} in bucket {bucket_name}")
+            raise Exception(
+                f"Access denied to file {file_path} in bucket {bucket_name}"
+            )
         else:
             logger.error(f"Error reading file {file_path}: {str(e)}")
             raise Exception(f"Error reading file {file_path}: {str(e)}")
@@ -214,7 +246,12 @@ async def s3_list_objects(
             Bucket=bucket_name, Prefix=prefix, MaxKeys=max_items, Delimiter="/"
         )
 
-        result = {"bucket": bucket_name, "prefix": prefix, "objects": [], "common_prefixes": []}
+        result = {
+            "bucket": bucket_name,
+            "prefix": prefix,
+            "objects": [],
+            "common_prefixes": [],
+        }
 
         # Handle objects (files)
         for obj in response.get("Contents", []):
@@ -269,8 +306,12 @@ async def s3_list_objects(
             logger.error(f"Error listing objects in bucket {bucket_name}: {str(e)}")
             raise Exception(f"Error listing objects in bucket {bucket_name}: {str(e)}")
     except Exception as e:
-        logger.error(f"Unexpected error listing objects in bucket {bucket_name}: {str(e)}")
-        raise Exception(f"Unexpected error listing objects in bucket {bucket_name}: {str(e)}")
+        logger.error(
+            f"Unexpected error listing objects in bucket {bucket_name}: {str(e)}"
+        )
+        raise Exception(
+            f"Unexpected error listing objects in bucket {bucket_name}: {str(e)}"
+        )
 
 
 @mcp.tool()
@@ -296,7 +337,9 @@ async def s3_head_object(
             - Metadata: User-defined metadata
     """
     try:
-        logger.info(f"Retrieving metadata for object {object_key} in bucket {bucket_name}")
+        logger.info(
+            f"Retrieving metadata for object {object_key} in bucket {bucket_name}"
+        )
 
         # Prepare request parameters
         params = {"Bucket": bucket_name, "Key": object_key}
@@ -329,14 +372,24 @@ async def s3_head_object(
             logger.error(f"Object {object_key} not found in bucket {bucket_name}")
             raise Exception(f"Object {object_key} not found in bucket {bucket_name}")
         elif error_code == "403":
-            logger.error(f"Access denied to object {object_key} in bucket {bucket_name}")
-            raise Exception(f"Access denied to object {object_key} in bucket {bucket_name}")
+            logger.error(
+                f"Access denied to object {object_key} in bucket {bucket_name}"
+            )
+            raise Exception(
+                f"Access denied to object {object_key} in bucket {bucket_name}"
+            )
         else:
             logger.error(f"Error retrieving metadata for object {object_key}: {str(e)}")
-            raise Exception(f"Error retrieving metadata for object {object_key}: {str(e)}")
+            raise Exception(
+                f"Error retrieving metadata for object {object_key}: {str(e)}"
+            )
     except Exception as e:
-        logger.error(f"Unexpected error retrieving metadata for object {object_key}: {str(e)}")
-        raise Exception(f"Unexpected error retrieving metadata for object {object_key}: {str(e)}")
+        logger.error(
+            f"Unexpected error retrieving metadata for object {object_key}: {str(e)}"
+        )
+        raise Exception(
+            f"Unexpected error retrieving metadata for object {object_key}: {str(e)}"
+        )
 
 
 @mcp.tool()
@@ -495,8 +548,12 @@ async def s3_get_object(
             logger.error(f"Object {object_key} not found in bucket {bucket_name}")
             raise Exception(f"Object {object_key} not found in bucket {bucket_name}")
         elif error_code == "403":
-            logger.error(f"Access denied to object {object_key} in bucket {bucket_name}")
-            raise Exception(f"Access denied to object {object_key} in bucket {bucket_name}")
+            logger.error(
+                f"Access denied to object {object_key} in bucket {bucket_name}"
+            )
+            raise Exception(
+                f"Access denied to object {object_key} in bucket {bucket_name}"
+            )
         else:
             logger.error(f"Error retrieving object {object_key}: {str(e)}")
             raise Exception(f"Error retrieving object {object_key}: {str(e)}")
@@ -509,10 +566,11 @@ def create_http_app():
     """Create FastAPI app for HTTP transport"""
     try:
         from fastapi import FastAPI, Request
-        import uvicorn
 
         app = FastAPI(
-            title="S3 MCP Server", description="MCP server for AWS S3 service", version="1.0.0"
+            title="S3 MCP Server",
+            description="MCP server for AWS S3 service",
+            version="1.0.0",
         )
 
         @app.get("/health")
@@ -574,24 +632,38 @@ def create_http_app():
                             input_schema = (
                                 tool_obj.model_json_schema()
                                 if hasattr(tool_obj, "model_json_schema")
-                                else {"type": "object", "properties": {}, "required": []}
+                                else {
+                                    "type": "object",
+                                    "properties": {},
+                                    "required": [],
+                                }
                             )
 
                             tool_info = {
                                 "name": tool_name,
-                                "description": tool_obj.description or f"S3 tool: {tool_name}",
+                                "description": tool_obj.description
+                                or f"S3 tool: {tool_name}",
                                 "inputSchema": input_schema,
                             }
-                        except Exception as e:
+                        except Exception:
                             # Fallback if schema generation fails
                             tool_info = {
                                 "name": tool_name,
-                                "description": tool_obj.description or f"S3 tool: {tool_name}",
-                                "inputSchema": {"type": "object", "properties": {}, "required": []},
+                                "description": tool_obj.description
+                                or f"S3 tool: {tool_name}",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {},
+                                    "required": [],
+                                },
                             }
                         tools.append(tool_info)
 
-                    return {"jsonrpc": "2.0", "id": request_id, "result": {"tools": tools}}
+                    return {
+                        "jsonrpc": "2.0",
+                        "id": request_id,
+                        "result": {"tools": tools},
+                    }
 
                 elif method == "tools/call":
                     tool_name = params.get("name")
@@ -611,7 +683,9 @@ def create_http_app():
                             return {
                                 "jsonrpc": "2.0",
                                 "id": request_id,
-                                "result": {"content": [{"type": "text", "text": result_text}]},
+                                "result": {
+                                    "content": [{"type": "text", "text": result_text}]
+                                },
                             }
                         except Exception as e:
                             logger.error(f"Error calling tool {tool_name}: {e}")
@@ -627,20 +701,28 @@ def create_http_app():
                         return {
                             "jsonrpc": "2.0",
                             "id": request_id,
-                            "error": {"code": -32601, "message": f"Tool not found: {tool_name}"},
+                            "error": {
+                                "code": -32601,
+                                "message": f"Tool not found: {tool_name}",
+                            },
                         }
                 else:
                     return {
                         "jsonrpc": "2.0",
                         "id": request_id,
-                        "error": {"code": -32601, "message": f"Method not found: {method}"},
+                        "error": {
+                            "code": -32601,
+                            "message": f"Method not found: {method}",
+                        },
                     }
 
             except Exception as e:
                 logger.error(f"Error processing MCP request: {e}")
                 return {
                     "jsonrpc": "2.0",
-                    "id": request_data.get("id", None) if "request_data" in locals() else None,
+                    "id": request_data.get("id", None)
+                    if "request_data" in locals()
+                    else None,
                     "error": {"code": -32603, "message": f"Internal error: {str(e)}"},
                 }
 
@@ -671,7 +753,7 @@ if __name__ == "__main__":
                 sys.exit(1)
 
             # Get configuration from environment
-            host = os.getenv("HOST", "0.0.0.0")
+            host = os.getenv("HOST", "127.0.0.1")  # Bind to localhost only for security
             port = int(os.getenv("PORT", "8083"))
 
             # Start server with uvicorn
@@ -691,7 +773,11 @@ if __name__ == "__main__":
             "error": str(e),
             "type": type(e).__name__,
             "message": "MCP server encountered an error",
-            "details": {"server": "s3", "status": "failed", "traceback": traceback.format_exc()},
+            "details": {
+                "server": "s3",
+                "status": "failed",
+                "traceback": traceback.format_exc(),
+            },
         }
         print(json.dumps(error_response), file=sys.stderr)
         sys.exit(1)

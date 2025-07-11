@@ -94,6 +94,46 @@ The Amazon DataZone MCP server provides **38 tools** organized into 5 categories
 
 > **For detailed documentation** of each tool with parameters and examples, see our [Tool Reference](docs/TOOL_REFERENCE.md).
 
+## Security Considerations
+
+### Transport Mode Security
+
+This MCP server supports two transport modes:
+
+#### **stdio Transport (Recommended for Local Development)**
+- **Default and most secure**: No network exposure
+- **Use for**: Local development, Claude Desktop integration, direct MCP client usage
+- **Security**: Zero network attack surface, only parent process can communicate
+
+```bash
+# Secure stdio mode (default)
+python servers/datazone/server.py
+```
+
+#### **HTTP Transport (Use with Caution)**
+- **Network exposure**: Binds to `127.0.0.1` (localhost only) by default
+- **Use for**: Container deployments, integration testing, multi-service architectures
+- **Security considerations**:
+  - Only use in controlled environments
+  - Default binding to localhost prevents remote access
+  - Consider additional authentication for production use
+
+```bash
+# HTTP mode - localhost only (secure)
+MCP_TRANSPORT=http python servers/datazone/server.py
+
+# HTTP mode - all interfaces (INSECURE - only for containers)
+MCP_TRANSPORT=http HOST=0.0.0.0 python servers/datazone/server.py
+```
+
+### Security Best Practices
+
+1. **Use stdio transport** for local development and MCP client integration
+2. **Use HTTP transport** only when necessary (containers, health checks, etc.)
+3. **Never bind to 0.0.0.0** on development machines
+4. **Use Docker** for HTTP deployments to provide additional network isolation
+5. **Implement additional authentication** for production HTTP deployments
+
 ## License
 
 This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details.
