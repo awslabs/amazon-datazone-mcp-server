@@ -1,3 +1,17 @@
+# Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 """
 Domain management tools for Amazon DataZone.
 """
@@ -123,7 +137,9 @@ def register_tools(mcp: FastMCP):
             raise Exception(f"Unexpected error creating domain {name}: {str(e)}")
 
     @mcp.tool()
-    async def list_domain_units(domain_identifier: str, parent_domain_unit_identifier: str) -> Any:
+    async def list_domain_units(
+        domain_identifier: str, parent_domain_unit_identifier: str
+    ) -> Any:
         """
         Lists child domain units for the specified parent domain unit in an Amazon DataZone domain.
 
@@ -141,11 +157,15 @@ def register_tools(mcp: FastMCP):
             )
             return response
         except ClientError as e:
-            raise Exception(f"Error listing domain units for domain {domain_identifier}: {e}")
+            raise Exception(
+                f"Error listing domain units for domain {domain_identifier}: {e}"
+            )
 
     @mcp.tool()
     async def list_domains(
-        max_results: int = 25, next_token: Optional[str] = None, status: Optional[str] = None
+        max_results: int = 25,
+        next_token: Optional[str] = None,
+        status: Optional[str] = None,
     ) -> Any:
         """
         Lists Amazon DataZone domains.
@@ -161,14 +181,14 @@ def register_tools(mcp: FastMCP):
                 - next_token: Token for next page of results (if available)
         """
         try:
-            logger.info(f"Listing domains")
+            logger.info("Listing domains")
             params: Dict[str, Any] = {
                 "maxResults": min(max_results, 25)
             }  # Ensure maxResults is within valid range
             if next_token:
-                params[
-                    "nextToken"
-                ] = next_token  # Fixed: Amazon API expects 'nextToken', not 'next_token'
+                params["nextToken"] = (
+                    next_token  # Fixed: Amazon API expects 'nextToken', not 'next_token'
+                )
             if status:
                 params["status"] = status
 
@@ -191,46 +211,46 @@ def register_tools(mcp: FastMCP):
                 }
                 result["items"].append(formatted_domain)
 
-            logger.info(f"Successfully listed domains")
+            logger.info("Successfully listed domains")
             return result
         except ClientError as e:
             error_code = e.response["Error"]["Code"]
             if error_code == "AccessDeniedException":
-                logger.error(f"Access denied while listing domains")
-                raise Exception(f"Access denied while listing domains")
+                logger.error("Access denied while listing domains")
+                raise Exception("Access denied while listing domains")
             elif error_code == "InternalServerException":
                 logger.error(
-                    f"The request has failed because of an unknown error, exception or failure"
+                    "The request has failed because of an unknown error, exception or failure"
                 )
                 raise Exception(
-                    f"The request has failed because of an unknown error, exception or failure"
+                    "The request has failed because of an unknown error, exception or failure"
                 )
             elif error_code == "ThrottlingException":
-                logger.error(f"The request was denied due to request throttling")
-                raise Exception(f"The request was denied due to request throttling")
+                logger.error("The request was denied due to request throttling")
+                raise Exception("The request was denied due to request throttling")
             elif error_code == "ConflictException":
-                logger.error(f"There is a conflict listing the domains")
-                raise Exception(f"There is a conflict listing the domains")
+                logger.error("There is a conflict listing the domains")
+                raise Exception("There is a conflict listing the domains")
             elif error_code == "UnauthorizedException":
-                logger.error(f"Insufficient permission to list domains")
-                raise Exception(f"Insufficient permission to list domains")
+                logger.error("Insufficient permission to list domains")
+                raise Exception("Insufficient permission to list domains")
             elif error_code == "ValidationException":
                 logger.error(
-                    f"input fails to satisfy the constraints specified by the Amazon service"
+                    "input fails to satisfy the constraints specified by the Amazon service"
                 )
                 raise Exception(
-                    f"input fails to satisfy the constraints specified by the Amazon service"
+                    "input fails to satisfy the constraints specified by the Amazon service"
                 )
             elif error_code == "ResourceNotFoundException":
                 logger.error(
-                    f"input fails to satisfy the constraints specified by the Amazon service"
+                    "input fails to satisfy the constraints specified by the Amazon service"
                 )
                 raise Exception(
-                    f"input fails to satisfy the constraints specified by the Amazon service"
+                    "input fails to satisfy the constraints specified by the Amazon service"
                 )
-        except Exception as e:
-            logger.error(f"Unexpected error listing domains")
-            raise Exception(f"Unexpected error listing domains")
+        except Exception:
+            logger.error("Unexpected error listing domains")
+            raise Exception("Unexpected error listing domains")
 
     @mcp.tool()
     async def create_domain_unit(
@@ -298,7 +318,9 @@ def register_tools(mcp: FastMCP):
                 "owners": response.get("owners", []),
             }
 
-            logger.info(f"Successfully created domain unit '{name}' in domain {domain_identifier}")
+            logger.info(
+                f"Successfully created domain unit '{name}' in domain {domain_identifier}"
+            )
             return result
 
         except ClientError as e:
@@ -311,7 +333,9 @@ def register_tools(mcp: FastMCP):
                     f"Access denied while creating domain unit '{name}' in domain {domain_identifier}"
                 )
             elif error_code == "ConflictException":
-                logger.error(f"Domain unit '{name}' already exists in domain {domain_identifier}")
+                logger.error(
+                    f"Domain unit '{name}' already exists in domain {domain_identifier}"
+                )
                 raise Exception(
                     f"Domain unit '{name}' already exists in domain {domain_identifier}"
                 )
@@ -345,7 +369,9 @@ def register_tools(mcp: FastMCP):
             )
 
     @mcp.tool()
-    async def get_domain_unit(domain_identifier: str, identifier: str) -> Dict[str, Any]:
+    async def get_domain_unit(
+        domain_identifier: str, identifier: str
+    ) -> Dict[str, Any]:
         """
         Retrieves detailed information about a specific domain unit in Amazon DataZone.
 
@@ -369,7 +395,9 @@ def register_tools(mcp: FastMCP):
                 - lastUpdatedBy: The user who last updated the domain unit
         """
         try:
-            logger.info(f"Getting domain unit {identifier} in domain {domain_identifier}")
+            logger.info(
+                f"Getting domain unit {identifier} in domain {domain_identifier}"
+            )
 
             # Get the domain unit
             response = datazone_client.get_domain_unit(
@@ -405,8 +433,12 @@ def register_tools(mcp: FastMCP):
                     f"Access denied while getting domain unit {identifier} in domain {domain_identifier}"
                 )
             elif error_code == "ResourceNotFoundException":
-                logger.error(f"Domain unit {identifier} not found in domain {domain_identifier}")
-                raise Exception(f"Domain unit {identifier} not found in domain {domain_identifier}")
+                logger.error(
+                    f"Domain unit {identifier} not found in domain {domain_identifier}"
+                )
+                raise Exception(
+                    f"Domain unit {identifier} not found in domain {domain_identifier}"
+                )
             else:
                 logger.error(
                     f"Error getting domain unit {identifier} in domain {domain_identifier}: {str(e)}"
@@ -612,7 +644,9 @@ def register_tools(mcp: FastMCP):
             )
             # Validate entity type
             if entity_type not in ["DOMAIN_UNIT", "PROJECT"]:
-                raise ValueError("entity_type must be either 'DOMAIN_UNIT' or 'PROJECT'")
+                raise ValueError(
+                    "entity_type must be either 'DOMAIN_UNIT' or 'PROJECT'"
+                )
 
             # Prepare the owner object
             owner = {"type": owner_type}
@@ -634,7 +668,9 @@ def register_tools(mcp: FastMCP):
                 params["clientToken"] = client_token
 
             response = datazone_client.add_entity_owner(
-                domainIdentifier=domain_identifier, entityIdentifier=entity_identifier, **params
+                domainIdentifier=domain_identifier,
+                entityIdentifier=entity_identifier,
+                **params,
             )
             logger.info(
                 f"Successfully added owner {owner_identifier} to {entity_type.lower()} {entity_identifier} in domain {domain_identifier}"
@@ -726,7 +762,10 @@ def register_tools(mcp: FastMCP):
             # Prepare the request parameters
             params = {
                 "policyType": policy_type,
-                "principal": {"identifier": principal_identifier, "type": principal_type},
+                "principal": {
+                    "identifier": principal_identifier,
+                    "type": principal_type,
+                },
             }
 
             # Add optional parameters if provided
@@ -941,7 +980,9 @@ def register_tools(mcp: FastMCP):
             ```
         """
         try:
-            logger.info(f"Searching {search_scope.lower()} in domain {domain_identifier}")
+            logger.info(
+                f"Searching {search_scope.lower()} in domain {domain_identifier}"
+            )
             # Validate search_scope
             valid_scopes = ["ASSET", "GLOSSARY", "GLOSSARY_TERM", "DATA_PRODUCT"]
             if search_scope not in valid_scopes:
@@ -951,7 +992,9 @@ def register_tools(mcp: FastMCP):
             params = {
                 "domainIdentifier": domain_identifier,
                 "searchScope": search_scope,
-                "maxResults": min(max_results, 50),  # Ensure maxResults is within valid range
+                "maxResults": min(
+                    max_results, 50
+                ),  # Ensure maxResults is within valid range
             }
 
             # Add optional parameters if provided
@@ -978,21 +1021,31 @@ def register_tools(mcp: FastMCP):
         except ClientError as e:
             error_code = e.response["Error"]["Code"]
             if error_code == "AccessDeniedException":
-                raise Exception(f"Access denied while searching in domain {domain_identifier}")
+                raise Exception(
+                    f"Access denied while searching in domain {domain_identifier}"
+                )
             elif error_code == "InternalServerException":
                 raise Exception(
                     f"Internal server error while searching in domain {domain_identifier}"
                 )
             elif error_code == "ThrottlingException":
-                raise Exception(f"Request throttled while searching in domain {domain_identifier}")
+                raise Exception(
+                    f"Request throttled while searching in domain {domain_identifier}"
+                )
             elif error_code == "UnauthorizedException":
                 raise Exception(f"Unauthorized to search in domain {domain_identifier}")
             elif error_code == "ValidationException":
-                raise Exception(f"Invalid input while searching in domain {domain_identifier}")
+                raise Exception(
+                    f"Invalid input while searching in domain {domain_identifier}"
+                )
             else:
-                raise Exception(f"Error searching in domain {domain_identifier}: {str(e)}")
+                raise Exception(
+                    f"Error searching in domain {domain_identifier}: {str(e)}"
+                )
         except Exception as e:
-            raise Exception(f"Unexpected error searching in domain {domain_identifier}: {str(e)}")
+            raise Exception(
+                f"Unexpected error searching in domain {domain_identifier}: {str(e)}"
+            )
 
     @mcp.tool()
     async def search_types(
@@ -1045,7 +1098,9 @@ def register_tools(mcp: FastMCP):
                 - totalMatchCount (int): Total number of matching items.
         """
         try:
-            logger.info(f"Searching types {search_scope.lower()} in domain {domain_identifier}")
+            logger.info(
+                f"Searching types {search_scope.lower()} in domain {domain_identifier}"
+            )
             # Validate search_scope
             valid_scopes = ["ASSET_TYPE", "FORM_TYPE", "LINEAGE_NODE_TYPE"]
             if search_scope not in valid_scopes:
@@ -1055,7 +1110,9 @@ def register_tools(mcp: FastMCP):
             params = {
                 "domainIdentifier": domain_identifier,
                 "searchScope": search_scope,
-                "maxResults": min(max_results, 50),  # Ensure maxResults is within valid range
+                "maxResults": min(
+                    max_results, 50
+                ),  # Ensure maxResults is within valid range
                 "managed": managed,
             }
 
@@ -1091,13 +1148,17 @@ def register_tools(mcp: FastMCP):
                     f"Request throttled while searching types in domain {domain_identifier}"
                 )
             elif error_code == "UnauthorizedException":
-                raise Exception(f"Unauthorized to search types in domain {domain_identifier}")
+                raise Exception(
+                    f"Unauthorized to search types in domain {domain_identifier}"
+                )
             elif error_code == "ValidationException":
                 raise Exception(
                     f"Invalid input while searching types in domain {domain_identifier}"
                 )
             else:
-                raise Exception(f"Error searching types in domain {domain_identifier}: {str(e)}")
+                raise Exception(
+                    f"Error searching types in domain {domain_identifier}: {str(e)}"
+                )
         except Exception as e:
             raise Exception(
                 f"Unexpected error searching types in domain {domain_identifier}: {str(e)}"
@@ -1133,7 +1194,10 @@ def register_tools(mcp: FastMCP):
                 - type (str): The type of the user profile. Valid values: "IAM", "SSO".
         """
         try:
-            params = {"domainIdentifier": domain_identifier, "userIdentifier": user_identifier}
+            params = {
+                "domainIdentifier": domain_identifier,
+                "userIdentifier": user_identifier,
+            }
 
             # Add optional parameters if provided
             if user_type:
@@ -1240,9 +1304,16 @@ def register_tools(mcp: FastMCP):
                     Min length: 1, Max length: 8192
         """
         try:
-            logger.info(f"Searching {user_type} user profiles in domain {domain_identifier}")
+            logger.info(
+                f"Searching {user_type} user profiles in domain {domain_identifier}"
+            )
             # Validate user_type
-            valid_types = ["SSO_USER", "DATAZONE_USER", "DATAZONE_SSO_USER", "DATAZONE_IAM_USER"]
+            valid_types = [
+                "SSO_USER",
+                "DATAZONE_USER",
+                "DATAZONE_SSO_USER",
+                "DATAZONE_IAM_USER",
+            ]
             if user_type not in valid_types:
                 raise ValueError(f"user_type must be one of {valid_types}")
 
@@ -1345,7 +1416,9 @@ def register_tools(mcp: FastMCP):
             HTTPError: If the API request fails or returns an error.
         """
         try:
-            logger.info(f"Searching {group_type} group profiles in domain {domain_identifier}")
+            logger.info(
+                f"Searching {group_type} group profiles in domain {domain_identifier}"
+            )
             # Validate user_type
             valid_types = ["SSO_GROUP", "DATAZONE_SSO_GROUP"]
             if group_type not in valid_types:

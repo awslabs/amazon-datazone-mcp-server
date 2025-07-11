@@ -48,7 +48,9 @@ def initialize_aws_session():
             and os.environ.get("AWS_SECRET_ACCESS_KEY")
             and os.environ.get("AWS_SESSION_TOKEN")
         ):
-            logger.info("Using AWS credentials from environment variables (local development)")
+            logger.info(
+                "Using AWS credentials from environment variables (local development)"
+            )
             session = boto3.Session(
                 aws_access_key_id=os.environ.get("AWS_ACCESS_KEY_ID"),
                 aws_secret_access_key=os.environ.get("AWS_SECRET_ACCESS_KEY"),
@@ -66,10 +68,12 @@ def initialize_aws_session():
                 return session, os.environ.get("AWS_ACCOUNT_ID", "unknown")
 
         # For AWS deployment, retrieve from Secrets Manager
-        logger.info("Running in AWS environment - retrieving credentials from Secrets Manager...")
+        logger.info(
+            "Running in AWS environment - retrieving credentials from Secrets Manager..."
+        )
         secrets_client = boto3.client("secretsmanager", region_name="us-east-1")
 
-        secret_name = "smus-ai/dev/mcp-aws-credentials"
+        secret_name = "smus-ai/dev/mcp-aws-credentials"  # pragma: allowlist secret
         logger.info(f"Retrieving credentials from secret: {secret_name}")
 
         response = secrets_client.get_secret_value(SecretId=secret_name)
@@ -97,7 +101,9 @@ def initialize_aws_session():
             logger.info(f"Retrieved account ID from default credentials: {account_id}")
             return default_session, account_id
         except Exception as sts_e:
-            logger.warning(f"Could not retrieve account ID from default credentials: {sts_e}")
+            logger.warning(
+                f"Could not retrieve account ID from default credentials: {sts_e}"
+            )
             return boto3.Session(), os.environ.get("AWS_ACCOUNT_ID", "unknown")
 
 
@@ -111,8 +117,10 @@ def create_mcp_server():
 
     # Initialize boto3 client with session
     try:
-        datazone_client = session.client("datazone")
-        logger.info(f"Successfully initialized DataZone client for account: {account_id}")
+        session.client("datazone")  # Initialize client for verification only
+        logger.info(
+            f"Successfully initialized DataZone client for account: {account_id}"
+        )
 
         # Verify credentials with STS get_caller_identity
         try:
@@ -131,15 +139,19 @@ def create_mcp_server():
                     f"ACCOUNT MISMATCH - Expected: {account_id}, Actual: {actual_account}"
                 )
             else:
-                logger.info(f"ACCOUNT MATCH CONFIRMED - Using correct account: {actual_account}")
+                logger.info(
+                    f"ACCOUNT MATCH CONFIRMED - Using correct account: {actual_account}"
+                )
 
         except Exception as sts_error:
-            logger.error(f"STS VERIFICATION FAILED - Cannot verify AWS credentials: {sts_error}")
+            logger.error(
+                f"STS VERIFICATION FAILED - Cannot verify AWS credentials: {sts_error}"
+            )
 
     except Exception as e:
         logger.error(f"Failed to initialize DataZone client: {str(e)}")
         # Don't raise - allow server to start without credentials for testing
-        datazone_client = None
+        pass
 
     # Register all the real tools
     domain_management.register_tools(mcp)
@@ -154,8 +166,7 @@ def create_mcp_server():
 def create_http_app():
     """Create FastAPI app with real MCP tools for HTTP transport"""
     try:
-        from fastapi import FastAPI, Request, Response
-        from fastapi.responses import JSONResponse
+        from fastapi import FastAPI, Request
 
         # Create the MCP server with real tools
         mcp = create_mcp_server()
@@ -201,7 +212,10 @@ def create_http_app():
                 "result": {
                     "protocolVersion": "2024-11-05",
                     "capabilities": {"tools": {}},
-                    "serverInfo": {"name": "amazon-datazone-mcp-server", "version": "1.0.0"},
+                    "serverInfo": {
+                        "name": "amazon-datazone-mcp-server",
+                        "version": "1.0.0",
+                    },
                 },
             }
 
@@ -226,7 +240,11 @@ def create_http_app():
                             input_schema = (
                                 tool_obj.model_json_schema()
                                 if hasattr(tool_obj, "model_json_schema")
-                                else {"type": "object", "properties": {}, "required": []}
+                                else {
+                                    "type": "object",
+                                    "properties": {},
+                                    "required": [],
+                                }
                             )
 
                             tool_info = {
@@ -241,11 +259,19 @@ def create_http_app():
                                 "name": tool_name,
                                 "description": tool_obj.description
                                 or f"DataZone tool: {tool_name}",
-                                "inputSchema": {"type": "object", "properties": {}, "required": []},
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {},
+                                    "required": [],
+                                },
                             }
                         tools.append(tool_info)
 
-                    return {"jsonrpc": "2.0", "id": request_id, "result": {"tools": tools}}
+                    return {
+                        "jsonrpc": "2.0",
+                        "id": request_id,
+                        "result": {"tools": tools},
+                    }
 
                 elif method == "tools/call":
                     tool_name = params.get("name")
@@ -265,7 +291,9 @@ def create_http_app():
                             return {
                                 "jsonrpc": "2.0",
                                 "id": request_id,
-                                "result": {"content": [{"type": "text", "text": result_text}]},
+                                "result": {
+                                    "content": [{"type": "text", "text": result_text}]
+                                },
                             }
                         except Exception as e:
                             logger.error(f"Error calling tool {tool_name}: {e}")
@@ -281,20 +309,28 @@ def create_http_app():
                         return {
                             "jsonrpc": "2.0",
                             "id": request_id,
-                            "error": {"code": -32601, "message": f"Tool not found: {tool_name}"},
+                            "error": {
+                                "code": -32601,
+                                "message": f"Tool not found: {tool_name}",
+                            },
                         }
                 else:
                     return {
                         "jsonrpc": "2.0",
                         "id": request_id,
-                        "error": {"code": -32601, "message": f"Method not found: {method}"},
+                        "error": {
+                            "code": -32601,
+                            "message": f"Method not found: {method}",
+                        },
                     }
 
             except Exception as e:
                 logger.error(f"Error processing MCP request: {e}")
                 return {
                     "jsonrpc": "2.0",
-                    "id": request_data.get("id", None) if "request_data" in locals() else None,
+                    "id": request_data.get("id", None)
+                    if "request_data" in locals()
+                    else None,
                     "error": {"code": -32603, "message": f"Internal error: {str(e)}"},
                 }
 
@@ -321,7 +357,7 @@ def main():
                 sys.exit(1)
 
             # Get configuration from environment
-            host = os.getenv("HOST", "0.0.0.0")  # nosec B104
+            host = os.getenv("HOST", "127.0.0.1")  # Bind to localhost only for security
             port = int(os.getenv("PORT", "8080"))
 
             # Start server with uvicorn

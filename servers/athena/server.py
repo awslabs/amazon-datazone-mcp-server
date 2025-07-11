@@ -46,7 +46,9 @@ def initialize_aws_session():
             and os.environ.get("AWS_SECRET_ACCESS_KEY")
             and os.environ.get("AWS_SESSION_TOKEN")
         ):
-            logger.info("Using AWS credentials from environment variables (local development)")
+            logger.info(
+                "Using AWS credentials from environment variables (local development)"
+            )
             session = boto3.Session(
                 aws_access_key_id=os.environ.get("AWS_ACCESS_KEY_ID"),
                 aws_secret_access_key=os.environ.get("AWS_SECRET_ACCESS_KEY"),
@@ -64,10 +66,12 @@ def initialize_aws_session():
                 return session, os.environ.get("AWS_ACCOUNT_ID", "unknown")
 
         # For AWS deployment, retrieve from Secrets Manager
-        logger.info("Running in AWS environment - retrieving credentials from Secrets Manager...")
+        logger.info(
+            "Running in AWS environment - retrieving credentials from Secrets Manager..."
+        )
         secrets_client = boto3.client("secretsmanager", region_name="us-east-1")
 
-        secret_name = "smus-ai/dev/mcp-aws-credentials"
+        secret_name = "smus-ai/dev/mcp-aws-credentials"  # pragma: allowlist secret
         logger.info(f"Retrieving credentials from secret: {secret_name}")
 
         response = secrets_client.get_secret_value(SecretId=secret_name)
@@ -95,7 +99,9 @@ def initialize_aws_session():
             logger.info(f"Retrieved account ID from default credentials: {account_id}")
             return default_session, account_id
         except Exception as sts_e:
-            logger.warning(f"Could not retrieve account ID from default credentials: {sts_e}")
+            logger.warning(
+                f"Could not retrieve account ID from default credentials: {sts_e}"
+            )
             return boto3.Session(), os.environ.get("AWS_ACCOUNT_ID", "unknown")
 
 
@@ -124,12 +130,18 @@ try:
 
         # Log warning if account mismatch
         if actual_account != account_id and account_id != "unknown":
-            logger.warning(f"ACCOUNT MISMATCH - Expected: {account_id}, Actual: {actual_account}")
+            logger.warning(
+                f"ACCOUNT MISMATCH - Expected: {account_id}, Actual: {actual_account}"
+            )
         else:
-            logger.info(f"ACCOUNT MATCH CONFIRMED - Using correct account: {actual_account}")
+            logger.info(
+                f"ACCOUNT MATCH CONFIRMED - Using correct account: {actual_account}"
+            )
 
     except Exception as sts_error:
-        logger.error(f"STS VERIFICATION FAILED - Cannot verify AWS credentials: {sts_error}")
+        logger.error(
+            f"STS VERIFICATION FAILED - Cannot verify AWS credentials: {sts_error}"
+        )
 
 except Exception as e:
     logger.error(f"Failed to initialize Athena clients: {str(e)}")
@@ -200,11 +212,15 @@ async def athena_execute_sql_query(
                 break
 
         if not active_env:
-            raise Exception(f"No active environment found for project {project_identifier}")
+            raise Exception(
+                f"No active environment found for project {project_identifier}"
+            )
 
         # List connections for the project to find the Athena connection
         connections = datazone_client.list_connections(
-            domainIdentifier=domain_identifier, projectIdentifier=project_identifier, type="ATHENA"
+            domainIdentifier=domain_identifier,
+            projectIdentifier=project_identifier,
+            type="ATHENA",
         )
 
         athena_connection = None
@@ -214,11 +230,15 @@ async def athena_execute_sql_query(
                 break
 
         if not athena_connection:
-            raise Exception(f"No Athena connection found for project {project_identifier}")
+            raise Exception(
+                f"No Athena connection found for project {project_identifier}"
+            )
 
         # Get the workgroup name from the Athena connection properties
         workgroup = (
-            athena_connection.get("props", {}).get("athenaProperties", {}).get("workgroupName")
+            athena_connection.get("props", {})
+            .get("athenaProperties", {})
+            .get("workgroupName")
         )
         if not workgroup:
             raise Exception("No Athena workgroup found in connection properties")
@@ -254,8 +274,13 @@ async def athena_execute_sql_query(
         start_time = time.time()
         response = None
 
-        while state in ["RUNNING", "QUEUED"] and (time.time() - start_time) < max_wait_time:
-            response = athena_client.get_query_execution(QueryExecutionId=query_execution_id)
+        while (
+            state in ["RUNNING", "QUEUED"]
+            and (time.time() - start_time) < max_wait_time
+        ):
+            response = athena_client.get_query_execution(
+                QueryExecutionId=query_execution_id
+            )
             state = response["QueryExecution"]["Status"]["State"]
 
             if state == "FAILED":
@@ -292,12 +317,16 @@ async def athena_execute_sql_query(
             "execution_time_ms": response["QueryExecution"]["Statistics"][
                 "TotalExecutionTimeInMillis"
             ],
-            "data_scanned_bytes": response["QueryExecution"]["Statistics"]["DataScannedInBytes"],
+            "data_scanned_bytes": response["QueryExecution"]["Statistics"][
+                "DataScannedInBytes"
+            ],
         }
 
         # Extract column information
         for column in results["ResultSet"]["ResultSetMetadata"]["ColumnInfo"]:
-            formatted_results["columns"].append({"name": column["Name"], "type": column["Type"]})
+            formatted_results["columns"].append(
+                {"name": column["Name"], "type": column["Type"]}
+            )
 
         # Extract row data (skip the header row)
         for row in results["ResultSet"]["Rows"][1:]:
@@ -306,7 +335,9 @@ async def athena_execute_sql_query(
                 formatted_row.append(data.get("VarCharValue", ""))
             formatted_results["rows"].append(formatted_row)
 
-        logger.info(f"Query completed successfully. Returned {len(formatted_results['rows'])} rows")
+        logger.info(
+            f"Query completed successfully. Returned {len(formatted_results['rows'])} rows"
+        )
         return formatted_results
 
     except Exception as e:
@@ -412,7 +443,6 @@ def create_http_app():
     """Create FastAPI app for HTTP transport"""
     try:
         from fastapi import FastAPI, Request
-        import uvicorn
 
         app = FastAPI(
             title="Athena MCP Server",
@@ -426,7 +456,9 @@ def create_http_app():
             # Get the actual tool count from FastMCP's tool manager
             tool_count = 0
             try:
-                if hasattr(mcp, "_tool_manager") and hasattr(mcp._tool_manager, "_tools"):
+                if hasattr(mcp, "_tool_manager") and hasattr(
+                    mcp._tool_manager, "_tools"
+                ):
                     tool_count = len(mcp._tool_manager._tools)
                 else:
                     tool_count = 2  # Known tools: athena_execute_sql_query, athena_describe_available_tables
@@ -446,12 +478,20 @@ def create_http_app():
             # Get actual tools from FastMCP's tool manager
             tools_available = []
             try:
-                if hasattr(mcp, "_tool_manager") and hasattr(mcp._tool_manager, "_tools"):
+                if hasattr(mcp, "_tool_manager") and hasattr(
+                    mcp._tool_manager, "_tools"
+                ):
                     tools_available = list(mcp._tool_manager._tools.keys())
                 else:
-                    tools_available = ["athena_execute_sql_query", "athena_describe_available_tables"]
+                    tools_available = [
+                        "athena_execute_sql_query",
+                        "athena_describe_available_tables",
+                    ]
             except Exception:
-                tools_available = ["athena_execute_sql_query", "athena_describe_available_tables"]
+                tools_available = [
+                    "athena_execute_sql_query",
+                    "athena_describe_available_tables",
+                ]
             return {
                 "service": "Athena MCP Server",
                 "status": "running",
@@ -503,14 +543,16 @@ def create_http_app():
 
                             tool_info = {
                                 "name": tool_name,
-                                "description": tool_obj.description or f"Athena tool: {tool_name}",
+                                "description": tool_obj.description
+                                or f"Athena tool: {tool_name}",
                                 "inputSchema": input_schema,
                             }
                         except Exception:
                             # Fallback if schema generation fails
                             tool_info = {
                                 "name": tool_name,
-                                "description": tool_obj.description or f"Athena tool: {tool_name}",
+                                "description": tool_obj.description
+                                or f"Athena tool: {tool_name}",
                                 "inputSchema": {
                                     "type": "object",
                                     "properties": {},
@@ -543,7 +585,9 @@ def create_http_app():
                             return {
                                 "jsonrpc": "2.0",
                                 "id": request_id,
-                                "result": {"content": [{"type": "text", "text": result_text}]},
+                                "result": {
+                                    "content": [{"type": "text", "text": result_text}]
+                                },
                             }
                         except Exception as e:
                             logger.error(f"Error calling tool {tool_name}: {e}")
@@ -559,20 +603,28 @@ def create_http_app():
                         return {
                             "jsonrpc": "2.0",
                             "id": request_id,
-                            "error": {"code": -32601, "message": f"Tool not found: {tool_name}"},
+                            "error": {
+                                "code": -32601,
+                                "message": f"Tool not found: {tool_name}",
+                            },
                         }
                 else:
                     return {
                         "jsonrpc": "2.0",
                         "id": request_id,
-                        "error": {"code": -32601, "message": f"Method not found: {method}"},
+                        "error": {
+                            "code": -32601,
+                            "message": f"Method not found: {method}",
+                        },
                     }
 
             except Exception as e:
                 logger.error(f"Error processing MCP request: {e}")
                 return {
                     "jsonrpc": "2.0",
-                    "id": request_data.get("id", None) if "request_data" in locals() else None,
+                    "id": request_data.get("id", None)
+                    if "request_data" in locals()
+                    else None,
                     "error": {"code": -32603, "message": f"Internal error: {str(e)}"},
                 }
 
@@ -624,7 +676,7 @@ if __name__ == "__main__":
                 sys.exit(1)
 
             # Get configuration from environment
-            host = os.getenv("HOST", "0.0.0.0")  # nosec B104
+            host = os.getenv("HOST", "127.0.0.1")  # Bind to localhost only for security
             port = int(os.getenv("PORT", "8082"))
 
             # Start server with uvicorn
