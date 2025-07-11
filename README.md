@@ -121,18 +121,14 @@ python servers/datazone/server.py
 ```bash
 # HTTP mode - localhost only (secure)
 MCP_TRANSPORT=http python servers/datazone/server.py
-
-# HTTP mode - all interfaces (INSECURE - only for containers)
-MCP_TRANSPORT=http HOST=0.0.0.0 python servers/datazone/server.py
 ```
 
 ### Security Best Practices
 
 1. **Use stdio transport** for local development and MCP client integration
 2. **Use HTTP transport** only when necessary (containers, health checks, etc.)
-3. **Never bind to 0.0.0.0** on development machines
-4. **Use Docker** for HTTP deployments to provide additional network isolation
-5. **Implement additional authentication** for production HTTP deployments
+3. **Use Docker** for HTTP deployments to provide additional network isolation
+4. **Implement additional authentication** for production HTTP deployments
 
 ## License
 
