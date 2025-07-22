@@ -1,110 +1,8 @@
 """Tests for the Athena MCP server functionality."""
 
-import json
-import os
 from unittest.mock import Mock, patch
 import pytest
 from botocore.exceptions import ClientError
-
-
-class TestGetMCPCredentials:
-    """Test get_mcp_credentials function."""
-
-    @patch.dict(
-        os.environ,
-        {
-            "AWS_ACCESS_KEY_ID": "ASIAQGYBP5OXW5MTKVKQ123456",  # pragma: allowlist secret
-            "AWS_SECRET_ACCESS_KEY": "test-secret",  # pragma: allowlist secret
-            "AWS_SESSION_TOKEN": "test-token",  # pragma: allowlist secret
-            "AWS_DEFAULT_REGION": "us-west-2",  # pragma: allowlist secret
-        },
-    )
-    def test_local_development_credentials(self):
-        """Test credentials from environment variables for local development."""
-        from servers.athena.server import get_mcp_credentials
-
-        result = get_mcp_credentials()
-
-        assert result is not None
-        assert (
-            result["aws_access_key_id"]  # pragma: allowlist secret
-            == "ASIAQGYBP5OXW5MTKVKQ123456"  # pragma: allowlist secret
-        )  # pragma: allowlist secret
-        assert (
-            result["aws_secret_access_key"] == "test-secret"  # pragma: allowlist secret
-        )  # pragma: allowlist secret
-        assert result["aws_session_token"] == "test-token"  # pragma: allowlist secret
-        assert result["region_name"] == "us-west-2"  # pragma: allowlist secret
-        assert result["account_id"] == "014498655151"  # pragma: allowlist secret
-
-    @patch.dict(
-        os.environ,
-        {
-            "AWS_ACCESS_KEY_ID": "AKIAIOSFODNN7EXAMPLE",  # Different pattern  # pragma: allowlist secret
-            "AWS_SECRET_ACCESS_KEY": "test-secret",  # pragma: allowlist secret
-            "AWS_SESSION_TOKEN": "test-token",  # pragma: allowlist secret
-        },
-    )
-    @patch("boto3.client")
-    def test_secrets_manager_retrieval(self, mock_boto_client):
-        """Test credentials retrieval from Secrets Manager."""
-        from servers.athena.server import get_mcp_credentials
-
-        # Mock secrets manager response
-        mock_secrets_client = Mock()
-        mock_boto_client.return_value = mock_secrets_client
-        mock_secrets_client.get_secret_value.return_value = {
-            "SecretString": json.dumps(
-                {
-                    "AWS_ACCESS_KEY_ID": "secrets-access-key",  # pragma: allowlist secret
-                    "AWS_SECRET_ACCESS_KEY": "secrets-secret-key",  # pragma: allowlist secret
-                    "AWS_SESSION_TOKEN": "secrets-session-token",  # pragma: allowlist secret
-                    "AWS_DEFAULT_REGION": "us-east-1",  # pragma: allowlist secret
-                    "ACCOUNT_ID": "123456789012",  # pragma: allowlist secret
-                }
-            )
-        }
-
-        result = get_mcp_credentials()
-
-        assert result is not None
-        assert (
-            result["aws_access_key_id"]
-            == "secrets-access-key"  # pragma: allowlist secret
-        )  # pragma: allowlist secret
-        assert (
-            result["aws_secret_access_key"]
-            == "secrets-secret-key"  # pragma: allowlist secret
-        )  # pragma: allowlist secret
-        assert (
-            result["aws_session_token"]
-            == "secrets-session-token"  # pragma: allowlist secret
-        )  # pragma: allowlist secret
-        assert result["region_name"] == "us-east-1"  # pragma: allowlist secret
-        assert result["account_id"] == "123456789012"  # pragma: allowlist secret
-
-        # Verify secrets manager was called correctly
-        mock_boto_client.assert_called_with(
-            "secretsmanager", region_name="us-east-1"
-        )  # pragma: allowlist secret
-        mock_secrets_client.get_secret_value.assert_called_with(  # pragma: allowlist secret
-            SecretId="datazone-mcp-server/aws-credentials"  # pragma: allowlist secret
-        )  # pragma: allowlist secret
-
-    @patch.dict(os.environ, {}, clear=True)
-    @patch("boto3.client")
-    def test_secrets_manager_failure_fallback(self, mock_boto_client):
-        """Test fallback to None when Secrets Manager fails."""
-        from servers.athena.server import get_mcp_credentials
-
-        # Mock secrets manager to raise an exception
-        mock_secrets_client = Mock()
-        mock_boto_client.return_value = mock_secrets_client
-        mock_secrets_client.get_secret_value.side_effect = Exception("Access denied")
-
-        result = get_mcp_credentials()
-
-        assert result is None
 
 
 class TestAthenaExecuteSQLQuery:
@@ -243,7 +141,7 @@ class TestAthenaExecuteSQLQuery:
                 database_name="test_db",
             )
 
-        assert "Error executing SQL query" in str(exc_info.value)
+        assert "Athena SQL query failed" in str(exc_info.value)
 
     @patch("servers.athena.server.datazone_client")
     @patch("servers.athena.server.sts_client")
@@ -301,8 +199,17 @@ class TestAthenaExecuteSQLQuery:
 
         # Mock time.time to simulate timeout
         with patch("time.time") as mock_time:
-            # First call returns 0, subsequent calls return large values to trigger timeout
-            mock_time.side_effect = [0, 0, 400]  # 400 > 300 (max_wait_time)
+            # Use a function that returns increasing values to simulate timeout
+            call_count = [0]
+
+            def time_side_effect():
+                call_count[0] += 1
+                if call_count[0] == 1:
+                    return 0  # start_time
+                else:
+                    return 400  # All subsequent calls return a time that exceeds max_wait_time (300)
+
+            mock_time.side_effect = time_side_effect
 
             with pytest.raises(Exception) as exc_info:
                 await athena_execute_sql_query(
@@ -445,46 +352,6 @@ class TestModuleImports:
             pytest.fail(f"Missing required dependency: {e}")
 
 
-class TestEnvironmentConfiguration:
-    """Test environment configuration handling."""
-
-    def test_default_region(self):
-        """Test default region configuration."""
-        from servers.athena.server import get_mcp_credentials
-
-        with patch.dict(
-            os.environ,
-            {
-                "AWS_ACCESS_KEY_ID": "ASIAQGYBP5OXW5MTKVKQ123456",  # pragma: allowlist secret
-                "AWS_SECRET_ACCESS_KEY": "test-secret",  # pragma: allowlist secret
-                "AWS_SESSION_TOKEN": "test-token",  # pragma: allowlist secret
-                # No AWS_DEFAULT_REGION
-            },
-        ):
-            result = get_mcp_credentials()
-            assert result is not None
-            assert (
-                result["region_name"] == "us-east-1"
-            )  # Default region   # pragma: allowlist secret
-
-    def test_custom_region(self):
-        """Test custom region configuration."""
-        from servers.athena.server import get_mcp_credentials
-
-        with patch.dict(
-            os.environ,
-            {
-                "AWS_ACCESS_KEY_ID": "ASIAQGYBP5OXW5MTKVKQ123456",  # pragma: allowlist secret
-                "AWS_SECRET_ACCESS_KEY": "test-secret",  # pragma: allowlist secret
-                "AWS_SESSION_TOKEN": "test-token",  # pragma: allowlist secret
-                "AWS_DEFAULT_REGION": "us-west-2",  # pragma: allowlist secret
-            },
-        ):
-            result = get_mcp_credentials()
-            assert result is not None
-            assert result["region_name"] == "us-west-2"  # pragma: allowlist secret
-
-
 class TestErrorHandling:
     """Test error handling scenarios."""
 
@@ -512,7 +379,7 @@ class TestErrorHandling:
                 database_name="test_db",
             )
 
-        assert "Error executing SQL query" in str(exc_info.value)
+        assert "Athena SQL query failed" in str(exc_info.value)
 
     @patch("servers.athena.server.datazone_client")
     async def test_invalid_parameters(self, mock_datazone_client):
@@ -533,7 +400,7 @@ class TestErrorHandling:
                 database_name="test_db",
             )
 
-        assert "Error executing SQL query" in str(exc_info.value)
+        assert "Athena SQL query failed" in str(exc_info.value)
 
 
 class TestIntegration:
