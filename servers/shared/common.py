@@ -20,7 +20,7 @@ import json
 import sys
 import traceback
 import logging
-from typing import Dict, Any
+from typing import Dict, Any, Optional
 
 
 def setup_logging(server_name: str, level: int = logging.INFO) -> logging.Logger:
@@ -45,8 +45,8 @@ def setup_logging(server_name: str, level: int = logging.INFO) -> logging.Logger
 def create_error_response(
     error: Exception,
     server_name: str,
-    operation: str = None,
-    context: Dict[str, Any] = None,
+    operation: Optional[str] = None,
+    context: Optional[Dict[str, Any]] = None,
 ) -> Dict[str, Any]:
     """
     Create a standardized error response for MCP servers.
@@ -84,8 +84,8 @@ def log_error_and_exit(
     error: Exception,
     logger: logging.Logger,
     server_name: str,
-    operation: str = None,
-    context: Dict[str, Any] = None,
+    operation: Optional[str] = None,
+    context: Optional[Dict[str, Any]] = None,
     exit_code: int = 1,
 ):
     """

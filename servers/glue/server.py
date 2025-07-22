@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Any, List, Dict
+from typing import Any, List, Dict, Optional
 import boto3
 from botocore.exceptions import ClientError
 from mcp.server.fastmcp import FastMCP
@@ -154,14 +154,14 @@ except Exception as e:
 @mcp.tool()
 async def glue_create_database(
     name: str,
-    catalog_id: str = None,
-    description: str = None,
-    location_uri: str = None,
-    parameters: Dict[str, str] = None,
-    tags: Dict[str, str] = None,
-    create_table_default_permissions: List[Dict[str, Any]] = None,
-    federated_database: Dict[str, str] = None,
-    target_database: Dict[str, str] = None,
+    catalog_id: Optional[str] = None,
+    description: Optional[str] = None,
+    location_uri: Optional[str] = None,
+    parameters: Optional[Dict[str, str]] = None,
+    tags: Optional[Dict[str, str]] = None,
+    create_table_default_permissions: Optional[List[Dict[str, Any]]] = None,
+    federated_database: Optional[Dict[str, str]] = None,
+    target_database: Optional[Dict[str, str]] = None,
 ) -> Any:
     """
     Creates a new database in the AWS Glue Data Catalog.
@@ -247,18 +247,18 @@ async def glue_create_crawler(
     name: str,
     role: str,
     targets: Dict[str, List[Dict[str, Any]]],
-    database_name: str = None,
-    classifiers: List[str] = None,
-    configuration: str = None,
-    crawler_security_configuration: str = None,
-    description: str = None,
-    lake_formation_configuration: Dict[str, Any] = None,
-    lineage_configuration: Dict[str, str] = None,
-    recrawl_policy: Dict[str, str] = None,
-    schedule: str = None,
-    schema_change_policy: Dict[str, str] = None,
-    table_prefix: str = None,
-    tags: Dict[str, str] = None,
+    database_name: Optional[str] = None,
+    classifiers: Optional[List[str]] = None,
+    configuration: Optional[str] = None,
+    crawler_security_configuration: Optional[str] = None,
+    description: Optional[str] = None,
+    lake_formation_configuration: Optional[Dict[str, Any]] = None,
+    lineage_configuration: Optional[Dict[str, str]] = None,
+    recrawl_policy: Optional[Dict[str, str]] = None,
+    schedule: Optional[str] = None,
+    schema_change_policy: Optional[Dict[str, str]] = None,
+    table_prefix: Optional[str] = None,
+    tags: Optional[Dict[str, str]] = None,
 ) -> Any:
     """
     Creates a new crawler with specified targets, role, configuration, and optional schedule.
@@ -379,14 +379,14 @@ async def glue_get_crawler(name: str) -> Any:
 @mcp.tool()
 async def glue_get_tables(
     database_name: str,
-    catalog_id: str = None,
-    expression: str = None,
+    catalog_id: Optional[str] = None,
+    expression: Optional[str] = None,
     include_status_details: bool = False,
     max_results: int = 100,
-    next_token: str = None,
-    query_as_of_time: int = None,
-    transaction_id: str = None,
-    attributes_to_get: List[str] = None,
+    next_token: Optional[str] = None,
+    query_as_of_time: Optional[int] = None,
+    transaction_id: Optional[str] = None,
+    attributes_to_get: Optional[List[str]] = None,
 ) -> Any:
     """
     Retrieves the definitions of some or all of the tables in a given database.
@@ -449,10 +449,10 @@ async def glue_get_tables(
 async def glue_get_table(
     database_name: str,
     name: str,
-    catalog_id: str = None,
+    catalog_id: Optional[str] = None,
     include_status_details: bool = False,
-    query_as_of_time: int = None,
-    transaction_id: str = None,
+    query_as_of_time: Optional[int] = None,
+    transaction_id: Optional[str] = None,
 ) -> Any:
     """
     Retrieves the Table definition in a Data Catalog for a specified table.

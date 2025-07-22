@@ -354,7 +354,7 @@ async def athena_describe_available_tables(
     workgroup: Optional[str] = None,
     catalog_name: Optional[str] = None,
     max_results: int = 50,
-    next_token: str = None,
+    next_token: Optional[str] = None,
 ) -> Dict[str, Any]:
     """
     Describes the available tables in an Athena database.
@@ -454,7 +454,7 @@ if __name__ == "__main__":
             if hasattr(mcp, "_tool_manager") and hasattr(mcp._tool_manager, "_tools"):
                 tool_count = len(mcp._tool_manager._tools)
             elif hasattr(mcp, "tools"):
-                tool_count = len(mcp.tools)
+                tool_count = len(getattr(mcp, "tools", []))
             else:
                 tool_count = 2  # We know there are 2 tools defined
         except Exception as e:

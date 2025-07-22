@@ -16,11 +16,15 @@ from datetime import datetime
 
 # Skip if ANTHROPIC_API_KEY is not available (for CI without secrets)
 # Also skip if AWS credentials are not configured properly
+# Skip in any CI environment since this test depends on external APIs
 pytest_mark_skipif = pytest.mark.skipif(
     not os.getenv("ANTHROPIC_API_KEY")
     or not os.getenv("AWS_ACCESS_KEY_ID")
-    or os.getenv("CI") == "true",  # Skip in CI environments
-    reason="ANTHROPIC_API_KEY not available or AWS credentials not configured or running in CI",
+    or os.getenv("CI") == "true"
+    or os.getenv("GITHUB_ACTIONS") == "true"
+    or os.getenv("CONTINUOUS_INTEGRATION") == "true"
+    or "runner" in os.getenv("HOME", "").lower(),  # GitHub Actions runner
+    reason="Skipping API classification test due to external API dependencies and reliability issues",
 )
 
 
