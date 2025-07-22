@@ -167,6 +167,8 @@ async def s3_read_file(
         logger.info(f"Reading file {file_path} from bucket {bucket_name}")
 
         # Get the object
+        if not s3_client:
+            raise Exception("S3 client not initialized")
         response = s3_client.get_object(Bucket=bucket_name, Key=file_path)
 
         # Read the content
@@ -244,6 +246,8 @@ async def s3_list_objects(
         if prefix and not prefix.endswith("/"):
             prefix = prefix + "/"
 
+        if not s3_client:
+            raise Exception("S3 client not initialized")
         response = s3_client.list_objects_v2(
             Bucket=bucket_name, Prefix=prefix, MaxKeys=max_items, Delimiter="/"
         )
@@ -350,6 +354,8 @@ async def s3_head_object(
             params["VersionId"] = version_id
 
         # Make the API call
+        if not s3_client:
+            raise Exception("S3 client not initialized")
         response = s3_client.head_object(**params)
 
         # Extract relevant metadata
@@ -409,6 +415,8 @@ async def s3_list_buckets() -> Dict[str, Any]:
         logger.info("Listing all accessible S3 buckets")
 
         # List buckets
+        if not s3_client:
+            raise Exception("S3 client not initialized")
         response = s3_client.list_buckets()
 
         # Format the response
@@ -457,6 +465,8 @@ async def s3_upload_object(
         logger.info(f"Uploading object {object_key} to bucket {bucket_name}")
 
         # Upload the content
+        if not s3_client:
+            raise Exception("S3 client not initialized")
         response = s3_client.put_object(
             Bucket=bucket_name, Key=object_key, Body=content, ContentType=content_type
         )
@@ -527,6 +537,8 @@ async def s3_get_object(
             params["Range"] = f"bytes={range_start}-{range_end}"
 
         # Make the API call
+        if not s3_client:
+            raise Exception("S3 client not initialized")
         response = s3_client.get_object(**params)
 
         # Extract relevant information
