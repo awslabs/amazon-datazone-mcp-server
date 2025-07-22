@@ -22,15 +22,12 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
     "Topic :: Software Development :: Libraries :: Python Modules",
     "Topic :: Database",
-    "Topic :: Internet :: WWW/HTTP",
 ]
 dependencies = [
     "boto3",
     "httpx",
     "mcp[cli]>=1.9.2",
     "psutil",
-    "fastapi>=0.104.1",
-    "uvicorn>=0.24.0",
     "pydantic>=2.0.0",
     "pandas>=1.5.0",
     "tqdm>=4.64.0",

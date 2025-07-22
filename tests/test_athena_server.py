@@ -27,9 +27,12 @@ class TestGetMCPCredentials:
 
         assert result is not None
         assert (
-            result["aws_access_key_id"] == "ASIAQGYBP5OXW5MTKVKQ123456"  # pragma: allowlist secret
+            result["aws_access_key_id"]  # pragma: allowlist secret
+            == "ASIAQGYBP5OXW5MTKVKQ123456"  # pragma: allowlist secret
         )  # pragma: allowlist secret
-        assert result["aws_secret_access_key"] == "test-secret"  # pragma: allowlist secret
+        assert (
+            result["aws_secret_access_key"] == "test-secret"  # pragma: allowlist secret
+        )  # pragma: allowlist secret
         assert result["aws_session_token"] == "test-token"  # pragma: allowlist secret
         assert result["region_name"] == "us-west-2"  # pragma: allowlist secret
         assert result["account_id"] == "014498655151"  # pragma: allowlist secret
@@ -65,16 +68,27 @@ class TestGetMCPCredentials:
         result = get_mcp_credentials()
 
         assert result is not None
-        assert result["aws_access_key_id"] == "secrets-access-key"  # pragma: allowlist secret
-        assert result["aws_secret_access_key"] == "secrets-secret-key"  # pragma: allowlist secret
-        assert result["aws_session_token"] == "secrets-session-token"  # pragma: allowlist secret
+        assert (
+            result["aws_access_key_id"]
+            == "secrets-access-key"  # pragma: allowlist secret
+        )  # pragma: allowlist secret
+        assert (
+            result["aws_secret_access_key"]
+            == "secrets-secret-key"  # pragma: allowlist secret
+        )  # pragma: allowlist secret
+        assert (
+            result["aws_session_token"]
+            == "secrets-session-token"  # pragma: allowlist secret
+        )  # pragma: allowlist secret
         assert result["region_name"] == "us-east-1"  # pragma: allowlist secret
         assert result["account_id"] == "123456789012"  # pragma: allowlist secret
 
         # Verify secrets manager was called correctly
-        mock_boto_client.assert_called_with("secretsmanager", region_name="us-east-1")  # pragma: allowlist secret
-        mock_secrets_client.get_secret_value.assert_called_with(
-            SecretId="smus-ai/dev/mcp-aws-credentials"
+        mock_boto_client.assert_called_with(
+            "secretsmanager", region_name="us-east-1"
+        )  # pragma: allowlist secret
+        mock_secrets_client.get_secret_value.assert_called_with(  # pragma: allowlist secret
+            SecretId="datazone-mcp-server/aws-credentials"  # pragma: allowlist secret
         )  # pragma: allowlist secret
 
     @patch.dict(os.environ, {}, clear=True)
@@ -118,7 +132,9 @@ class TestAthenaExecuteSQLQuery:
         mock_session_instance.region_name = "us-east-1"
 
         # Mock STS get_caller_identity
-        mock_sts_client.get_caller_identity.return_value = {"Account": "123456789012"}  # pragma: allowlist secret
+        mock_sts_client.get_caller_identity.return_value = {
+            "Account": "123456789012"
+        }  # pragma: allowlist secret
 
         # Mock DataZone list_environments
         mock_datazone_client.list_environments.return_value = {
@@ -251,7 +267,9 @@ class TestAthenaExecuteSQLQuery:
         mock_session_instance.region_name = "us-east-1"
 
         # Mock STS get_caller_identity
-        mock_sts_client.get_caller_identity.return_value = {"Account": "123456789012"}  # pragma: allowlist secret
+        mock_sts_client.get_caller_identity.return_value = {
+            "Account": "123456789012"
+        }  # pragma: allowlist secret
 
         # Mock DataZone list_environments
         mock_datazone_client.list_environments.return_value = {
@@ -403,76 +421,6 @@ class TestAthenaDescribeAvailableTables:
         assert "Error describing tables" in str(exc_info.value)
 
 
-class TestCreateHTTPApp:
-    """Test create_http_app function."""
-
-    @patch("servers.athena.server.mcp")
-    @patch("fastapi.FastAPI")
-    def test_create_http_app_success(self, mock_fastapi_class, mock_mcp):
-        """Test successful HTTP app creation."""
-        from servers.athena.server import create_http_app
-
-        # Mock FastAPI app instance
-        mock_app = Mock()
-        mock_app.routes = [
-            Mock(path="/health"),
-            Mock(path="/"),
-            Mock(path="/mcp/athena"),
-        ]
-        mock_fastapi_class.return_value = mock_app
-
-        app = create_http_app()
-        assert app is not None
-
-    @patch("servers.athena.server.mcp")
-    @patch("fastapi.FastAPI")
-    def test_health_endpoint(self, mock_fastapi_class, mock_mcp):
-        """Test health endpoint."""
-        from servers.athena.server import create_http_app
-
-        # Mock the tool manager
-        mock_mcp._tool_manager._tools = {}
-
-        # Mock FastAPI app instance
-        mock_app = Mock()
-        mock_fastapi_class.return_value = mock_app
-
-        app = create_http_app()
-        assert app is not None
-
-    @patch("servers.athena.server.mcp")
-    @patch("fastapi.FastAPI")
-    def test_root_endpoint(self, mock_fastapi_class, mock_mcp):
-        """Test root endpoint."""
-        from servers.athena.server import create_http_app
-
-        # Mock the tool manager
-        mock_mcp._tool_manager._tools = {}
-
-        # Mock FastAPI app instance
-        mock_app = Mock()
-        mock_fastapi_class.return_value = mock_app
-
-        app = create_http_app()
-        assert app is not None
-
-    @patch("servers.athena.server.mcp")
-    @patch("fastapi.FastAPI")
-    def test_mcp_endpoint(self, mock_fastapi_class, mock_mcp):
-        """Test MCP endpoint."""
-        from servers.athena.server import create_http_app
-
-        # Mock the tool manager
-        mock_mcp._tool_manager._tools = {}
-
-        # Mock FastAPI app instance
-        mock_app = Mock()
-        mock_fastapi_class.return_value = mock_app
-
-        app = create_http_app()
-        assert app is not None
-
-
 class TestModuleImports:
     """Test module imports and initialization."""
 
@@ -515,7 +463,9 @@ class TestEnvironmentConfiguration:
         ):
             result = get_mcp_credentials()
             assert result is not None
-            assert result["region_name"] == "us-east-1"  # Default region   # pragma: allowlist secret
+            assert (
+                result["region_name"] == "us-east-1"
+            )  # Default region   # pragma: allowlist secret
 
     def test_custom_region(self):
         """Test custom region configuration."""
@@ -611,7 +561,9 @@ class TestIntegration:
         mock_session_instance.region_name = "us-east-1"
 
         # Mock STS get_caller_identity
-        mock_sts_client.get_caller_identity.return_value = {"Account": "123456789012"}  # pragma: allowlist secret
+        mock_sts_client.get_caller_identity.return_value = {
+            "Account": "123456789012"
+        }  # pragma: allowlist secret
 
         # Mock DataZone responses
         mock_datazone_client.list_environments.return_value = {

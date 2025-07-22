@@ -341,7 +341,7 @@ Use the issue template and include:
 
 ### Security Issues
 
-For security vulnerabilities, please email [trwang@amazon.com] instead of creating a public issue.
+For security vulnerabilities, please create a private security advisory on GitHub instead of creating a public issue.
 
 ## Feature Requests
 

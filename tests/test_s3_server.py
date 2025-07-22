@@ -27,10 +27,12 @@ class TestGetMCPCredentials:
 
         assert result is not None
         assert (
-            result["aws_access_key_id"]
+            result["aws_access_key_id"]  # pragma: allowlist secret
             == "ASIAQGYBP5OXW5MTKVKQ123456"  # pragma: allowlist secret
         )  # pragma: allowlist secret
-        assert result["aws_secret_access_key"] == "test-secret"  # pragma: allowlist secret
+        assert (
+            result["aws_secret_access_key"] == "test-secret"  # pragma: allowlist secret
+        )  # pragma: allowlist secret
         assert result["aws_session_token"] == "test-token"  # pragma: allowlist secret
         assert result["region_name"] == "us-west-2"  # pragma: allowlist secret
         assert result["account_id"] == "014498655151"  # pragma: allowlist secret
@@ -66,16 +68,27 @@ class TestGetMCPCredentials:
         result = get_mcp_credentials()
 
         assert result is not None
-        assert result["aws_access_key_id"] == "secrets-access-key"  # pragma: allowlist secret
-        assert result["aws_secret_access_key"] == "secrets-secret-key"  # pragma: allowlist secret
-        assert result["aws_session_token"] == "secrets-session-token"  # pragma: allowlist secret
+        assert (
+            result["aws_access_key_id"]
+            == "secrets-access-key"  # pragma: allowlist secret
+        )  # pragma: allowlist secret
+        assert (
+            result["aws_secret_access_key"]
+            == "secrets-secret-key"  # pragma: allowlist secret
+        )  # pragma: allowlist secret
+        assert (
+            result["aws_session_token"]
+            == "secrets-session-token"  # pragma: allowlist secret
+        )  # pragma: allowlist secret
         assert result["region_name"] == "us-east-1"  # pragma: allowlist secret
         assert result["account_id"] == "123456789012"  # pragma: allowlist secret
 
         # Verify secrets manager was called correctly
-        mock_boto_client.assert_called_with("secretsmanager", region_name="us-east-1")  # pragma: allowlist secret
-        mock_secrets_client.get_secret_value.assert_called_with(
-            SecretId="smus-ai/dev/mcp-aws-credentials"
+        mock_boto_client.assert_called_with(
+            "secretsmanager", region_name="us-east-1"
+        )  # pragma: allowlist secret
+        mock_secrets_client.get_secret_value.assert_called_with(  # pragma: allowlist secret
+            SecretId="datazone-mcp-server/aws-credentials"  # pragma: allowlist secret
         )  # pragma: allowlist secret
 
     @patch.dict(os.environ, {}, clear=True)
@@ -630,75 +643,6 @@ class TestS3GetObject:
             await s3_get_object(
                 bucket_name="test-bucket", object_key="nonexistent/file.txt"
             )
-
-
-class TestCreateHTTPApp:
-    """Test create_http_app function."""
-
-    @patch("servers.s3.server.mcp")
-    @patch("fastapi.FastAPI")
-    def test_create_http_app_success(self, mock_fastapi_class, mock_mcp):
-        """Test successful HTTP app creation."""
-        from servers.s3.server import create_http_app
-
-        # Mock FastAPI app instance
-        mock_app = Mock()
-        mock_app.routes = [Mock(path="/health"), Mock(path="/"), Mock(path="/mcp/s3")]
-        mock_fastapi_class.return_value = mock_app
-
-        app = create_http_app()
-
-        assert app is not None
-        # Verify the app has the expected endpoints
-        routes = [route.path for route in app.routes]
-        assert "/health" in routes
-        assert "/" in routes
-        assert "/mcp/s3" in routes
-
-    @patch("servers.s3.server.mcp")
-    @patch("fastapi.FastAPI")
-    def test_health_endpoint(self, mock_fastapi_class, mock_mcp):
-        """Test health endpoint."""
-        from servers.s3.server import create_http_app
-
-        # Mock the tool manager
-        mock_mcp._tool_manager._tools = {"test_tool": Mock()}
-
-        # Mock FastAPI app instance
-        mock_app = Mock()
-        mock_fastapi_class.return_value = mock_app
-
-        app = create_http_app()
-        assert app is not None
-
-    @patch("servers.s3.server.mcp")
-    @patch("fastapi.FastAPI")
-    def test_root_endpoint(self, mock_fastapi_class, mock_mcp):
-        """Test root endpoint."""
-        from servers.s3.server import create_http_app
-
-        # Mock the tool manager
-        mock_mcp._tool_manager._tools = {"test_tool": Mock()}
-
-        # Mock FastAPI app instance
-        mock_app = Mock()
-        mock_fastapi_class.return_value = mock_app
-
-        app = create_http_app()
-        assert app is not None
-
-    @patch("servers.s3.server.mcp")
-    @patch("fastapi.FastAPI")
-    def test_mcp_endpoint(self, mock_fastapi_class, mock_mcp):
-        """Test MCP endpoint."""
-        from servers.s3.server import create_http_app
-
-        # Mock FastAPI app instance
-        mock_app = Mock()
-        mock_fastapi_class.return_value = mock_app
-
-        app = create_http_app()
-        assert app is not None
 
 
 class TestModuleImports:

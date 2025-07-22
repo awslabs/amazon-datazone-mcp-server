@@ -94,41 +94,41 @@ The Amazon DataZone MCP server provides **38 tools** organized into 5 categories
 
 > **For detailed documentation** of each tool with parameters and examples, see our [Tool Reference](docs/TOOL_REFERENCE.md).
 
-## Security Considerations
+## Running the Servers
 
-### Transport Mode Security
+The Amazon DataZone MCP Server uses **stdio transport** for secure, local communication with MCP clients.
 
-This MCP server supports two transport modes:
-
-#### **stdio Transport (Recommended for Local Development)**
-- **Default and most secure**: No network exposure
-- **Use for**: Local development, Claude Desktop integration, direct MCP client usage
-- **Security**: Zero network attack surface, only parent process can communicate
+### **Running DataZone MCP Server**
 
 ```bash
-# Secure stdio mode (default)
+# Default stdio transport
 python servers/datazone/server.py
 ```
 
-#### **HTTP Transport (Use with Caution)**
-- **Network exposure**: Binds to `127.0.0.1` (localhost only) by default
-- **Use for**: Container deployments, integration testing, multi-service architectures
-- **Security considerations**:
-  - Only use in controlled environments
-  - Default binding to localhost prevents remote access
-  - Consider additional authentication for production use
+### **Running Individual Service Servers**
 
 ```bash
-# HTTP mode - localhost only (secure)
-MCP_TRANSPORT=http python servers/datazone/server.py
+# Athena MCP Server
+python servers/athena/server.py
+
+# Glue MCP Server
+python servers/glue/server.py
+
+# S3 MCP Server
+python servers/s3/server.py
 ```
 
-### Security Best Practices
+### **Integration with MCP Clients**
 
-1. **Use stdio transport** for local development and MCP client integration
-2. **Use HTTP transport** only when necessary (containers, health checks, etc.)
-3. **Use Docker** for HTTP deployments to provide additional network isolation
-4. **Implement additional authentication** for production HTTP deployments
+The servers are designed to work with MCP clients like Claude Desktop:
+
+```json
+{
+  "name": "amazon-datazone-mcp-server",
+  "command": "python",
+  "args": ["path/to/servers/datazone/server.py"]
+}
+```
 
 ## License
 

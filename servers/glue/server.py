@@ -69,7 +69,9 @@ def initialize_aws_session():
         )
         secrets_client = boto3.client("secretsmanager", region_name="us-east-1")
 
-        secret_name = "smus-ai/dev/mcp-aws-credentials"  # pragma: allowlist secret
+        secret_name = os.getenv(
+            "AWS_SECRET_NAME", "datazone-mcp-server/aws-credentials"
+        )  # pragma: allowlist secret
         logger.info(f"Retrieving credentials from secret: {secret_name}")
 
         response = secrets_client.get_secret_value(SecretId=secret_name)
@@ -499,177 +501,6 @@ async def glue_get_table(
         )
 
 
-def create_http_app():
-    """Create FastAPI app for HTTP transport"""
-    try:
-        from fastapi import FastAPI, Request
-
-        app = FastAPI(
-            title="Glue MCP Server",
-            description="MCP server for AWS Glue service",
-            version="1.0.0",
-        )
-
-        @app.get("/health")
-        async def health_check():
-            """Health check endpoint for ALB"""
-            # Get the actual tool count from FastMCP's tool manager
-            tool_count = len(mcp._tool_manager._tools)
-            return {
-                "status": "healthy",
-                "service": "glue-mcp-server",
-                "version": "1.0.0",
-                "transport": "http",
-                "tools_count": tool_count,
-            }
-
-        @app.get("/")
-        def root():
-            """Root endpoint with service info"""
-            # Get actual tools from FastMCP's tool manager
-            tools_available = list(mcp._tool_manager._tools.keys())
-            return {
-                "service": "Glue MCP Server",
-                "status": "running",
-                "transport": "http",
-                "endpoints": ["/health", "/mcp/glue"],
-                "tools_available": tools_available,
-            }
-
-        @app.get("/mcp/glue")
-        def mcp_root():
-            """MCP root endpoint"""
-            return {
-                "jsonrpc": "2.0",
-                "method": "initialize",
-                "result": {
-                    "protocolVersion": "2024-11-05",
-                    "capabilities": {"tools": {}},
-                    "serverInfo": {"name": "glue-mcp-server", "version": "1.0.0"},
-                },
-            }
-
-        @app.post("/mcp/glue")
-        async def mcp_endpoint(request: Request):
-            """MCP JSON-RPC endpoint using real tools"""
-            try:
-                # Parse the request body
-                request_data = await request.json()
-                method = request_data.get("method")
-                params = request_data.get("params", {})
-                request_id = request_data.get("id")
-
-                if method == "tools/list":
-                    # Get actual tools from FastMCP's tool manager
-                    tools = []
-                    for tool_name, tool_obj in mcp._tool_manager._tools.items():
-                        # Get tool info from the MCP tool object
-                        try:
-                            # Use the correct attributes from FastMCP Tool object
-                            input_schema = (
-                                tool_obj.model_json_schema()
-                                if hasattr(tool_obj, "model_json_schema")
-                                else {
-                                    "type": "object",
-                                    "properties": {},
-                                    "required": [],
-                                }
-                            )
-
-                            tool_info = {
-                                "name": tool_name,
-                                "description": tool_obj.description
-                                or f"Glue tool: {tool_name}",
-                                "inputSchema": input_schema,
-                            }
-                        except Exception:
-                            # Fallback if schema generation fails
-                            tool_info = {
-                                "name": tool_name,
-                                "description": tool_obj.description
-                                or f"Glue tool: {tool_name}",
-                                "inputSchema": {
-                                    "type": "object",
-                                    "properties": {},
-                                    "required": [],
-                                },
-                            }
-                        tools.append(tool_info)
-
-                    return {
-                        "jsonrpc": "2.0",
-                        "id": request_id,
-                        "result": {"tools": tools},
-                    }
-
-                elif method == "tools/call":
-                    tool_name = params.get("name")
-                    arguments = params.get("arguments", {})
-
-                    if tool_name in mcp._tool_manager._tools:
-                        try:
-                            # Call the tool using FastMCP's call_tool method
-                            result = await mcp.call_tool(tool_name, arguments)
-
-                            # Format the result for MCP
-                            if isinstance(result, dict) or isinstance(result, list):
-                                result_text = json.dumps(result, indent=2, default=str)
-                            else:
-                                result_text = str(result)
-
-                            return {
-                                "jsonrpc": "2.0",
-                                "id": request_id,
-                                "result": {
-                                    "content": [{"type": "text", "text": result_text}]
-                                },
-                            }
-                        except Exception as e:
-                            logger.error(f"Error calling tool {tool_name}: {e}")
-                            return {
-                                "jsonrpc": "2.0",
-                                "id": request_id,
-                                "error": {
-                                    "code": -32603,
-                                    "message": f"Tool execution error: {str(e)}",
-                                },
-                            }
-                    else:
-                        return {
-                            "jsonrpc": "2.0",
-                            "id": request_id,
-                            "error": {
-                                "code": -32601,
-                                "message": f"Tool not found: {tool_name}",
-                            },
-                        }
-                else:
-                    return {
-                        "jsonrpc": "2.0",
-                        "id": request_id,
-                        "error": {
-                            "code": -32601,
-                            "message": f"Method not found: {method}",
-                        },
-                    }
-
-            except Exception as e:
-                logger.error(f"Error processing MCP request: {e}")
-                return {
-                    "jsonrpc": "2.0",
-                    "id": request_data.get("id", None)
-                    if "request_data" in locals()
-                    else None,
-                    "error": {"code": -32603, "message": f"Internal error: {str(e)}"},
-                }
-
-        return app
-
-    except ImportError as e:
-        logger.error(f"FastAPI not available for HTTP transport: {e}")
-        return None
-
-
 # Start the MCP server
 if __name__ == "__main__":
     try:
@@ -678,29 +509,9 @@ if __name__ == "__main__":
         logger.info(f"FastMCP version: {getattr(FastMCP, '__version__', 'unknown')}")
         logger.info(f"Number of registered tools: {len(getattr(mcp, '_tools', []))}")
 
-        # Check transport mode via environment variable
-        transport_mode = os.getenv("MCP_TRANSPORT", "stdio").lower()
-
-        if transport_mode == "http":
-            # HTTP transport for Docker deployment
-            logger.info("Starting Glue MCP server with HTTP transport")
-
-            app = create_http_app()
-            if not app:
-                sys.exit(1)
-
-            # Get configuration from environment
-            host = os.getenv("HOST", "127.0.0.1")  # Bind to localhost only for security
-            port = int(os.getenv("PORT", "8081"))
-
-            # Start server with uvicorn
-            import uvicorn
-
-            uvicorn.run(app, host=host, port=port, log_level="info")
-        else:
-            # Default stdio transport
-            logger.info("Starting Glue MCP server with stdio transport")
-            mcp.run(transport="stdio")
+        # Start Glue MCP server with stdio transport only
+        logger.info("Starting Glue MCP server with stdio transport")
+        mcp.run(transport="stdio")
 
     except Exception as e:
         logger.error(f"Failed to start Glue MCP server: {str(e)}")
