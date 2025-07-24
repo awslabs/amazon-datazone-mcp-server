@@ -39,7 +39,8 @@
       "**/*requirements.txt",
       "VERSION",
       "**/py.typed",
-      "docker/Dockerfile.*"
+      "docker/Dockerfile.*",
+      "**/MANIFEST.in"
     ]
   }
 ]
