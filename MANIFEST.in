@@ -15,4 +15,4 @@ global-exclude .git*
 global-exclude .coverage
 global-exclude *.lock
 global-exclude .ruff_cache/*
-global-exclude .pytest_cache/* 
+global-exclude .pytest_cache/*

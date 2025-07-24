@@ -27,7 +27,7 @@ pytest tests/test_domain_management.py
 ### Environment Variables (for integration tests)
 ```bash
 export TEST_DATAZONE_DOMAIN_ID="dzd_your_domain_id"
-export TEST_DATAZONE_PROJECT_ID="prj_your_project_id" 
+export TEST_DATAZONE_PROJECT_ID="prj_your_project_id"
 export AWS_DEFAULT_REGION="us-east-1"
 ```
 
@@ -44,7 +44,7 @@ async def test_function(self, mock_client):
 # Run integration tests (requires AWS credentials)
 pytest tests/test_integration.py -m integration
 
-# Skip integration tests  
+# Skip integration tests
 pytest -m "not integration"
 ```
 

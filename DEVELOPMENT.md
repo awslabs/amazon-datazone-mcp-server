@@ -80,7 +80,7 @@ pytest tests/test_data_management.py tests/test_domain_management.py
 ## Code Quality
 
 - **Formatting**: Use `black` for code formatting
-- **Import sorting**: Use `isort` for import organization  
+- **Import sorting**: Use `isort` for import organization
 - **Type hints**: Use type hints throughout the codebase
 - **Linting**: Use `ruff` and `flake8` for code quality
 - **Documentation**: Document all public functions and classes
