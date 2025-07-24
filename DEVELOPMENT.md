@@ -27,30 +27,35 @@ This document provides guidance for developers who want to contribute to or modi
 
 3. **Install Dependencies**
    ```bash
-   pip install -r requirements.txt
    pip install -e .  # Install in development mode
    ```
 
 4. **Install Development Dependencies**
    ```bash
-   pip install pytest pytest-cov pytest-asyncio black isort mypy
+   pip install -e ".[dev]"  # Install with dev dependencies
    ```
 
 ## Project Structure
 
 ```
 amazon-datazone-mcp-server/
-├── servers/                    # MCP server implementations
-│   ├── datazone/              # Main DataZone MCP server
-│   ├── athena/                # Athena-specific server
-│   ├── glue/                  # Glue-specific server
-│   ├── s3/                    # S3-specific server
-│   └── shared/                # Shared utilities
-├── tests/                     # Test suite
-├── docs/                      # Documentation
-├── requirements.txt           # Dependencies
-├── pyproject.toml            # Project configuration
-└── README.md                 # Main documentation
+├── src/
+│   └── amazon_datazone_mcp_server/    # Main package
+│       ├── __init__.py
+│       ├── server.py                  # MCP server entry point
+│       └── tools/                     # DataZone tool implementations
+│           ├── __init__.py
+│           ├── common.py
+│           ├── data_management.py
+│           ├── domain_management.py
+│           ├── environment.py
+│           ├── glossary.py
+│           └── project_management.py
+├── tests/                             # Test suite (DataZone-only)
+├── docs/                              # Documentation
+├── pyproject.toml                     # Project configuration and dependencies
+├── VERSION                            # Package version
+└── README.md                          # User documentation
 ```
 
 ## Running Tests
@@ -60,58 +65,68 @@ amazon-datazone-mcp-server/
 pytest
 
 # Run with coverage
-pytest --cov=servers --cov-report=html
+pytest --cov=src/amazon_datazone_mcp_server --cov-report=html
 
 # Run specific test file
 pytest tests/test_datazone_mcp_server.py
 
 # Run with verbose output
 pytest -v
+
+# Run only DataZone-specific tests
+pytest tests/test_data_management.py tests/test_domain_management.py
 ```
 
+## Code Quality
 
 - **Formatting**: Use `black` for code formatting
-- **Import sorting**: Use `isort` for import organization
+- **Import sorting**: Use `isort` for import organization  
 - **Type hints**: Use type hints throughout the codebase
+- **Linting**: Use `ruff` and `flake8` for code quality
 - **Documentation**: Document all public functions and classes
 
 ```bash
 # Format code
-black .
+black src/ tests/
 
 # Sort imports
-isort .
+isort src/ tests/
+
+# Run linting
+ruff check src/ tests/
+flake8 src/ tests/
 
 # Type checking
-mypy servers/
+mypy src/
 ```
 
-## Running the Servers
-
-All servers use stdio transport for secure communication:
+## Running the Server
 
 ```bash
-# DataZone MCP Server
-python servers/datazone/server.py
+# Install the package
+pip install -e .
 
-# Individual service servers
-python servers/athena/server.py
-python servers/glue/server.py
-python servers/s3/server.py
+# Run the DataZone MCP server
+amazon-datazone-mcp-server
+
+# Or run directly
+python -m amazon_datazone_mcp_server.server
 ```
 
-## AWS Configuration
-
-Ensure your AWS credentials are properly configured:
+## Building for PyPI
 
 ```bash
-# Via AWS CLI
-aws configure
+# Install build tools
+pip install build twine
 
-# Or via environment variables
-export AWS_ACCESS_KEY_ID=your_access_key
-export AWS_SECRET_ACCESS_KEY=your_secret_key
-export AWS_DEFAULT_REGION=us-east-1
+# Build the package
+python -m build
+
+# Check the built package
+twine check dist/*
+
+# Upload to PyPI (requires credentials)
+twine upload dist/*
 ```
 
 ## Contributing
@@ -120,21 +135,33 @@ export AWS_DEFAULT_REGION=us-east-1
 2. Create a feature branch
 3. Make your changes
 4. Add tests for new functionality
-5. Ensure all tests pass
+5. Run the test suite and ensure all tests pass
 6. Submit a pull request
 
-## Debugging
+## AWS Configuration
 
-Use Python's built-in logging for debugging:
+The server requires AWS credentials to access DataZone APIs:
 
-```python
-import logging
-logging.basicConfig(level=logging.DEBUG)
+```bash
+# Configure AWS CLI
+aws configure
+
+# Or use environment variables
+export AWS_ACCESS_KEY_ID=your_access_key
+export AWS_SECRET_ACCESS_KEY=your_secret_key
+export AWS_SESSION_TOKEN=your_session_token  # If using temporary credentials
+export AWS_DEFAULT_REGION=us-east-1
 ```
 
-## Architecture Notes
+For local development, you can also set:
+```bash
+export MCP_LOCAL_DEV=true
+```
 
-- **MCP Protocol**: All servers implement the Model Context Protocol specification
-- **AWS SDK**: Uses boto3 for AWS API interactions
-- **Error Handling**: Comprehensive error handling with proper JSON-RPC responses
-- **Type Safety**: Full type annotations for better development experience
+## Release Process
+
+1. Update `VERSION` file
+2. Update `CHANGELOG.md` (if exists)
+3. Create a git tag: `git tag v0.1.0`
+4. Push tags: `git push --tags`
+5. Build and upload to PyPI
