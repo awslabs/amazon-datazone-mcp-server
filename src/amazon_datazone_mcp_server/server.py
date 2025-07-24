@@ -35,6 +35,15 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
 
+def redact_sensitive_data(data, visible_chars=4):
+    """Redact sensitive data, showing only the last few characters."""
+    if not data or not isinstance(data, str):
+        return "unknown"
+    if len(data) <= visible_chars:
+        return "*" * len(data)
+    return f"{'*' * (len(data) - visible_chars)}{data[-visible_chars:]}"
+
+
 def initialize_aws_session():
     """Initialize AWS session with proper credential handling (no credential exposure)"""
     try:
@@ -61,7 +70,7 @@ def initialize_aws_session():
             try:
                 sts_client = session.client("sts")
                 account_id = sts_client.get_caller_identity()["Account"]
-                logger.info(f"Retrieved account ID from STS: {account_id}")
+                logger.info(f"Retrieved account ID from STS: {redact_sensitive_data(account_id)}")
                 return session, account_id
             except Exception as e:
                 logger.warning(f"Could not retrieve account ID from STS: {e}")
@@ -76,13 +85,13 @@ def initialize_aws_session():
         secret_name = os.getenv(
             "AWS_SECRET_NAME", "datazone-mcp-server/aws-credentials"
         )  # pragma: allowlist secret
-        logger.info(f"Retrieving credentials from secret: {secret_name}")
+        logger.info(f"Retrieving credentials from secret: {redact_sensitive_data(secret_name)}")
 
         response = secrets_client.get_secret_value(SecretId=secret_name)
         secret_value = json.loads(response["SecretString"])
 
         logger.info(
-            f"Successfully retrieved credentials from Secrets Manager for account: {secret_value.get('ACCOUNT_ID', 'unknown')}"
+            f"Successfully retrieved credentials from Secrets Manager for account: {redact_sensitive_data(secret_value.get('ACCOUNT_ID', 'unknown'))}"
         )
         session = boto3.Session(
             aws_access_key_id=secret_value["AWS_ACCESS_KEY_ID"],
@@ -100,7 +109,7 @@ def initialize_aws_session():
             default_session = boto3.Session()
             sts_client = default_session.client("sts")
             account_id = sts_client.get_caller_identity()["Account"]
-            logger.info(f"Retrieved account ID from default credentials: {account_id}")
+            logger.info(f"Retrieved account ID from default credentials: {redact_sensitive_data(account_id)}")
             return default_session, account_id
         except Exception as sts_e:
             logger.warning(
@@ -121,7 +130,7 @@ def create_mcp_server():
     try:
         session.client("datazone")  # Initialize client for verification only
         logger.info(
-            f"Successfully initialized DataZone client for account: {account_id}"
+            f"Successfully initialized DataZone client for account: {redact_sensitive_data(account_id)}"
         )
 
         # Verify credentials with STS get_caller_identity
@@ -131,18 +140,18 @@ def create_mcp_server():
             actual_account = identity.get("Account", "unknown")
             user_arn = identity.get("Arn", "unknown")
             logger.info(
-                f"STS VERIFICATION SUCCESS - DataZone MCP connected to AWS Account: {actual_account}"
+                f"STS VERIFICATION SUCCESS - DataZone MCP connected to AWS Account: {redact_sensitive_data(actual_account)}"
             )
-            logger.info(f"STS Identity ARN: {user_arn}")
+            logger.info(f"STS Identity ARN: {redact_sensitive_data(user_arn)}")
 
             # Log warning if account mismatch
             if actual_account != account_id and account_id != "unknown":
                 logger.warning(
-                    f"ACCOUNT MISMATCH - Expected: {account_id}, Actual: {actual_account}"
+                    f"ACCOUNT MISMATCH - Expected: {redact_sensitive_data(account_id)}, Actual: {redact_sensitive_data(actual_account)}"
                 )
             else:
                 logger.info(
-                    f"ACCOUNT MATCH CONFIRMED - Using correct account: {actual_account}"
+                    f"ACCOUNT MATCH CONFIRMED - Using correct account: {redact_sensitive_data(actual_account)}"
                 )
 
         except Exception as sts_error:
