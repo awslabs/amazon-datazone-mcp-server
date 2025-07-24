@@ -35,7 +35,6 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
 
-
 def initialize_aws_session():
     """Initialize AWS session with proper credential handling (no credential exposure)"""
     try:
@@ -126,13 +125,14 @@ def create_mcp_server():
             sts_client = session.client("sts")
             identity = sts_client.get_caller_identity()
             actual_account = identity.get("Account", "unknown")
-            user_arn = identity.get("Arn", "unknown")
             logger.info("STS VERIFICATION SUCCESS - DataZone MCP connected to AWS")
             logger.info("STS Identity verified successfully")
 
             # Log warning if account mismatch
             if actual_account != account_id and account_id != "unknown":
-                logger.warning("ACCOUNT MISMATCH - Expected and actual account IDs do not match")
+                logger.warning(
+                    "ACCOUNT MISMATCH - Expected and actual account IDs do not match"
+                )
             else:
                 logger.info("ACCOUNT MATCH CONFIRMED - Using correct account")
 
