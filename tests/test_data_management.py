@@ -448,7 +448,7 @@ class TestDataManagement:
 
     def test_register_tools(self, mock_fastmcp):
         """Test that tools are registered with FastMCP instance."""
-        from servers.datazone.tools import data_management
+        from amazon_datazone_mcp_server.tools import data_management
 
         # Call the register_tools function
         data_management.register_tools(mock_fastmcp)

@@ -99,7 +99,7 @@
 # @pytest.fixture
 # async def mcp_server_with_tools():
 #     """Setup MCP server for integration testing."""
-#     from servers.datazone import server
+#     from amazon_datazone_mcp_server import server
 
 #     # Return the actual server instance for integration tests
 #     return server.mcp
@@ -112,7 +112,7 @@
 #     def _extract_tool(mcp_server, tool_name):
 #         # For integration tests, we need to access the actual implementation
 #         # This is a simplified version - in real integration we"d call through MCP
-#         from servers.datazone.tools import (
+#         from amazon_datazone_mcp_server.tools import (
 #             data_management,
 #             domain_management,
 #             environment,

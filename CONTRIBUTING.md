@@ -53,7 +53,7 @@ cd amazon-datazone-mcp-server
 4. **Configure AWS Credentials**
    ```bash
    aws configure
-   # or set environment variables
+   # OR set environment variables
    export AWS_ACCESS_KEY_ID=your_access_key
    export AWS_SECRET_ACCESS_KEY=your_secret_key
    export AWS_DEFAULT_REGION=us-east-1
@@ -62,95 +62,49 @@ cd amazon-datazone-mcp-server
 5. **Verify Setup**
    ```bash
    python -m pytest tests/
-   python -c "import datazone_mcp_server; print('Setup successful!')"
+   python -c "import amazon_datazone_mcp_server; print('Setup successful!')"
    ```
 
 ## Making Changes
 
-### Branch Naming Convention
+### Development Workflow
 
-Use descriptive branch names:
-- `feature/add-new-tool` - For new features
-- `fix/error-handling` - For bug fixes
-- `docs/update-readme` - For documentation updates
-- `refactor/improve-structure` - For refactoring
-
-### Commit Message Format
-
-Follow conventional commit format:
-```
-type(scope): brief description
-
-Detailed explanation of the change (if necessary)
-
-Fixes #123
-```
-
-Examples:
-- `feat(domain): add domain unit creation tool`
-- `fix(project): handle missing project identifier`
-- `docs(readme): add installation instructions`
-
-## Development Guidelines
-
-### Adding New Tools
-
-When adding new DataZone API operations:
-
-1. **Choose the Right Module**
-   - Domain operations → `domain_management.py`
-   - Project operations → `project_management.py`
-   - Asset/Data operations → `data_management.py`
-   - Glossary operations → `glossary.py`
-   - Environment operations → `environment.py`
-
-2. **Tool Function Template**
-   ```python
-   @mcp.tool()
-   async def your_new_tool(
-       domain_identifier: str,
-       required_param: str,
-       optional_param: str = None
-   ) -> Any:
-       """
-       Brief description of what this tool does.
-
-       Args:
-           domain_identifier (str): The domain identifier
-           required_param (str): Description of required parameter
-           optional_param (str, optional): Description of optional parameter
-       Returns:
-           Any: Description of return value
-       Example:
-           ```python
-           result = await client.call_tool("your_new_tool", {
-               "domain_identifier": "dzd_123",
-               "required_param": "value"
-           })
-           ```
-       """
-       try:
-           # Prepare parameters
-           params = {
-               "domainIdentifier": domain_identifier,
-               "requiredParam": required_param
-           }
-           if optional_param:
-               params["optionalParam"] = optional_param
-           # Call AWS DataZone API
-           response = datazone_client.your_api_method(**params)
-           return response
-       except ClientError as e:
-           error_code = e.response['Error']['Code']
-           if error_code == 'AccessDeniedException':
-               raise Exception(f"Access denied: {str(e)}")
-           # Handle other specific errors...
-           else:
-               raise Exception(f"Error in your_new_tool: {str(e)}")
+1. **Create a feature branch**
+   ```bash
+   git checkout -b feature/your-feature-name
    ```
 
-3. **Update Module Registration**
-   Make sure to add your tool to the module's return dictionary and verify it's registered in `server.py`.
+2. **Make your changes**
+   - Follow the coding standards
+   - Add comprehensive tests
+   - Update documentation
+
+3. **Test your changes**
+   ```bash
+   pytest
+   pytest --cov=src/amazon_datazone_mcp_server --cov-report=html
+   black src tests
+   isort src tests
+   mypy src
+   ```
+
+### Tool Development
+
+When adding new DataZone tools:
+
+1. **Add the tool function** in the appropriate module (e.g., `src/amazon_datazone_mcp_server/tools/domain_management.py`)
+
+2. **Register the tool** in the module's `register_tools()` function
+
+3. **Add comprehensive tests**:
+   ```python
+   import pytest
+   from unittest.mock import patch
+   from amazon_datazone_mcp_server.tools import your_module
+
+   class TestYourModule:
+       @patch('amazon_datazone_mcp_server.tools.your_module.datazone_client')
+   ```
 
 ### Error Handling Best Practices
 
@@ -365,4 +319,4 @@ Contributors will be recognized in:
 - CHANGELOG.md release notes
 - GitHub contributors list
 
-Thank you for contributing to AWS DataZone MCP Server! ##
+Thank you for contributing to Amazon DataZone MCP Server! ##

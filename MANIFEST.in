@@ -1,0 +1,18 @@
+include README.md
+include LICENSE
+include NOTICE
+include VERSION
+include pyproject.toml
+
+recursive-include src *.py
+include src/amazon_datazone_mcp_server/py.typed
+
+# Exclude everything else
+global-exclude *.pyc
+global-exclude __pycache__
+global-exclude tests/*
+global-exclude .git*
+global-exclude .coverage
+global-exclude *.lock
+global-exclude .ruff_cache/*
+global-exclude .pytest_cache/*

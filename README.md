@@ -10,10 +10,9 @@ A high-performance Model Context Protocol (MCP) server that provides seamless in
 ## Features
 
 - **Complete Amazon DataZone API Coverage**: Access all major DataZone operations
-- **Modular Architecture**: Well-organized, maintainable code structure
-- **Type Safety**: Full TypeScript-style type hints for Python
-- **Comprehensive Error Handling**: Detailed error messages and proper exception handling
-- **Production Ready**: Robust logging, validation, and configuration management
+- **Type Safety**: Full type hints and validation
+- **Production Ready**: Robust error handling and logging
+- **MCP Compatible**: Works with any MCP-compatible client
 
 ### Supported Operations
 
@@ -25,129 +24,83 @@ A high-performance Model Context Protocol (MCP) server that provides seamless in
 | **Glossary** | Business glossaries, glossary terms |
 | **Environment** | Environments, connections, blueprints |
 
+## Installation
+
+```bash
+pip install amazon-datazone-mcp-server
+```
+
 ## Configuration
 
-Please follow the https://modelcontextprotocol.io/ for configure this MCP server via stdio.
+Configure AWS credentials using the standard AWS methods:
+- AWS CLI: `aws configure`
+- Environment variables: `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_DEFAULT_REGION`
+- IAM roles or instance profiles
 
-## Available Tools
+## Running the Server
 
-The Amazon DataZone MCP server provides **38 tools** organized into 5 categories:
-
-### Domain Management
-- `get_domain` - Retrieve domain information
-- `create_domain` - Create a new domain
-- `list_domain_units` - List domain units
-- `create_domain_unit` - Create domain unit
-- `list_domains` - List domains
-- `add_entity_owner` - Add entity ownership
-- `add_policy_grant` - Grant policies
-- `search` - Search across DataZone
-- `search_types` - Search typs across DataZone
-- `get_user_profile` - Get user profile
-- `search_user_profiles` - Search user profiles
-- `search_group_profiles` - Search group profiles
-
-### Project Management
-- `create_project` - Create new project
-- `get_project` - Get project details
-- `list_projects` - List all projects
-- `create_project_membership` - Add project members
-- `list_project_profiles` - List project profiles
-- `create_project_profile` - Create project profile
-- `get_project_profile` - Get project profile
-- `list_project_memberships` - List project memberships
-
-### Glossary Management
-- `create_glossary` - Create business glossary
-- `create_glossary_term` - Create glossary term
-- `get_glossary` - Get glossary details
-- `get_glossary_term` - Get term details
-
-### Data Management
-- `get_asset` - Retrieve asset information
-- `create_asset` - Create new asset
-- `publish_asset` - Publish asset to catalog
-- `get_listing` - Get asset listing
-- `search_listings` - Search published assets
-- `create_data_source` - Create data source
-- `get_data_source` - Get data source
-- `start_data_source_run` - Start data source run
-- `create_subscription_request` - Request data subscription
-- `accept_subscription_request` - Accept subscription
-- `get_form_type` - Get metadata form type
-- `create_form_type` - Create metadata form type
-- `get_subscription` - Get subscription
-- `list_data_sources` - List data sources
-
-
-### Environment Management
-- `list_environments` - List environments
-- `create_connection` - Create environment connection
-- `get_connection` - Get connection details
-- `get_environment` - Get environment details
-- `get_environment_blueprint` - Get environment blueprint
-- `get_environment_blueprint_configuration` - Get environment blueprint configuration
-- `list_connections` - List all connections
-- `list_environment_blueprints` - List available blueprints
-- `list_environment_blueprint_configurations` - List available blueprint configurations
-- `list_environment_profiles` - List environment profiles
-
-> **For detailed documentation** of each tool with parameters and examples, see our [Tool Reference](docs/TOOL_REFERENCE.md).
-
-## Running the Servers
-
-The Amazon DataZone MCP Server uses **stdio transport** for secure, local communication with MCP clients.
-
-### **Running DataZone MCP Server**
+The server uses **stdio transport** for secure communication with MCP clients:
 
 ```bash
-# Default stdio transport
-python servers/datazone/server.py
+amazon-datazone-mcp-server
 ```
 
-### **Running Individual Service Servers**
+### Integration with MCP Clients
 
-```bash
-# Athena MCP Server
-python servers/athena/server.py
-
-# Glue MCP Server
-python servers/glue/server.py
-
-# S3 MCP Server
-python servers/s3/server.py
-```
-
-### **Integration with MCP Clients**
-
-The servers are designed to work with MCP clients like Claude Desktop:
+Configure in your MCP client (e.g., Claude Desktop):
 
 ```json
 {
   "name": "amazon-datazone-mcp-server",
-  "command": "python",
-  "args": ["path/to/servers/datazone/server.py"]
+  "command": "amazon-datazone-mcp-server"
 }
 ```
 
+## Available Tools
+
+The server provides **38 tools** across 5 categories:
+
+### Domain Management
+- `get_domain`, `create_domain`, `list_domains`
+- `list_domain_units`, `create_domain_unit`
+- `add_entity_owner`, `add_policy_grant`
+- `search`, `search_types`
+- User/group profile management
+
+### Project Management
+- `create_project`, `get_project`, `list_projects`
+- `create_project_membership`, `list_project_memberships`
+- Project profile management
+
+### Data Management
+- Asset operations: `get_asset`, `create_asset`, `publish_asset`
+- Listing operations: `get_listing`, `search_listings`
+- Data source management: `create_data_source`, `start_data_source_run`
+- Subscription management: request, accept, get subscriptions
+- Form type management
+
+### Glossary Management
+- `create_glossary`, `get_glossary`
+- `create_glossary_term`, `get_glossary_term`
+
+### Environment Management
+- Environment operations: `list_environments`, `get_environment`
+- Connection management: `create_connection`, `get_connection`, `list_connections`
+- Blueprint operations: list and get blueprints and configurations
+
+**Each tool includes comprehensive parameter documentation and examples accessible through your MCP client.**
+
 ## License
 
-This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details.
+Licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details.
 
 ## Disclaimer
 
 **This is an unofficial, community-developed project and is not affiliated with, endorsed by, or supported by Amazon Web Services, Inc.**
 
 - AWS and DataZone are trademarks of Amazon.com, Inc. or its affiliates
-- This project provides a community-built interface to Amazon DataZone APIs
 - Users are responsible for their own AWS credentials, costs, and compliance
 - No warranty or support is provided - use at your own risk
-- Always follow AWS security best practices when using this tool
+- Always follow AWS security best practices
 
-For official Amazon DataZone documentation and support, visit [Amazon DataZone Documentation](https://docs.aws.amazon.com/datazone/).
-
-## Acknowledgments
-
-- [Model Context Protocol](https://modelcontextprotocol.io/) for the protocol specification
-- [Amazon DataZone](https://aws.amazon.com/datazone/) for the data governance platform
-- The open-source community for inspiration and contributions
+For official Amazon DataZone documentation, visit [Amazon DataZone Documentation](https://docs.aws.amazon.com/datazone/).

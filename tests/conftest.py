@@ -138,11 +138,11 @@ def mcp_server_with_tools(mock_datazone_client):
     try:
         # Now import and reload the modules to get the mocked client
         import importlib
-        from servers.datazone.tools import common
+        from amazon_datazone_mcp_server.tools import common
 
         importlib.reload(common)  # This will recreate datazone_client with our mock
 
-        from servers.datazone.tools import (
+        from amazon_datazone_mcp_server.tools import (
             data_management,
             domain_management,
             environment,

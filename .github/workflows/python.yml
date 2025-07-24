@@ -55,7 +55,7 @@ jobs:
 
       - name: Security check - Bandit
         id: bandit-check
-        run: bandit -r --severity-level medium --confidence-level medium -f html -o bandit-report.html -c "pyproject.toml" servers/ || echo "status=failure" >> $GITHUB_OUTPUT
+        run: bandit -r --severity-level medium --confidence-level medium -f html -o bandit-report.html -c "pyproject.toml" src/ || echo "status=failure" >> $GITHUB_OUTPUT
 
       - name: Store Bandit as Artifact
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
@@ -73,35 +73,22 @@ jobs:
       - name: Run tests
         run: |
           if [ -d "tests" ]; then
-            uv run --frozen pytest tests/ --ignore=tests/test_api_classification_accuracy.py --cov=servers --cov-branch --cov-report=term-missing --cov-report=xml:coverage.xml
+            uv run --frozen pytest tests/ --cov=src/amazon_datazone_mcp_server --cov-branch --cov-report=term-missing --cov-report=xml:coverage.xml
           else
             echo "No tests directory found, skipping tests"
           fi
 
-      - name: Run API Classification Accuracy Test
-        env:
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-        run: |
-          if [ -n "$ANTHROPIC_API_KEY" ]; then
-            echo "Running API classification accuracy test with Anthropic API key"
-            uv run --frozen pytest tests/test_api_classification_accuracy.py::TestAPIClassificationAccuracy::test_api_classification_accuracy -v
-          else
-            echo "ANTHROPIC_API_KEY not available, skipping API classification test"
-            uv run --frozen pytest tests/test_api_classification_accuracy.py::test_dataset_structure -v
-          fi
-
-      - name: Upload API Classification Test Results
+      - name: Upload Test Results
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
-          name: api-classification-results
+          name: test-results
           path: |
-            test_results/
             coverage.xml
           retention-days: 30
 
       - name: Run pyright
-        run: uv run --frozen pyright servers/
+        run: uv run --frozen pyright src/
 
       - name: Run ruff format
         run: uv run --frozen ruff format .
@@ -133,7 +120,7 @@ jobs:
               fi;
             ) || echo "good $line"
           done < .venv/FILES;
-          uv tool run --from cyclonedx-bom cyclonedx-py environment $VIRTUAL_ENV --PEP-639 --gather-license-texts --pyproject pyproject.toml --mc-type library --output-format JSON > sbom.json
+          uv tool run --from cyclonedx-bom cyclonedx-py environment $VIRTUAL_ENV --gather-license-texts --pyproject pyproject.toml --mc-type library --output-format JSON > sbom.json
       - name: Display SBOM
         run: |
           cat <<EOT |
