@@ -121,14 +121,14 @@ def register_tools(mcp: FastMCP):
         except ClientError as e:
             error_code = e.response["Error"]["Code"]
             if error_code == "AccessDeniedException":
-                logger.error(f"Access denied while creating domain {name}")
+                logger.error(f"Access denied while creating domain {name}{}")
                 raise Exception(f"Access denied while creating domain {name}")
             elif error_code == "ConflictException":
                 logger.error(f"Domain {name} already exists")
                 raise Exception(f"Domain {name} already exists")
             elif error_code == "ValidationException":
-                logger.error(f"Invalid parameters for creating domain {name}")
-                raise Exception(f"Invalid parameters for creating domain {name}")
+                logger.error(f"Invalid parameters for creating domain {name}: {str(e)}")
+                raise Exception(f"Invalid parameters for creating domain {name}: {str(e)}")
             else:
                 logger.error(f"Error creating domain {name}: {str(e)}")
                 raise Exception(f"Error creating domain {name}: {str(e)}")
@@ -949,7 +949,8 @@ def register_tools(mcp: FastMCP):
                 Type: FilterClause object (Union type)
             max_results (int, optional): Maximum number of results to return (1-50, default: 50)
             next_token (str, optional): Token for pagination (1-8192 characters)
-            owning_project_identifier (str, optional): The identifier of the owning project
+            owning_project_identifier (str, optional): The identifier of the owning project. This is required
+            when the user is requesting a search_scope of ASSET or DATA_PRODUCT. 
                 Pattern: ^[a-zA-Z0-9_-]{1,36}$
             search_in (List[Dict[str, str]], optional): The details of the search
                 Array Members: 1-10 items
@@ -987,6 +988,11 @@ def register_tools(mcp: FastMCP):
             valid_scopes = ["ASSET", "GLOSSARY", "GLOSSARY_TERM", "DATA_PRODUCT"]
             if search_scope not in valid_scopes:
                 raise ValueError(f"search_scope must be one of {valid_scopes}")
+            
+            if (search_scope == "ASSET" or search_scope == "DATA_PRODUCT") and not owning_project_identifier:
+                raise Exception (
+                    f"To search for this search_scope:{search_scope} the owning_project_identifier is also required. Make sure to provide that as well"
+            )
 
             # Prepare the request parameters
             params = {
@@ -1012,6 +1018,7 @@ def register_tools(mcp: FastMCP):
                 params["searchText"] = search_text
             if sort:
                 params["sort"] = sort
+            
 
             response = datazone_client.search(**params)
             logger.info(
@@ -1022,21 +1029,21 @@ def register_tools(mcp: FastMCP):
             error_code = e.response["Error"]["Code"]
             if error_code == "AccessDeniedException":
                 raise Exception(
-                    f"Access denied while searching in domain {domain_identifier}"
+                    f"Access denied while searching in domain {domain_identifier}: {str(e)}"
                 )
             elif error_code == "InternalServerException":
                 raise Exception(
-                    f"Internal server error while searching in domain {domain_identifier}"
+                    f"Internal server error while searching in domain {domain_identifier}: {str(e)}"
                 )
             elif error_code == "ThrottlingException":
                 raise Exception(
-                    f"Request throttled while searching in domain {domain_identifier}"
+                    f"Request throttled while searching in domain {domain_identifier} : {str(e)}"
                 )
             elif error_code == "UnauthorizedException":
-                raise Exception(f"Unauthorized to search in domain {domain_identifier}")
+                raise Exception(f"Unauthorized to search in domain {domain_identifier} : {str(e)}")
             elif error_code == "ValidationException":
                 raise Exception(
-                    f"Invalid input while searching in domain {domain_identifier}"
+                    f"Invalid input while searching in domain {domain_identifier} : {str(e)}"
                 )
             else:
                 raise Exception(
