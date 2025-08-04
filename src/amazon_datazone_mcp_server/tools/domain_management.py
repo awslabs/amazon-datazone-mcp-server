@@ -26,6 +26,7 @@ from .common import ClientError, datazone_client, logger
 def register_tools(mcp: FastMCP):
     """Register domain management tools with the MCP server."""
 
+    
     @mcp.tool()
     async def get_domain(identifier: str) -> Any:
         """
@@ -121,7 +122,7 @@ def register_tools(mcp: FastMCP):
         except ClientError as e:
             error_code = e.response["Error"]["Code"]
             if error_code == "AccessDeniedException":
-                logger.error(f"Access denied while creating domain {name}{}")
+                logger.error(f"Access denied while creating domain {name}")
                 raise Exception(f"Access denied while creating domain {name}")
             elif error_code == "ConflictException":
                 logger.error(f"Domain {name} already exists")
@@ -991,7 +992,7 @@ def register_tools(mcp: FastMCP):
             
             if (search_scope == "ASSET" or search_scope == "DATA_PRODUCT") and not owning_project_identifier:
                 raise Exception (
-                    f"To search for this search_scope:{search_scope} the owning_project_identifier is also required. Make sure to provide that as well"
+                    f"To search for this search_scope:{search_scope} the owning_project_identifier is also required. Make sure to provide that as well."
             )
 
             # Prepare the request parameters
