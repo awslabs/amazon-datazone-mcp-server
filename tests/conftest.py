@@ -130,6 +130,7 @@ def mcp_server_with_tools(mock_datazone_client):
             return mock_datazone_client
         # For other services, use the original client function
         return original_boto3_client(service_name, **kwargs)
+
     def mock_boto3_session(*args, **kwargs):
         mock_session = Mock()
         mock_session.client = mock_boto3_client

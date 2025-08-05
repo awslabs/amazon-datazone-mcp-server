@@ -27,16 +27,16 @@ class TestDataManagementErrorHandling:
             f"Access denied while getting asset {asset_id} in domain {domain_id}"
             in str(exc_info.value)
         )
+
     @pytest.mark.asyncio
-    async def test_search_validation_error(self, mcp_server_with_tools, tool_extractor, test_data_helper):
+    async def test_search_validation_error(
+        self, mcp_server_with_tools, tool_extractor, test_data_helper
+    ):
         """Test that search validates required parameters correctly."""
         search = tool_extractor(mcp_server_with_tools, "search")
         # Test with invalid scope should fail
         with pytest.raises(ValueError, match="search_scope must be one of"):
-            await search(
-                domain_identifier="dzd_test123",
-                search_scope="INVALID_SCOPE"
-            )
+            await search(domain_identifier="dzd_test123", search_scope="INVALID_SCOPE")
 
     @pytest.mark.asyncio
     async def test_get_asset_internal_server_error(

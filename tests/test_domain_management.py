@@ -252,11 +252,13 @@ class TestDomainManagement:
         domain_id = test_data_helper.get_domain_id()
         search_scope = "ASSET"
         search_text = "test"
+        owning_project_id = "project_123"
 
         result = await search(
             domain_identifier=domain_id,
             search_scope=search_scope,
             search_text=search_text,
+            owning_project_identifier=owning_project_id,
         )
 
         # Verify the result
