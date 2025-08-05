@@ -22,7 +22,7 @@ import boto3
 # Import the real MCP tools
 from mcp.server.fastmcp import FastMCP
 
-from amazon_datazone_mcp_server.tools import (
+from .tools import (
     data_management,
     domain_management,
     environment,
@@ -52,11 +52,11 @@ def initialize_aws_session():
     # Check for local development environment using generic environment variable
     # Use MCP_LOCAL_DEV=true to indicate local development instead of hardcoded key patterns
     is_local_dev = os.environ.get("MCP_LOCAL_DEV", "").lower() == "true"
-    region = os.environ.get("AWS_REGION", "us-east-1")
 
     # Check if AWS profile is specified
     profile_name = os.environ.get("AWS_PROFILE")
     if profile_name:
+        region = os.environ.get("AWS_REGION") or os.environ.get("AWS_DEFAULT_REGION", "us-east-1")
         logger.info(
             f"Using AWS credentials from profile: {profile_name}, region : {region}"
         )
