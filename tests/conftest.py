@@ -130,11 +130,16 @@ def mcp_server_with_tools(mock_datazone_client):
             return mock_datazone_client
         # For other services, use the original client function
         return original_boto3_client(service_name, **kwargs)
+    def mock_boto3_session(*args, **kwargs):
+        mock_session = Mock()
+        mock_session.client = mock_boto3_client
+        return mock_session
 
     original_boto3_client = boto3.client
     patcher = patch("boto3.client", side_effect=mock_boto3_client)
+    patcher2 = patch("boto3.Session", side_effect=mock_boto3_session)
     patcher.start()
-
+    patcher2.start()
     try:
         # Now import and reload the modules to get the mocked client
         import importlib
@@ -172,6 +177,7 @@ def mcp_server_with_tools(mock_datazone_client):
     finally:
         # Stop the patcher when the test is done
         patcher.stop()
+        patcher2.stop()
 
 
 @pytest.fixture
