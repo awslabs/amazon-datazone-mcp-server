@@ -36,7 +36,7 @@ dependencies = [
 dev = [
     "pytest>=7.0.0",
     "pytest-cov>=4.0.0",
-    "pytest-asyncio>=0.21.0",
+    "pytest-asyncio>=1.1.0",
     "black>=23.0.0",
     "isort>=5.12.0",
     "mypy>=1.0.0",
@@ -89,7 +89,6 @@ python_files = ["test_*.py", "*_test.py"]
 python_classes = ["Test*"]
 python_functions = ["test_*"]
 asyncio_mode = "auto"
-asyncio_default_fixture_loop_scope = "function"
 markers = [
     "slow: marks tests as slow (deselect with '-m \"not slow\"')",
     "integration: marks tests as integration tests requiring AWS credentials",
@@ -100,10 +99,4 @@ markers = [
 exclude_dirs = ["tests", ".venv", "venv"]
 skips = ["B101"]
 
-[dependency-groups]
-dev = [
-    "pyright>=1.1.403",
-    "pytest-asyncio>=1.1.0",
-    "pytest-cov>=6.2.1",
-    "ruff>=0.12.4",
-]
+

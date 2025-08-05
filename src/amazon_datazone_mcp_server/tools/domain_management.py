@@ -26,7 +26,6 @@ from .common import ClientError, datazone_client, logger
 def register_tools(mcp: FastMCP):
     """Register domain management tools with the MCP server."""
 
-    
     @mcp.tool()
     async def get_domain(identifier: str) -> Any:
         """
@@ -129,7 +128,9 @@ def register_tools(mcp: FastMCP):
                 raise Exception(f"Domain {name} already exists")
             elif error_code == "ValidationException":
                 logger.error(f"Invalid parameters for creating domain {name}: {str(e)}")
-                raise Exception(f"Invalid parameters for creating domain {name}: {str(e)}")
+                raise Exception(
+                    f"Invalid parameters for creating domain {name}: {str(e)}"
+                )
             else:
                 logger.error(f"Error creating domain {name}: {str(e)}")
                 raise Exception(f"Error creating domain {name}: {str(e)}")
@@ -951,7 +952,7 @@ def register_tools(mcp: FastMCP):
             max_results (int, optional): Maximum number of results to return (1-50, default: 50)
             next_token (str, optional): Token for pagination (1-8192 characters)
             owning_project_identifier (str, optional): The identifier of the owning project. This is required
-            when the user is requesting a search_scope of ASSET or DATA_PRODUCT. 
+            when the user is requesting a search_scope of ASSET or DATA_PRODUCT.
                 Pattern: ^[a-zA-Z0-9_-]{1,36}$
             search_in (List[Dict[str, str]], optional): The details of the search
                 Array Members: 1-10 items
@@ -989,11 +990,13 @@ def register_tools(mcp: FastMCP):
             valid_scopes = ["ASSET", "GLOSSARY", "GLOSSARY_TERM", "DATA_PRODUCT"]
             if search_scope not in valid_scopes:
                 raise ValueError(f"search_scope must be one of {valid_scopes}")
-            
-            if (search_scope == "ASSET" or search_scope == "DATA_PRODUCT") and not owning_project_identifier:
-                raise Exception (
+
+            if (
+                search_scope == "ASSET" or search_scope == "DATA_PRODUCT"
+            ) and not owning_project_identifier:
+                raise Exception(
                     f"To search for this search_scope:{search_scope} the owning_project_identifier is also required. Make sure to provide that as well."
-            )
+                )
 
             # Prepare the request parameters
             params = {
@@ -1019,7 +1022,6 @@ def register_tools(mcp: FastMCP):
                 params["searchText"] = search_text
             if sort:
                 params["sort"] = sort
-            
 
             response = datazone_client.search(**params)
             logger.info(
@@ -1041,7 +1043,9 @@ def register_tools(mcp: FastMCP):
                     f"Request throttled while searching in domain {domain_identifier} : {str(e)}"
                 )
             elif error_code == "UnauthorizedException":
-                raise Exception(f"Unauthorized to search in domain {domain_identifier} : {str(e)}")
+                raise Exception(
+                    f"Unauthorized to search in domain {domain_identifier} : {str(e)}"
+                )
             elif error_code == "ValidationException":
                 raise Exception(
                     f"Invalid input while searching in domain {domain_identifier} : {str(e)}"
@@ -1050,6 +1054,9 @@ def register_tools(mcp: FastMCP):
                 raise Exception(
                     f"Error searching in domain {domain_identifier}: {str(e)}"
                 )
+        except ValueError:
+            # Re-raise validation errors as-is for proper error handling
+            raise
         except Exception as e:
             raise Exception(
                 f"Unexpected error searching in domain {domain_identifier}: {str(e)}"
