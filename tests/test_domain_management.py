@@ -267,7 +267,77 @@ class TestDomainManagement:
 
         # Verify the mock was called correctly
         mcp_server_with_tools._mock_client.search.assert_called_once()
+    @pytest.mark.asyncio
+    async def test_search_success(
+        self, mcp_server_with_tools, tool_extractor, test_data_helper
+    ):
+        """Test successful search operation."""
+        # Configure mock response
+        mcp_server_with_tools._mock_client.search.return_value = {
+            "items": [
+                {
+                    "id": "search_result_123",
+                    "name": "Search Result",
+                    "description": "Test search result",
+                    "assetType": "amazon.datazone.S3Asset",
+                }
+            ],
+            "totalMatchCount": 1,
+        }
 
+        search = tool_extractor(mcp_server_with_tools, "search")
+
+        domain_id = test_data_helper.get_domain_id()
+        search_scope = "ASSET"
+        search_text = "test"
+        owning_project_id = "XXXXXXXXXXX"
+
+        result = await search(
+            domain_identifier=domain_id,
+            search_scope=search_scope,
+            search_text=search_text,
+            owning_project_identifier=owning_project_id,
+        )
+
+        # Verify the result
+        assert result is not None
+        assert "items" in result
+        assert len(result["items"]) == 1
+        assert result["totalMatchCount"] == 1
+
+        # Verify the mock was called correctly
+        mcp_server_with_tools._mock_client.search.assert_called_once()
+
+    @pytest.mark.asyncio
+    async def test_search_failure(
+        self, mcp_server_with_tools, tool_extractor, test_data_helper
+    ):
+        """Test successful search operation."""
+        # Configure mock response
+        mcp_server_with_tools._mock_client.search.return_value = {
+            "items": [
+                {
+                    "id": "search_result_123",
+                    "name": "Search Result",
+                    "description": "Test search result",
+                    "assetType": "amazon.datazone.S3Asset",
+                }
+            ],
+            "totalMatchCount": 1,
+        }
+
+        search = tool_extractor(mcp_server_with_tools, "search")
+
+        domain_id = test_data_helper.get_domain_id()
+        search_scope = "ASSET"
+        search_text = "test"
+
+        with pytest.raises(Exception):
+            result = await search(
+            domain_identifier=domain_id,
+            search_scope=search_scope,
+            search_text=search_text,
+            )
     @pytest.mark.asyncio
     async def test_add_policy_grant_success(
         self, mcp_server_with_tools, tool_extractor, test_data_helper

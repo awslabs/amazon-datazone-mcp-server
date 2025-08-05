@@ -15,6 +15,7 @@
 
 import boto3
 import httpx  # noqa: F401
+import os
 import logging
 from typing import Any, Dict, List, Optional  # noqa: F401
 from botocore.exceptions import ClientError  # noqa: F401
@@ -36,10 +37,17 @@ class LazyDataZoneClient:
     def _get_client(self):
         if self._client is None:
             try:
-                self._client = boto3.client("datazone")
+                self.profile = os.environ.get("AWS_PROFILE", None)
+                logger.info(f"The AWS Profile being used: {self.profile}")
+                try:
+                    self.session = boto3.Session(profile_name=self.profile)
+                except Exception as e:
+                    logger.info(f"Profile {self.profile} not found. Using default profile.")
+                    self.session = boto3.Session(profile_name="default");
+                self._client = self.session.client("datazone")
             except Exception as e:
-                logger.warning(f"Failed to initialize DataZone client: {e}")
-                # Return a mock client that raises meaningful errors
+                # Log the error without raising to avoid breaking the application
+                logger.error(f"Failed to initialize DataZone client: {e}")
                 raise RuntimeError(f"DataZone client not available: {e}")
         return self._client
 
@@ -51,3 +59,4 @@ class LazyDataZoneClient:
 
 # Initialize the lazy client
 datazone_client = LazyDataZoneClient()
+
