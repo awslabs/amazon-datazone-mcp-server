@@ -35,39 +35,55 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
 
+def get_account_id_from_session(session):
+    """Helper function to get account ID from a boto3 session"""
+    try:
+        sts_client = session.client("sts")
+        account_id = sts_client.get_caller_identity()["Account"]
+        logger.info(f"Retrieved account ID from STS: {account_id}")
+        return account_id
+    except Exception as e:
+        logger.warning(f"Could not retrieve account ID from STS: {e}")
+        return os.environ.get("AWS_ACCOUNT_ID", "unknown")
+
+
 def initialize_aws_session():
     """Initialize AWS session with proper credential handling (no credential exposure)"""
+    # Check for local development environment using generic environment variable
+    # Use MCP_LOCAL_DEV=true to indicate local development instead of hardcoded key patterns
+    is_local_dev = os.environ.get("MCP_LOCAL_DEV", "").lower() == "true"
+
+    # Check if AWS profile is specified
+    profile_name = os.environ.get("AWS_PROFILE")
+    if profile_name:
+        region = os.environ.get("AWS_REGION") or os.environ.get("AWS_DEFAULT_REGION", "us-east-1")
+        logger.info(
+            f"Using AWS credentials from profile: {profile_name}, region : {region}"
+        )
+        session = boto3.Session(profile_name=profile_name, region_name=region)
+        account_id = get_account_id_from_session(session)
+        return session, account_id
+
+    if (
+        is_local_dev
+        and os.environ.get("AWS_ACCESS_KEY_ID")
+        and os.environ.get("AWS_SECRET_ACCESS_KEY")
+        and os.environ.get("AWS_SESSION_TOKEN")
+    ):
+        logger.info(
+            "Using AWS credentials from environment variables (local development)"
+        )
+        session = boto3.Session(
+            aws_access_key_id=os.environ.get("AWS_ACCESS_KEY_ID"),
+            aws_secret_access_key=os.environ.get("AWS_SECRET_ACCESS_KEY"),
+            aws_session_token=os.environ.get("AWS_SESSION_TOKEN"),
+            region_name=os.environ.get("AWS_DEFAULT_REGION", "us-east-1"),
+        )
+        account_id = get_account_id_from_session(session)
+        return session, account_id
+
+    # Try to get credentials from Secrets Manager
     try:
-        # Check for local development environment using generic environment variable
-        # Use MCP_LOCAL_DEV=true to indicate local development instead of hardcoded key patterns
-        is_local_dev = os.environ.get("MCP_LOCAL_DEV", "").lower() == "true"
-
-        if (
-            is_local_dev
-            and os.environ.get("AWS_ACCESS_KEY_ID")
-            and os.environ.get("AWS_SECRET_ACCESS_KEY")
-            and os.environ.get("AWS_SESSION_TOKEN")
-        ):
-            logger.info(
-                "Using AWS credentials from environment variables (local development)"
-            )
-            session = boto3.Session(
-                aws_access_key_id=os.environ.get("AWS_ACCESS_KEY_ID"),
-                aws_secret_access_key=os.environ.get("AWS_SECRET_ACCESS_KEY"),
-                aws_session_token=os.environ.get("AWS_SESSION_TOKEN"),
-                region_name=os.environ.get("AWS_DEFAULT_REGION", "us-east-1"),
-            )
-            # Get account ID dynamically from STS
-            try:
-                sts_client = session.client("sts")
-                account_id = sts_client.get_caller_identity()["Account"]
-                logger.info("Successfully retrieved account ID from STS")
-                return session, account_id
-            except Exception as e:
-                logger.warning(f"Could not retrieve account ID from STS: {e}")
-                return session, os.environ.get("AWS_ACCOUNT_ID", "unknown")
-
-        # For AWS deployment, retrieve from Secrets Manager
         logger.info(
             "Running in AWS environment - retrieving credentials from Secrets Manager..."
         )
@@ -93,18 +109,11 @@ def initialize_aws_session():
     except Exception as e:
         logger.error(f"Failed to retrieve credentials from Secrets Manager: {e}")
         logger.warning("Falling back to default AWS credentials")
-        # Try to get account ID from default session
-        try:
-            default_session = boto3.Session()
-            sts_client = default_session.client("sts")
-            account_id = sts_client.get_caller_identity()["Account"]
-            logger.info("Successfully retrieved account ID from default credentials")
-            return default_session, account_id
-        except Exception as sts_e:
-            logger.warning(
-                f"Could not retrieve account ID from default credentials: {sts_e}"
-            )
-            return boto3.Session(), os.environ.get("AWS_ACCOUNT_ID", "unknown")
+
+    # Fall back to default credentials
+    default_session = boto3.Session()
+    account_id = get_account_id_from_session(default_session)
+    return default_session, account_id
 
 
 def create_mcp_server():
