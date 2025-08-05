@@ -37,16 +37,15 @@ class LazyDataZoneClient:
     def _get_client(self):
         if self._client is None:
             try:
-                self.profile = os.environ.get("AWS_PROFILE", None)
-                logger.info(f"The AWS Profile being used: {self.profile}")
-                try:
-                    self.session = boto3.Session(profile_name=self.profile)
-                except Exception as e:
-                    logger.info(f"Profile {self.profile} not found. Using default profile.")
-                    self.session = boto3.Session(profile_name="default");
-                self._client = self.session.client("datazone")
+                profile = os.environ.get("AWS_PROFILE")
+                if profile:
+                    logger.info(f"Using AWS profile: {profile}")
+                    session = boto3.Session(profile_name=profile)
+                else:
+                    logger.info("Using default AWS credential chain")
+                    session = boto3.Session()  # Let boto3 handle credential chain
+                self._client = session.client("datazone")
             except Exception as e:
-                # Log the error without raising to avoid breaking the application
                 logger.error(f"Failed to initialize DataZone client: {e}")
                 raise RuntimeError(f"DataZone client not available: {e}")
         return self._client
